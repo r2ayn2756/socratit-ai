@@ -23,6 +23,7 @@ import notificationRoutes from './routes/notification.routes';
 import progressRoutes from './routes/progress.routes';
 import curriculumRoutes from './routes/curriculum.routes';
 import aiTARoutes from './routes/aiTA.routes';
+import seedRoutes from './routes/seed.routes';
 
 // Create Express application
 const app: Application = express();
@@ -139,6 +140,7 @@ app.use(`${API_PREFIX}/notifications`, notificationRoutes);
 app.use(`${API_PREFIX}/progress`, progressRoutes);
 app.use(`${API_PREFIX}/curriculum`, curriculumRoutes);
 app.use(`${API_PREFIX}/ai-ta`, aiTARoutes);
+app.use(`${API_PREFIX}/seed`, seedRoutes); // One-time database seed endpoint
 
 // ============================================================================
 // ERROR HANDLING

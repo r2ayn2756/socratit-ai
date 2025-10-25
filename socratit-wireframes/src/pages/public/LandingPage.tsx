@@ -173,7 +173,7 @@ export const LandingPage: React.FC = () => {
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-slate-900 rounded-b-3xl z-10"></div>
 
                   {/* Screen */}
-                  <div className="relative bg-gradient-to-b from-slate-950 to-slate-900 rounded-[2.5rem] overflow-hidden h-[600px]">
+                  <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 rounded-[2.5rem] overflow-hidden h-[600px]">
                     {/* Status Bar */}
                     <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-8 text-white text-xs z-20">
                       <span className="font-semibold">9:41</span>
@@ -188,7 +188,7 @@ export const LandingPage: React.FC = () => {
                       {/* Time Display */}
                       <div className="text-center text-white mb-8">
                         <div className="text-6xl font-light mb-1">9:41</div>
-                        <div className="text-lg font-light opacity-70">Monday, October 20</div>
+                        <div className="text-lg font-light opacity-90">Monday, October 20</div>
                       </div>
 
                       {/* Notification 1 */}
@@ -196,7 +196,7 @@ export const LandingPage: React.FC = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="glass rounded-2xl p-3 shadow-lg"
+                        className="bg-white/95 backdrop-blur rounded-2xl p-3 shadow-lg"
                       >
                         <div className="flex items-start gap-3">
                           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center flex-shrink-0">
@@ -204,13 +204,13 @@ export const LandingPage: React.FC = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-semibold text-white">Socratit.ai</span>
-                              <span className="text-xs text-white/60">6:00 AM</span>
+                              <span className="text-sm font-semibold text-slate-900">Socratit.ai</span>
+                              <span className="text-xs text-slate-600">6:00 AM</span>
                             </div>
-                            <div className="text-sm text-white font-medium mb-0.5">
+                            <div className="text-sm text-slate-900 font-medium mb-0.5">
                               ✓ Submitted attendance reports
                             </div>
-                            <div className="text-xs text-white/70">
+                            <div className="text-xs text-slate-600">
                               All 5 classes marked complete
                             </div>
                           </div>
@@ -222,7 +222,7 @@ export const LandingPage: React.FC = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
-                        className="glass rounded-2xl p-3 shadow-lg"
+                        className="bg-white/95 backdrop-blur rounded-2xl p-3 shadow-lg"
                       >
                         <div className="flex items-start gap-3">
                           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center flex-shrink-0">
@@ -230,13 +230,13 @@ export const LandingPage: React.FC = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-semibold text-white">Socratit.ai</span>
-                              <span className="text-xs text-white/60">6:15 AM</span>
+                              <span className="text-sm font-semibold text-slate-900">Socratit.ai</span>
+                              <span className="text-xs text-slate-600">6:15 AM</span>
                             </div>
-                            <div className="text-sm text-white font-medium mb-0.5">
+                            <div className="text-sm text-slate-900 font-medium mb-0.5">
                               Sent feedback to 24 students
                             </div>
-                            <div className="text-xs text-white/70">
+                            <div className="text-xs text-slate-600">
                               Personalized comments on last week's quiz
                             </div>
                           </div>
@@ -248,7 +248,7 @@ export const LandingPage: React.FC = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.9 }}
-                        className="glass rounded-2xl p-3 shadow-lg"
+                        className="bg-white/95 backdrop-blur rounded-2xl p-3 shadow-lg"
                       >
                         <div className="flex items-start gap-3">
                           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-orange to-red-500 flex items-center justify-center flex-shrink-0">
@@ -256,20 +256,20 @@ export const LandingPage: React.FC = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-semibold text-white">Socratit.ai</span>
-                              <span className="text-xs text-white/60">6:30 AM</span>
+                              <span className="text-sm font-semibold text-slate-900">Socratit.ai</span>
+                              <span className="text-xs text-slate-600">6:30 AM</span>
                             </div>
-                            <div className="text-sm text-white font-medium mb-0.5">
+                            <div className="text-sm text-slate-900 font-medium mb-0.5">
                               ⚠️ 18 students struggling with Triangle Proofs
                             </div>
-                            <div className="text-xs text-white/70 mb-2">
+                            <div className="text-xs text-slate-600 mb-2">
                               Suggested: Re-format tomorrow's lesson
                             </div>
                             <div className="flex gap-2">
-                              <button className="flex-1 px-3 py-1.5 bg-brand-blue text-white rounded-lg text-xs font-semibold">
+                              <button className="flex-1 px-3 py-1.5 bg-brand-blue text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors">
                                 View Details
                               </button>
-                              <button className="flex-1 px-3 py-1.5 bg-white/20 text-white rounded-lg text-xs font-semibold">
+                              <button className="flex-1 px-3 py-1.5 bg-slate-200 text-slate-900 rounded-lg text-xs font-semibold hover:bg-slate-300 transition-colors">
                                 Edit Lesson
                               </button>
                             </div>
