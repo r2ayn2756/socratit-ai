@@ -8,7 +8,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { Request } from 'express';
 import { env } from '../config/env';
-import { fileTypeFromBuffer } from 'file-type';
+import FileType from 'file-type';
 
 // ============================================================================
 // ALLOWED FILE TYPES
@@ -102,7 +102,7 @@ export async function validateFileContent(filePath: string, declaredMimeType: st
   try {
     // Read first 4100 bytes for file type detection
     const buffer = await fs.readFile(filePath);
-    const fileType = await fileTypeFromBuffer(buffer);
+    const fileType = await FileType.fromBuffer(buffer);
 
     if (!fileType) {
       // file-type couldn't detect type (might be plain text)
