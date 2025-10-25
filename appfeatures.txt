@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<socratit_ai_application>
+  
+  <!-- PUBLIC PAGES -->
+  <page_category name="Public Pages">
+    
+    <page name="Landing Page (Homepage)" url="socratit.ai" priority="P0">
+      <purpose>Convert teachers and admins to sign up</purpose>
+      <sections>
+        <section name="Hero Section">
+          <feature>Headline: "Teaching Shouldn't Feel Like Two Full-Time Jobs"</feature>
+          <feature>Subheadline value prop</feature>
+          <feature>CTA buttons: "Start Free Trial" + "Watch Demo"</feature>
+          <feature>Screenshot/video of proactive briefing</feature>
+        </section>
+        <section name="Problem Statement">
+          <feature>Teacher pain points list</feature>
+        </section>
+        <section name="How It Works">
+          <feature>3-step visual flow</feature>
+        </section>
+        <section name="Feature Grid">
+          <feature>Features for teachers, students, admins</feature>
+        </section>
+        <section name="Proactive TA Demo">
+          <feature>Showcase automated messages from ai</feature>
+        </section>
+        <section name="Social Proof">
+          <feature>Testimonials</feature>
+          <feature>Statistics</feature>
+        </section>
+        <section name="Admin Appeal">
+          <feature>ROI information</feature>
+          <feature>Analytics preview</feature>
+        </section>
+        <section name="Final CTA">
+          <feature>Call to action buttons</feature>
+          <feature>Footer</feature>
+        </section>
+      </sections>
+    </page>
+    
+    <page name="Sign Up / Login Pages" url="/signup, /login" priority="P0">
+      <purpose>User authentication and account creation</purpose>
+      <signup_features>
+        <feature>Role selection: Teacher / Student / Admin / Parent</feature>
+        <feature>Email + password</feature>
+        <feature>School/district selection (dropdown or manual entry)</feature>
+        <feature>Terms acceptance</feature>
+        <feature>Email verification</feature>
+      </signup_features>
+      <login_features>
+        <feature>Email + password</feature>
+        <feature>"Forgot password" flow</feature>
+        <feature priority="P1">SSO options (Google, Microsoft)</feature>
+      </login_features>
+    </page>
+    
+  </page_category>
+  
+  <!-- TEACHER PAGES -->
+  <page_category name="Teacher Pages">
+    
+    <page name="Teacher Dashboard (Home)" url="/teacher/dashboard" priority="P0">
+      <purpose>Daily command center for teachers</purpose>
+      <sections>
+        
+        <section name="Proactive Daily Briefing" priority="P0">
+          <description>Top Section - Card Based - Generated each morning at 6 AM</description>
+          <card name="Automated Tasks Summary">
+            <feature>"I submitted attendance reports"</feature>
+            <feature>"I sent feedback to 24 students"</feature>
+            <feature>List of completed tasks</feature>
+          </card>
+          <card name="Student Struggle Analysis">
+            <feature>Topic: Triangle Proofs</feature>
+            <feature>Summary: "18 of 24 students struggled with..."</feature>
+            <feature>Visual: quick chart showing struggle areas</feature>
+            <feature>Actionable suggestion: "Re-format tomorrow's lesson..."</feature>
+            <feature>"Confirm" or "Edit Lesson" buttons</feature>
+          </card>
+          <card name="Proactive Communications">
+            <feature>"Three parents expressed concerns about..."</feature>
+            <feature>Draft email preview</feature>
+            <feature>"Send" or "Edit" buttons</feature>
+          </card>
+          <card name="Recommendations">
+            <feature>Pacing updates</feature>
+            <feature>Students needing intervention</feature>
+            <feature>Enrichment opportunities</feature>
+          </card>
+          <feature>Historical briefings: "View Past Week" dropdown</feature>
+        </section>
+        
+        <section name="Quick Actions Bar" priority="P0">
+          <feature>"Create Assignment" button (dropdown: Next Assignment / Custom / From Description)</feature>
+          <feature>"Send Announcement" button</feature>
+          <feature priority="P1">"Take Attendance" button</feature>
+          <feature>"View Messages" (with unread count)</feature>
+        </section>
+        
+        <section name="Classes Overview" priority="P0">
+          <card name="Class Card">
+            <feature>Class name + period</feature>
+            <feature>Student count</feature>
+            <feature>Recent activity summary</feature>
+            <feature>"Manage Class" button</feature>
+          </card>
+          <feature>"+ Create New Class" button</feature>
+        </section>
+        
+        <section name="Upcoming Deadlines" priority="P0">
+          <feature>List of assignments due this week across all classes</feature>
+          <feature>Color coded by class</feature>
+          <feature>Quick grade status</feature>
+        </section>
+        
+        <section name="Alerts & Notifications" priority="P0">
+          <feature>Students who submitted late work</feature>
+          <feature>Parents who messaged</feature>
+          <feature>Students who need help (flagged by AI TA)</feature>
+          <feature>Missing grades that need input</feature>
+        </section>
+        
+      </sections>
+    </page>
+    
+    <page name="Teacher Class View" url="/teacher/class/[class-id]" priority="P0">
+      <purpose>Manage everything for one specific class</purpose>
+      <navigation_tabs>
+        <tab>Overview</tab>
+        <tab>Assignments</tab>
+        <tab>Students</tab>
+        <tab>Gradebook</tab>
+        <tab>Analytics</tab>
+        <tab>Settings</tab>
+      </navigation_tabs>
+      
+      <tab name="Overview" priority="P0">
+        <section name="Class Header">
+          <feature>Class name, period, subject, grade level</feature>
+          <feature>Join code (large, copyable)</feature>
+          <feature>Student count</feature>
+          <feature>Edit class settings button</feature>
+        </section>
+        <section name="Quick Stats">
+          <feature>Average class grade</feature>
+          <feature>Assignment completion rate this week</feature>
+          <feature>Students needing attention (flagged by AI)</feature>
+        </section>
+        <section name="Recent Activity Feed">
+          <feature>"Student X submitted Assignment Y"</feature>
+          <feature>"15 students completed homework"</feature>
+          <feature>"3 students asked for help on Question 4"</feature>
+        </section>
+        <section name="Curriculum Timeline">
+          <feature>Visual timeline showing: Past units (completed), Current unit (highlighted), Upcoming units</feature>
+          <feature>Click to jump to week</feature>
+          <feature>Drag to reorder/adjust pacing</feature>
+          <feature>"Edit Timeline" button</feature>
+        </section>
+      </tab>
+      
+      <tab name="Assignments" priority="P0">
+        <section name="Assignment List">
+          <feature>All assignments for this class</feature>
+          <feature>Filters: All / Published / Draft / Scheduled</feature>
+          <feature>Sort: By date, by name, by completion rate</feature>
+          <assignment_card>
+            <feature>Title + type (homework, quiz, project)</feature>
+            <feature>Due date</feature>
+            <feature>Published status</feature>
+            <feature>Completion rate: "18/24 submitted"</feature>
+            <feature>Average score</feature>
+            <feature>"View" | "Edit" | "Duplicate" buttons</feature>
+          </assignment_card>
+        </section>
+        <section name="Create Assignment">
+          <feature>"Create Assignment" button - Opens assignment builder modal</feature>
+        </section>
+        <section name="Bulk Actions" priority="P1">
+          <feature>Select multiple → Duplicate, Delete, Export</feature>
+        </section>
+      </tab>
+      
+      <tab name="Students" priority="P0">
+        <section name="Student Roster Table">
+          <columns>
+            <column>Name</column>
+            <column>Student ID (optional)</column>
+            <column>Current grade</column>
+            <column>Missing assignments (count)</column>
+            <column>Last active</column>
+            <column>Status indicators (struggling, excelling, inactive)</column>
+          </columns>
+          <feature>Click student → Student detail view</feature>
+          <feature>Sort by any column</feature>
+          <feature>Search bar</feature>
+        </section>
+        <section name="Actions">
+          <feature>"Message Student" button</feature>
+          <feature>"Remove from Class" button</feature>
+          <feature priority="P1">"Export Roster" button</feature>
+        </section>
+        <section name="Student Detail Modal">
+          <feature>Student info + photo (if available)</feature>
+          <feature>Current grade + breakdown by assignment</feature>
+          <feature priority="P1">Progress heatmap</feature>
+          <feature>Recent activity</feature>
+          <feature>AI TA interaction history (what questions they asked)</feature>
+          <feature>Teacher notes section (private)</feature>
+          <feature>"Message Student" and "Contact Parent" buttons</feature>
+        </section>
+      </tab>
+      
+      <tab name="Gradebook" priority="P0">
+        <section name="Spreadsheet Interface">
+          <feature>Rows: Students (name in first column)</feature>
+          <feature>Columns: Each assignment</feature>
+          <feature>Cells: Grades (color coded)
+            - Green: complete
+            - Yellow: late
+            - Red: missing
+            - Blue: pending grading
+          </feature>
+          <feature>Click cell → Quick edit grade or jump to submission</feature>
+          <feature>Last column: Calculated total grade</feature>
+        </section>
+        <section name="Gradebook Settings">
+          <feature>Category weights (homework 40%, tests 60%, etc.)</feature>
+          <feature>Drop lowest score per category</feature>
+          <feature>Extra credit options</feature>
+          <feature>Grade scale (A = 90-100, etc.)</feature>
+          <feature>"Export to CSV" button</feature>
+        </section>
+        <section name="Manual Grading Queue">
+          <feature>List of submissions waiting for grades</feature>
+          <feature>Click → Side panel opens showing:
+            - Student answer
+            - Rubric (if attached) - P1
+            - Previous submissions (for context)
+            - Grade input + comment box
+            - "Next Submission" button (rapid grading)
+          </feature>
+        </section>
+        <section name="Return Grades">
+          <feature>Checkbox: "Notify students"</feature>
+          <feature>Button: "Publish Grades"</feature>
+        </section>
+      </tab>
+      
+      <tab name="Analytics" priority="P0">
+        <section name="Class Performance Overview">
+          <feature>Grade distribution chart (histogram)</feature>
+          <feature>Completion rate over time (line graph)</feature>
+          <feature>Most challenging assignments (bar chart)</feature>
+        </section>
+        <section name="Topic Mastery Heatmap" priority="P1">
+          <feature>Grid showing: Topic × Student</feature>
+          <feature>Color intensity = mastery level</feature>
+          <feature>Click cell → See which assignments contributed</feature>
+        </section>
+        <section name="Student Struggle Insights">
+          <feature>List of questions students struggled with most</feature>
+          <feature>Time spent per question average</feature>
+          <feature>Common wrong answers</feature>
+          <feature>AI TA intervention frequency</feature>
+        </section>
+        <section name="Engagement Metrics" priority="P2">
+          <feature>Login frequency</feature>
+          <feature>Time on task</feature>
+          <feature>Tab-switching incidents (if tracking enabled)</feature>
+        </section>
+        <section name="Exportable Reports" priority="P1">
+          <feature>Generate PDF report for admin</feature>
+          <feature>Custom date ranges</feature>
+        </section>
+      </tab>
+      
+      <tab name="Settings" priority="P0">
+        <section name="Class Details">
+          <feature>Edit name, subject, grade level, period</feature>
+          <feature>Meeting schedule</feature>
+          <feature>Archive class button</feature>
+          <feature>Delete class button (with confirmation)</feature>
+        </section>
+        <section name="Assignment Defaults" priority="P1">
+          <feature>Default due time (11:59 PM)</feature>
+          <feature>Allow late submissions (yes/no)</feature>
+          <feature>Late penalty settings</feature>
+          <feature>Allow resubmissions (yes/no)</feature>
+        </section>
+        <section name="Student Permissions" priority="P1">
+          <feature>Can students message each other (yes/no)</feature>
+          <feature priority="P2">Can students see leaderboard (yes/no)</feature>
+        </section>
+        <section name="Integrations" priority="P1">
+          <feature>Connect to Google Classroom</feature>
+          <feature>Sync with SIS</feature>
+        </section>
+      </tab>
+      
+    </page>
+    
+    <page name="Assignment Builder Page" url="/teacher/assignment/create or /teacher/assignment/[id]/edit" priority="P0">
+      <purpose>Create or edit assignments</purpose>
+      <description>Three Creation Modes (Tabs)</description>
+      
+      <mode name="Next Assignment (Auto-Generate)" priority="P0">
+        <interface>
+          <feature>Shows current position in curriculum timeline</feature>
+          <feature>Preview of topic: "Triangle Proofs - Lesson 3"</feature>
+          <feature>"Generate Assignment" button</feature>
+          <feature>AI generates in ~10 seconds</feature>
+          <feature>Preview generated assignment</feature>
+          <feature>Edit if needed</feature>
+          <feature>"Save & Publish" or "Save as Draft"</feature>
+        </interface>
+      </mode>
+      
+      <mode name="Describe Assignment (Natural Language)" priority="P0">
+        <interface>
+          <feature>Large text box: "Describe the assignment you want..."</feature>
+          <feature>Example prompts shown:
+            - "10 trig problems, mixed difficulty"
+            - "Essay on World War II causes, 500 words"
+            - "Lab report template for chemistry experiment"
+          </feature>
+          <feature>Optional parameters:
+            - Assignment type (homework, quiz, project, etc.)
+            - Difficulty level (slider)
+            - Estimated time to complete
+          </feature>
+          <feature>"Generate" button</feature>
+          <feature>AI creates assignment → Preview → Edit → Publish</feature>
+        </interface>
+      </mode>
+      
+      <mode name="Manual Builder" priority="P0">
+        <interface>
+          <section name="Assignment Details Section">
+            <feature>Title (text input)</feature>
+            <feature>Type (dropdown: homework, quiz, test, project, practice)</feature>
+            <feature>Instructions (rich text editor)</feature>
+            <feature>Due date & time (date picker)</feature>
+            <feature>Total points (number input)</feature>
+            <feature priority="P1">Attach rubric (upload or create)</feature>
+            <feature priority="P1">Standards tags (search & select)</feature>
+          </section>
+          <section name="Questions Section">
+            <feature>"+ Add Question" button</feature>
+            <feature>Question types:
+              - Multiple choice
+              - Short answer
+              - Long answer (essay)
+              - Math problem (with equation editor) - P1
+              - File upload
+              - True/False
+            </feature>
+            <question_card>
+              <feature>Question text (rich text)</feature>
+              <feature>Image upload (optional)</feature>
+              <feature>Point value</feature>
+              <feature>Answer key (for auto-grading)</feature>
+              <feature>"Delete" | "Duplicate" | "Reorder" buttons</feature>
+            </question_card>
+            <feature>Drag to reorder questions</feature>
+          </section>
+          <section name="Import Options" priority="P1">
+            <feature>"Upload Worksheet" → AI digitizes questions</feature>
+            <feature>"Import from Bank" → Search question library</feature>
+          </section>
+          <section name="Preview Section">
+            <feature>Toggle: "Preview as Student"</feature>
+            <feature>See exactly what students will see</feature>
+          </section>
+          <section name="Distribution Settings">
+            <feature>Select which class(es) to assign to</feature>
+            <feature>Publish immediately or schedule</feature>
+            <feature>Notify students (yes/no)</feature>
+          </section>
+          <section name="Action Buttons">
+            <feature>"Save as Draft"</feature>
+            <feature>"Save & Publish"</feature>
+            <feature>"Cancel"</feature>
+          </section>
+        </interface>
+      </mode>
+      
+    </page>
+    
+    <page name="Messaging Center" url="/teacher/messages" priority="P0">
+      <purpose>Communicate with students and parents</purpose>
+      <layout>
+        <section name="Left Sidebar">
+          <feature>Tabs: Students | Parents - P1</feature>
+          <feature>List of conversations (most recent first)</feature>
+          <conversation_item>
+            <feature>Name</feature>
+            <feature>Last message preview</feature>
+            <feature>Unread indicator (badge)</feature>
+            <feature>Timestamp</feature>
+          </conversation_item>
+          <feature>Search bar</feature>
+          <feature>"New Message" button</feature>
+        </section>
+        <section name="Main Panel">
+          <feature>Chat interface with selected person</feature>
+          <feature>Message history (scrollable)</feature>
+          <feature>Text input box at bottom</feature>
+          <feature>Send button</feature>
+          <feature>Attachment button (images, files)</feature>
+        </section>
+        <section name="Right Sidebar">
+          <feature>Student/parent info</feature>
+          <feature>Current grade (if student)</feature>
+          <feature>Quick actions:
+            - "View Profile"
+            - "View Grades" (if student)
+            - "Call Parent" - P1 (if parent, shows phone)
+          </feature>
+        </section>
+        <section name="AI Message Assistant" priority="P1">
+          <feature>"Draft Message" button</feature>
+          <feature>AI suggests message based on context</feature>
+          <feature>Teacher edits and sends</feature>
+        </section>
+      </layout>
+    </page>
+    
+    <page name="Teacher Profile & Settings" url="/teacher/settings" priority="P0">
+      <purpose>Manage teacher account and preferences</purpose>
+      <sections>
+        <section name="Profile">
+          <feature>Name, email, profile photo</feature>
+          <feature>School/district</feature>
+          <feature>Subjects taught</feature>
+          <feature>Bio (optional)</feature>
+        </section>
+        <section name="Account Settings">
+          <feature>Change password</feature>
+          <feature>Email preferences</feature>
+          <feature priority="P1">Notification settings (email, in-app, SMS)</feature>
+        </section>
+        <section name="Preferences" priority="P1">
+          <feature>Default gradebook weights</feature>
+          <feature>Timezone</feature>
+          <feature>Language</feature>
+          <feature>Dark mode toggle</feature>
+        </section>
+        <section name="Integrations" priority="P1">
+          <feature>Connected accounts (Google, Microsoft)</feature>
+          <feature>SIS connection status</feature>
+          <feature>API keys (for advanced users)</feature>
+        </section>
+        <section name="Billing" priority="P1">
+          <feature>Current plan</feature>
+          <feature>Payment method</feature>
+          <feature>Invoice history</feature>
+        </section>
+      </sections>
+    </page>
+    
+  </page_category>
+  
+  <!-- STUDENT PAGES -->
+  <page_category name="Student Pages">
+    
+    <page name="Student Dashboard (Home)" url="/student/dashboard" priority="P0">
+      <purpose>Student command center</purpose>
+      <layout>
+        <section name="Header">
+          <feature>Welcome message: "Welcome back, Sarah!"</feature>
+          <feature>Current date</feature>
+          <feature>Quick stats: "2 assignments due this week"</feature>
+        </section>
+        <section name="My Classes Grid">
+          <class_card>
+            <feature>Class name + teacher name</feature>
+            <feature>Current grade (large)</feature>
+            <feature>Upcoming assignments (next 2-3)</feature>
+            <feature>"View Class" button</feature>
+          </class_card>
+          <feature>"+ Join Class" button (enter code)</feature>
+        </section>
+        <section name="Daily Trivia" priority="P2">
+          <feature>One fun question</feature>
+          <feature>4 answer choices</feature>
+          <feature>"Submit Answer" button</feature>
+          <feature>Shows correct answer + explanation after submit</feature>
+          <feature>Leaderboard link</feature>
+        </section>
+        <section name="Upcoming Assignments (All Classes)">
+          <feature>List view sorted by due date</feature>
+          <feature>Shows: title, class, due date, points</feature>
+          <feature>Color coded by class</feature>
+          <feature>"Start" button for each</feature>
+        </section>
+        <section name="Recent Grades">
+          <feature>Last 5 graded assignments</feature>
+          <feature>Shows: assignment name, grade, teacher comment</feature>
+          <feature>Link to full submission</feature>
+        </section>
+        <section name="Messages/Announcements">
+          <feature>Unread messages count</feature>
+          <feature>Recent class announcements</feature>
+          <feature>"View All" button</feature>
+        </section>
+        <section name="Progress Overview" priority="P1">
+          <feature>Overall GPA across all classes</feature>
+          <feature>Progress charts</feature>
+          <feature>Heatmap preview (link to full view)</feature>
+        </section>
+      </layout>
+    </page>
+    
+    <page name="Student Class View" url="/student/class/[class-id]" priority="P0">
+      <purpose>Everything for one specific class</purpose>
+      <navigation_tabs>
+        <tab>Assignments</tab>
+        <tab>Grades</tab>
+        <tab>Progress</tab>
+        <tab>Messages</tab>
+      </navigation_tabs>
+      
+      <tab name="Assignments" priority="P0">
+        <section name="Filter Buttons">
+          <feature>All | To Do | Completed | Missing</feature>
+        </section>
+        <section name="Assignment List">
+          <assignment_card>
+            <feature>Title + type icon</feature>
+            <feature>Due date (with countdown if urgent)</feature>
+            <feature>Points possible</feature>
+            <feature>Status: Not Started | In Progress | Submitted | Graded</feature>
+            <feature>Grade (if graded)</feature>
+          </assignment_card>
+          <feature>Click card → Opens assignment page</feature>
+          <feature>Color coding:
+            - Gray: not started
+            - Blue: in progress
+            - Green: submitted
+            - Red: overdue
+          </feature>
+        </section>
+      </tab>
+      
+      <tab name="Grades" priority="P0">
+        <section name="Current Grade Display">
+          <feature>Large number: "87%"</feature>
+          <feature>Letter grade: "B+"</feature>
+          <feature>Progress bar</feature>
+        </section>
+        <section name="Grade Breakdown">
+          <feature>List of all graded assignments</feature>
+          <feature>Shows: name, score, points possible, percentage, date</feature>
+          <feature>Click → View submission + feedback</feature>
+        </section>
+        <section name="Category Breakdown" priority="P1">
+          <feature>Homework: 85%</feature>
+          <feature>Tests: 92%</feature>
+          <feature>Projects: 80%</feature>
+          <feature>Weighted calculation shown</feature>
+        </section>
+      </tab>
+      
+      <tab name="Progress" priority="P1">
+        <section name="Progress Heatmap">
+          <feature>Grid of topics covered</feature>
+          <feature>Color intensity shows mastery</feature>
+          <feature>Click topic → See related assignments</feature>
+        </section>
+        <section name="Strengths & Weaknesses">
+          <feature>"You're excelling at: Trigonometry, Algebra"</feature>
+          <feature>"Areas to focus on: Proofs, Word Problems"</feature>
+        </section>
+        <section name="Time Spent">
+          <feature>Chart showing study time over past month</feature>
+          <feature>Comparison to class average (if enabled)</feature>
+        </section>
+      </tab>
+      
+      <tab name="Messages" priority="P0">
+        <section name="Announcements">
+          <feature>Teacher's class-wide announcements</feature>
+          <feature>Newest first</feature>
+        </section>
+        <section name="Direct Messages with Teacher">
+          <feature>Simple chat interface</feature>
+          <feature>Can attach images/files</feature>
+        </section>
+      </tab>
+      
+    </page>
+    
+    <page name="Student Assignment View" url="/student/assignment/[assignment-id]" priority="P0">
+      <purpose>Complete and submit assignments</purpose>
+      <layout>
+        <section name="Header">
+          <feature>Assignment title</feature>
+          <feature>Due date + countdown timer</feature>
+          <feature>Points possible</feature>
+          <feature>"Save Draft" and "Submit" buttons (sticky header)</feature>
+        </section>
+        <section name="Instructions Panel">
+          <feature>Assignment instructions (from teacher)</feature>
+          <feature>Attached files/resources (downloadable)</feature>
+          <feature priority="P1">Rubric (if available)</feature>
+        </section>
+        <section name="Questions Section">
+          <description>Each question in separate card</description>
+          <question_card>
+            <feature>Question number, point value</feature>
+            <feature>Question text (may include images, formatted math)</feature>
+            <feature>Answer input (varies by type):
+              - Multiple choice: radio buttons
+              - Short answer: text box
+              - Essay: large text area with word count
+              - Math: equation editor - P1
+              - File upload: drag-drop zone
+            </feature>
+            <feature>Highlight to get help feature:
+              - Select any text in question
+              - Small chat icon appears
+              - Click → Opens AI TA sidebar
+            </feature>
+          </question_card>
+          <feature>Auto-save indicator: "Saved 5 seconds ago"</feature>
+        </section>
+        <section name="Progress Indicator">
+          <feature>"3 of 10 questions answered"</feature>
+          <feature>Progress bar</feature>
+        </section>
+        <section name="Navigation">
+          <feature>"Previous" / "Next" buttons</feature>
+          <feature>Jump to question (dropdown menu)</feature>
+        </section>
+        <section name="Submit Confirmation Modal">
+          <feature>"Are you sure? You have 2 unanswered questions"</feature>
+          <feature>"Go back" or "Submit anyway" buttons</feature>
+        </section>
+        <section name="After Submission View">
+          <feature>"Assignment submitted!"</feature>
+          <feature>Timestamp</feature>
+          <feature>"Edit submission" button (if teacher allows)</feature>
+          <feature>Auto-graded questions show score immediately</feature>
+        </section>
+        <section name="After Grading View">
+          <feature>Shows grade at top</feature>
+          <feature>Each question shows:
+            - Student answer
+            - Correct answer (if applicable)
+            - Teacher comments
+            - Points earned / possible
+          </feature>
+        </section>
+      </layout>
+    </page>
+    
+    <page name="AI Teaching Assistant (Chat Sidebar)" url="Sidebar overlay on /student/assignment/[assignment-id]" priority="P0">
+      <purpose>Socratic help without giving answers</purpose>
+      <description>This IS the differentiating feature</description>
+      <layout>
+        <section name="Sidebar Interface">
+          <feature>Slides in from right side (doesn't block assignment)</feature>
+          <feature>Shows the selected question text at top</feature>
+          <feature>Chat history below</feature>
+          <feature>Message input at bottom</feature>
+        </section>
+        <section name="Chat Behavior">
+          <initial_message>
+            <feature>"Hi! I see you're working on [question topic]. What part are you finding challenging?"</feature>
+          </initial_message>
+          <ai_response>
+            <description>Socratic Method - Never gives direct answer</description>
+            <feature>Asks clarifying questions: "Let's break this down. What do you already know about triangles?"</feature>
+            <feature>Provides hints: "Think about what happens to the angles when the sides are equal..."</feature>
+            <feature>Connects to past lessons: "Remember when we learned about the Pythagorean theorem?"</feature>
+            <feature>Encourages reasoning: "What would happen if you tried that approach?"</feature>
+          </ai_response>
+          <escalation>
+            <feature>If student still stuck after 5+ messages:
+              "It seems like you're really struggling with this concept. I've let your teacher know you might need extra help here."
+            </feature>
+            <feature>Teacher gets notification in dashboard</feature>
+          </escalation>
+          <context_window>
+            <feature>The specific question being asked about</feature>
+            <feature>Student's grade level and past performance</feature>
+            <feature>Related topics from curriculum</feature>
+            <feature>Previous questions student asked in this assignment</feature>
+          </context_window>
+        </section>
+        <section name="Features">
+          <feature>Copy messages button</feature>
+          <feature>"Clear chat and start over" button</feature>
+          <feature>Collapse sidebar button</feature>
+        </section>
+        <section name="Data Tracking (Backend)">
+          <description>This data feeds the Proactive Teacher Briefing</description>
+          <feature>Log every question asked</feature>
+          <feature>Track time spent stuck</feature>
+          <feature>Record which hints helped</feature>
+          <feature>Flag concepts student struggles with</feature>
+        </section>
+      </layout>
+    </page>
+    
+    <page name="Student Profile & Settings" url="/student/settings" priority="P0">
+      <purpose>Manage student account</purpose>
+      <sections>
+        <section name="Profile">
+          <feature>Name, username</feature>
+          <feature>Grade level</feature>
+          <feature>Profile photo (optional)</feature>
+          <feature>Student ID (optional)</feature>
+        </section>
+        <section name="Classes">
+          <feature>List of enrolled classes</feature>
+          <feature>"Leave Class" option</feature>
+        </section>
+        <section name="Preferences" priority="P1">
+          <feature>Notification settings</feature>
+          <feature>Dark mode</feature>
+          <feature>Language</feature>
+        </section>
+        <section name="Leaderboard Visibility" priority="P2">
+          <feature>Opt in/out of leaderboards</feature>
+        </section>
+      </sections>
+    </page>
+    
+  </page_category>
+  
+  <!-- ADMIN PAGES -->
+  <page_category name="Admin Pages">
+    
+    <page name="Admin Dashboard" url="/admin/dashboard" priority="P1">
+      <purpose>School/district oversight and analytics</purpose>
+      <note>Not needed for initial teacher sales</note>
+      <layout>
+        <section name="School-Wide Metrics (Top Cards)">
+          <feature>Total students</feature>
+          <feature>Total teachers</feature>
+          <feature>Active classes</feature>
+          <feature>Platform usage rate</feature>
+        </section>
+        <section name="Key Insights">
+          <feature>Students at risk (failing 2+ classes)</feature>
+          <feature>Teacher workload alerts</feature>
+          <feature>Intervention effectiveness</feature>
+          <feature>ROI calculator</feature>
+        </section>
+        <section name="Charts & Graphs">
+          <feature>Student performance trends over time</feature>
+          <feature>Teacher adoption rates</feature>
+          <feature>Feature usage analytics</feature>
+          <feature>Standards mastery by grade level</feature>
+        </section>
+        <section name="Action Items">
+          <feature>Students needing immediate intervention (clickable list)</feature>
+          <feature>Teachers not logging in (reach out)</feature>
+        </section>
+        <section name="Quick Links">
+          <feature>View all teachers</feature>
+          <feature>View all students</feature>
+          <feature>Generate reports</feature>
+          <feature>Manage licenses</feature>
+        </section>
+      </layout>
+    </page>
+    
+    <page name="Admin Analytics Page" url="/admin/analytics" priority="P1">
+      <purpose>Deep-dive into data</purpose>
+      <sections>
+        <section name="Filters">
+          <feature>Date range picker</feature>
+          <feature>Grade level</feature>
+          <feature>Subject</feature>
+          <feature>Teacher</feature>
+          <feature>Class</feature>
+        </section>
+        <section name="Report Types">
+          <feature>Student performance reports</feature>
+          <feature>Teacher workload reports</feature>
+          <feature>Engagement reports</feature>
+          <feature>Standards coverage reports</feature>
+          <feature>Intervention reports</feature>
+        </section>
+        <section name="Export">
+          <feature>PDF</feature>
+          <feature>CSV</feature>
+          <feature priority="P1">Google Sheets</feature>
+        </section>
+      </sections>
+    </page>
+    
+    <page name="Admin Teacher Management" url="/admin/teachers" priority="P1">
+      <purpose>Manage teacher accounts</purpose>
+      <features>
+        <feature>List of all teachers</feature>
+        <feature>Create new teacher account</feature>
+        <feature>Deactivate accounts</feature>
+        <feature>View teacher's classes and students</feature>
+        <feature>Impersonate teacher (for support)</feature>
+        <feature>Generate teacher usage reports</feature>
+      </features>
+    </page>
+    
+    <page name="Admin Student Management" url="/admin/students" priority="P1">
+      <purpose>Oversight of all students</purpose>
+      <features>
+        <feature>List all students</feature>
+        <feature>Filter by grade, risk level, teacher</feature>
+        <feature>View student details (grades, attendance, engagement)</feature>
+        <feature>Transfer students between classes</feature>
+        <feature>Generate student reports</feature>
+      </features>
+    </page>
+    
+  </page_category>
+  
+  <!-- PARENT PAGES -->
+  <page_category name="Parent Pages">
+    
+    <page name="Parent Dashboard" url="/parent/dashboard" priority="P1">
+      <purpose>Monitor child's progress</purpose>
+      <note>Build after MVP</note>
+      <layout>
+        <section name="Children Overview">
+          <description>If multiple kids</description>
+          <child_card>
+            <feature>Card for each child</feature>
+            <feature>Current GPA</feature>
+            <feature>Upcoming assignments</feature>
+            <feature>Recent alerts</feature>
+          </child_card>
+        </section>
+        <section name="Child Detail View">
+          <feature>All classes</feature>
+          <feature>Grades per class</feature>
+          <feature>Missing assignments (highlighted)</feature>
+          <feature>Recent teacher comments</feature>
+          <feature priority="P1">Attendance (if tracked)</feature>
+        </section>
+        <section name="Messages">
+          <feature>Chat with teachers</feature>
+          <feature>View announcements</feature>
+        </section>
+        <section name="Weekly Report">
+          <feature>Automated summary emailed + viewable in app</feature>
+          <feature>Positive highlights</feature>
+          <feature>Areas of concern</feature>
+        </section>
+      </layout>
+    </page>
+    
+  </page_category>
+  
+  <!-- SUPPORT/UTILITY PAGES -->
+  <page_category name="Support/Utility Pages">
+    
+    <page name="Notifications Center" url="/notifications" priority="P1">
+      <purpose>View all notifications</purpose>
+      <features>
+        <feature>All notifications (newest first)</feature>
+        <feature>Filter by type (messages, grades, assignments, system)</feature>
+        <feature>Mark as read</feature>
+        <feature>Delete</feature>
+        <feature>Settings link (manage preferences)</feature>
+      </features>
+    </page>
+    
+    <page name="Help/Support Page" url="/help" priority="P1">
+      <purpose>User support and documentation</purpose>
+      <features>
+        <feature>FAQ</feature>
+        <feature>Search knowledge base</feature>
+        <feature>Submit support ticket</feature>
+        <feature>Live chat (if available)</feature>
+        <feature>Video tutorials</feature>
+      </features>
+    </page>
+    
+  </page_category>
+  
+  <!-- BUILD ORDER -->
+  <build_order>
+    
+    <sprint number="1-2" weeks="1-4" name="Authentication & Core Structure">
+      <pages>
+        <page>Sign up</page>
+        <page>Login</page>
+        <page>Teacher Dashboard (empty state)</page>
+        <page>Student Dashboard (empty state)</page>
+      </pages>
+    </sprint>
+    
+    <sprint number="3-4" weeks="5-8" name="Classes & Assignment Creation">
+      <pages>
+        <page>Teacher Class View (Overview tab)</page>
+        <page>Assignment Builder (all 3 modes)</page>
+      </pages>
+    </sprint>
+    
+    <sprint number="5-6" weeks="9-12" name="Student Experience">
+      <pages>
+        <page>Student Class View</page>
+        <page>Student Assignment View</page>
+        <page>AI TA Chat Sidebar</page>
+      </pages>
+    </sprint>
+    
+    <sprint number="7-8" weeks="13-16" name="Grading & Analytics">
+      <pages>
+        <page>Gradebook Tab</page>
+        <page>Teacher Analytics Tab</page>
+        <page>Proactive Teacher Briefing</page>
+      </pages>
+    </sprint>
+    
+    <sprint number="9-10" weeks="17-20" name="Communication & Polish">
+      <pages>
+        <page>Messaging Center</page>
+        <page>Profile/Settings</page>
+        <page>Polish all pages</page>
+      </pages>
+      <milestone>MVP COMPLETE → Start Teacher Pilot with 20 teachers</milestone>
+    </sprint>
+    
+  </build_order>
+  
+</socratit_ai_application>

@@ -1,0 +1,1689 @@
+// ============================================================================
+// SOCRATIT.AI - DATABASE SCHEMA
+// Enterprise Classroom Management SaaS Platform
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  TEACHER
+  STUDENT
+  ADMIN
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  REGISTER
+  PASSWORD_RESET
+  EMAIL_VERIFY
+  VIEW_STUDENT_DATA
+  VIEW_GRADES
+  EXPORT_DATA
+  CREATE_CLASS
+  UPDATE_CLASS
+  DELETE_CLASS
+  UPDATE_USER
+  DELETE_USER
+  ENROLL_STUDENT
+  APPROVE_ENROLLMENT
+  REJECT_ENROLLMENT
+  REMOVE_STUDENT
+  GENERATE_CLASS_CODE
+  ADD_CLASS_TEACHER
+  REMOVE_CLASS_TEACHER
+  CREATE_ASSIGNMENT
+  UPDATE_ASSIGNMENT
+  DELETE_ASSIGNMENT
+  PUBLISH_ASSIGNMENT
+  VIEW_ASSIGNMENT
+  SUBMIT_ASSIGNMENT
+  GRADE_ASSIGNMENT
+  AI_GENERATE_QUIZ
+  AI_GRADE_RESPONSE
+  UPLOAD_CURRICULUM
+  PROCESS_CURRICULUM
+  DELETE_CURRICULUM
+  DOWNLOAD_CURRICULUM
+  GENERATE_FROM_CURRICULUM
+}
+
+enum EnrollmentStatus {
+  PENDING // Student requested to join, awaiting teacher approval
+  APPROVED // Teacher approved - student has access
+  REJECTED // Teacher rejected the request
+  REMOVED // Student was removed from class by teacher
+}
+
+enum AssignmentType {
+  PRACTICE
+  QUIZ
+  TEST
+  HOMEWORK
+  CHALLENGE
+}
+
+enum AssignmentStatus {
+  DRAFT // Being edited, not visible to students
+  SCHEDULED // Scheduled to publish at a future date
+  ACTIVE // Published and available to students
+  CLOSED // Past due date, no longer accepting submissions
+  ARCHIVED // Archived for historical records
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  FREE_RESPONSE
+}
+
+enum SubmissionStatus {
+  NOT_STARTED // Student hasn't opened the assignment
+  IN_PROGRESS // Student has started but not submitted
+  SUBMITTED // Student submitted for grading
+  GRADED // Graded and feedback provided
+}
+
+enum LetterGrade {
+  A_PLUS // 97-100%
+  A // 93-96%
+  A_MINUS // 90-92%
+  B_PLUS // 87-89%
+  B // 83-86%
+  B_MINUS // 80-82%
+  C_PLUS // 77-79%
+  C // 73-76%
+  C_MINUS // 70-72%
+  D_PLUS // 67-69%
+  D // 63-66%
+  D_MINUS // 60-62%
+  F // Below 60%
+}
+
+enum MasteryLevel {
+  NOT_STARTED // 0%
+  BEGINNING // 1-39%
+  DEVELOPING // 40-69%
+  PROFICIENT // 70-89%
+  MASTERED // 90-100%
+}
+
+enum TrendDirection {
+  IMPROVING
+  STABLE
+  DECLINING
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ============================================================================
+// SCHOOL MODEL
+// Multi-tenancy base - ensures data isolation between schools
+// ============================================================================
+
+model School {
+  id           String    @id @default(uuid())
+  name         String
+  schoolCode   String    @unique @map("school_code")
+  districtName String?   @map("district_name")
+  address      String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  // Relations
+  users     User[]
+  auditLogs AuditLog[]
+  classes   Class[]
+
+  @@index([schoolCode])
+  @@index([districtName])
+  @@map("schools")
+}
+
+// ============================================================================
+// USER MODEL
+// Core user entity with role-based differentiation
+// ============================================================================
+
+model User {
+  id                       String    @id @default(uuid())
+  email                    String    @unique
+  passwordHash             String    @map("password_hash")
+  firstName                String    @map("first_name")
+  lastName                 String    @map("last_name")
+  role                     UserRole
+  schoolId                 String    @map("school_id")
+  gradeLevel               String?   @map("grade_level")
+  profilePhotoUrl          String?   @map("profile_photo_url")
+  emailVerified            Boolean   @default(false) @map("email_verified")
+  emailVerificationToken   String?   @map("email_verification_token")
+  emailVerificationExpires DateTime? @map("email_verification_expires")
+  passwordResetToken       String?   @map("password_reset_token")
+  passwordResetExpires     DateTime? @map("password_reset_expires")
+  parentalConsentGiven     Boolean   @default(false) @map("parental_consent_given")
+  lastLoginAt              DateTime? @map("last_login_at")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+  deletedAt                DateTime? @map("deleted_at")
+
+  // Relations
+  school    School     @relation(fields: [schoolId], references: [id])
+  sessions  Session[]
+  auditLogs AuditLog[]
+
+  // Class Management Relations
+  teachingClasses      ClassTeacher[]    @relation("TeacherClasses")
+  studentEnrollments   ClassEnrollment[] @relation("StudentEnrollments")
+  processedEnrollments ClassEnrollment[] @relation("EnrollmentProcessor")
+
+  // Assignment Relations
+  createdAssignments Assignment[] @relation("AssignmentCreator")
+  submissions        Submission[] @relation("StudentSubmissions")
+  gradedSubmissions  Submission[] @relation("SubmissionGrader")
+
+  // Grade Relations
+  grades Grade[] @relation("StudentGrades")
+
+  // Analytics Relations
+  conceptMasteries ConceptMastery[] @relation("StudentConceptMastery")
+  insights         StudentInsight[] @relation("StudentInsights")
+
+  // Messaging Relations
+  sentMessages      Message[]      @relation("SentMessages")
+  receivedMessages  Message[]      @relation("ReceivedMessages")
+  conversationsAsP1 Conversation[] @relation("ConversationsAsParticipant1")
+  conversationsAsP2 Conversation[] @relation("ConversationsAsParticipant2")
+  presence          UserPresence?
+
+  // Notification Relations
+  notifications Notification[] @relation("UserNotifications")
+
+  // Progress Tracking Relations
+  studentProgress      StudentProgress[]     @relation("StudentProgress")
+  assignmentProgress   AssignmentProgress[]  @relation("StudentAssignmentProgress")
+  learningVelocityLogs LearningVelocityLog[] @relation("StudentVelocityLogs")
+
+  // Curriculum Relations
+  curriculumMaterials CurriculumMaterial[] @relation("TeacherCurriculum")
+
+  // AI Teaching Assistant Relations
+  aiConversations AIConversation[] @relation("StudentAIConversations")
+
+  @@index([email])
+  @@index([schoolId])
+  @@index([role])
+  @@index([emailVerificationToken])
+  @@index([passwordResetToken])
+  @@map("users")
+}
+
+// ============================================================================
+// SESSION MODEL
+// Manages refresh tokens and user sessions
+// ============================================================================
+
+model Session {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  refreshToken      String    @unique @map("refresh_token")
+  accessTokenFamily String    @map("access_token_family")
+  expiresAt         DateTime  @map("expires_at")
+  userAgent         String?   @map("user_agent")
+  ipAddress         String?   @map("ip_address")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  revokedAt         DateTime? @map("revoked_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ============================================================================
+// AUDIT LOG MODEL
+// FERPA/COPPA compliance - tracks all sensitive data access
+// ============================================================================
+
+model AuditLog {
+  id           String      @id @default(uuid())
+  userId       String?     @map("user_id")
+  schoolId     String?     @map("school_id")
+  action       AuditAction
+  resourceType String?     @map("resource_type")
+  resourceId   String?     @map("resource_id")
+  ipAddress    String      @map("ip_address")
+  userAgent    String?     @map("user_agent")
+  metadata     Json?
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  school School? @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([schoolId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// CLASS MODEL
+// Represents a class/course with support for multiple teachers
+// ============================================================================
+
+model Class {
+  id           String  @id @default(uuid())
+  schoolId     String  @map("school_id")
+  name         String // e.g., "Geometry", "Algebra II"
+  subject      String? // e.g., "Mathematics", "Science"
+  gradeLevel   String? @map("grade_level") // e.g., "9th Grade", "10-12"
+  academicYear String  @map("academic_year") // e.g., "2024-2025"
+  period       String? // e.g., "Period 3", "Block A"
+  room         String? // e.g., "Room 305"
+  scheduleTime String? @map("schedule_time") // e.g., "Mon, Wed, Fri 9:00-10:15 AM"
+  color        String  @default("blue") // UI theme color: blue, purple, orange
+
+  // Class Code for Student Self-Enrollment
+  classCode     String    @unique @map("class_code") // e.g., "GEO-X7Y9"
+  codeExpiresAt DateTime? @map("code_expires_at") // Optional expiration
+
+  // Status
+  isActive Boolean @default(true) @map("is_active")
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  school           School            @relation(fields: [schoolId], references: [id])
+  teachers         ClassTeacher[] // Multiple teachers can teach a class
+  enrollments      ClassEnrollment[] // Student enrollments
+  assignments      Assignment[] // Assignments for this class
+  gradeCategories  GradeCategory[] // Grade categories for this class
+  grades           Grade[] // All grades for this class
+  conceptMasteries ConceptMastery[] // Concept mastery tracking for this class
+  insights         StudentInsight[] // Student insights for this class
+  messages         Message[] // Class messages and announcements
+  notifications    Notification[] // Class-related notifications
+
+  // Progress Tracking Relations
+  studentProgress    StudentProgress[]     @relation("ClassProgress")
+  assignmentProgress AssignmentProgress[]  @relation("ClassAssignmentProgress")
+  conceptPaths       ConceptMasteryPath[]  @relation("ClassConceptPaths")
+  velocityLogs       LearningVelocityLog[] @relation("ClassVelocityLogs")
+
+  // AI Teaching Assistant Relations
+  aiConversations AIConversation[]
+  aiInsights      AITeacherInsight[]
+
+  @@index([schoolId])
+  @@index([classCode])
+  @@index([academicYear])
+  @@index([isActive])
+  @@map("classes")
+}
+
+// ============================================================================
+// CLASS TEACHER MODEL
+// Junction table for many-to-many relationship between classes and teachers
+// Supports multiple teachers per class (co-teaching)
+// ============================================================================
+
+model ClassTeacher {
+  id        String  @id @default(uuid())
+  classId   String  @map("class_id")
+  teacherId String  @map("teacher_id")
+  isPrimary Boolean @default(false) @map("is_primary") // Primary teacher vs co-teacher
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher User  @relation("TeacherClasses", fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, teacherId]) // One record per teacher per class
+  @@index([classId])
+  @@index([teacherId])
+  @@map("class_teachers")
+}
+
+// ============================================================================
+// CLASS ENROLLMENT MODEL
+// Manages student enrollments with approval workflow
+// ============================================================================
+
+model ClassEnrollment {
+  id        String           @id @default(uuid())
+  classId   String           @map("class_id")
+  studentId String           @map("student_id")
+  status    EnrollmentStatus @default(PENDING)
+
+  // Approval Tracking
+  requestedAt     DateTime  @default(now()) @map("requested_at")
+  processedAt     DateTime? @map("processed_at") // When approved/rejected/removed
+  processedBy     String?   @map("processed_by") // Teacher ID who approved/rejected/removed
+  rejectionReason String?   @map("rejection_reason") // Optional reason for rejection
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  class     Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student   User  @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  processor User? @relation("EnrollmentProcessor", fields: [processedBy], references: [id], onDelete: SetNull)
+
+  @@unique([classId, studentId]) // One enrollment per student per class
+  @@index([classId])
+  @@index([studentId])
+  @@index([status])
+  @@map("class_enrollments")
+}
+
+// ============================================================================
+// ASSIGNMENT MODEL
+// Represents assignments/quizzes/tests created by teachers
+// ============================================================================
+
+model Assignment {
+  id        String @id @default(uuid())
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy filtering
+  createdBy String @map("created_by") // Teacher ID
+
+  // Assignment Details
+  title        String
+  description  String?          @db.Text
+  instructions String?          @db.Text
+  type         AssignmentType
+  status       AssignmentStatus @default(DRAFT)
+
+  // Points & Grading
+  totalPoints  Int  @default(100) @map("total_points")
+  passingScore Int? @map("passing_score") // Optional minimum score to pass
+
+  // Scheduling
+  publishedAt DateTime? @map("published_at")
+  dueDate     DateTime? @map("due_date")
+  closeDate   DateTime? @map("close_date") // Optional hard close date
+
+  // Settings
+  allowLateSubmission Boolean @default(false) @map("allow_late_submission")
+  showCorrectAnswers  Boolean @default(true) @map("show_correct_answers") // Show answers after submission
+  shuffleQuestions    Boolean @default(false) @map("shuffle_questions")
+  shuffleOptions      Boolean @default(false) @map("shuffle_options")
+  timeLimit           Int?    @map("time_limit") // Time limit in minutes (optional)
+  maxAttempts         Int     @default(1) @map("max_attempts") // Number of attempts allowed
+
+  // AI Generation Metadata
+  aiGenerated        Boolean @default(false) @map("ai_generated")
+  aiPrompt           String? @map("ai_prompt") @db.Text // Original prompt used for AI generation
+  curriculumSource   String? @map("curriculum_source") @db.Text // Source material used (legacy text field)
+  curriculumSourceId String? @map("curriculum_source_id") // New: Link to CurriculumMaterial
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  class              Class                @relation(fields: [classId], references: [id], onDelete: Cascade)
+  creator            User                 @relation("AssignmentCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  curriculumMaterial CurriculumMaterial?  @relation("AssignmentFromCurriculum", fields: [curriculumSourceId], references: [id], onDelete: SetNull)
+  questions          Question[]
+  submissions        Submission[]
+  grades             Grade[]
+  progress           AssignmentProgress[] @relation("AssignmentProgress")
+
+  // AI Teaching Assistant Relations
+  aiConversations AIConversation[]
+
+  @@index([classId])
+  @@index([schoolId])
+  @@index([createdBy])
+  @@index([status])
+  @@index([type])
+  @@index([dueDate])
+  @@index([publishedAt])
+  @@map("assignments")
+}
+
+// ============================================================================
+// QUESTION MODEL
+// Individual questions within an assignment
+// ============================================================================
+
+model Question {
+  id           String @id @default(uuid())
+  assignmentId String @map("assignment_id")
+
+  // Question Details
+  type          QuestionType
+  questionText  String       @map("question_text") @db.Text
+  questionOrder Int          @map("question_order") // Display order in assignment
+  points        Int          @default(10) // Points for this question
+
+  // Multiple Choice Fields
+  optionA       String? @map("option_a") @db.Text
+  optionB       String? @map("option_b") @db.Text
+  optionC       String? @map("option_c") @db.Text
+  optionD       String? @map("option_d") @db.Text
+  correctOption String? @map("correct_option") // 'A', 'B', 'C', or 'D'
+
+  // Free Response Fields
+  correctAnswer String? @map("correct_answer") @db.Text // Reference answer for AI grading
+  rubric        String? @db.Text // Grading rubric for AI
+
+  // Explanation
+  explanation String? @db.Text // Explanation shown after answer
+
+  // Metadata
+  concept    String? // e.g., "quadratic equations" for analytics
+  difficulty String? // e.g., "easy", "medium", "hard"
+
+  // AI Generation
+  aiGenerated Boolean @default(false) @map("ai_generated")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  answers    Answer[]
+
+  @@index([assignmentId])
+  @@index([type])
+  @@index([concept])
+  @@map("questions")
+}
+
+// ============================================================================
+// SUBMISSION MODEL
+// Student's submission for an entire assignment
+// ============================================================================
+
+model Submission {
+  id           String @id @default(uuid())
+  assignmentId String @map("assignment_id")
+  studentId    String @map("student_id")
+
+  // Submission Details
+  status        SubmissionStatus @default(NOT_STARTED)
+  attemptNumber Int              @default(1) @map("attempt_number")
+
+  // Scoring
+  totalScore     Float? @map("total_score") // Calculated total score
+  percentage     Float? // Percentage score (totalScore / totalPoints * 100)
+  earnedPoints   Float? @map("earned_points") // Same as totalScore, for clarity
+  possiblePoints Int?   @map("possible_points") // Total possible points
+
+  // Timing
+  startedAt   DateTime? @map("started_at") // When student opened assignment
+  submittedAt DateTime? @map("submitted_at") // When student submitted
+  gradedAt    DateTime? @map("graded_at") // When grading completed
+  gradedBy    String?   @map("graded_by") // Teacher ID if manually graded/reviewed
+  timeSpent   Int?      @map("time_spent") // Time spent in seconds
+
+  // Feedback
+  teacherFeedback String? @map("teacher_feedback") @db.Text
+  teacherNotes    String? @map("teacher_notes") @db.Text // Private notes
+
+  // Metadata
+  isLate    Boolean @default(false) @map("is_late")
+  ipAddress String? @map("ip_address")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  grader     User?      @relation("SubmissionGrader", fields: [gradedBy], references: [id], onDelete: SetNull)
+  answers    Answer[]
+
+  @@unique([assignmentId, studentId, attemptNumber]) // One submission per attempt
+  @@index([assignmentId])
+  @@index([studentId])
+  @@index([status])
+  @@index([submittedAt])
+  @@index([gradedAt])
+  @@map("submissions")
+}
+
+// ============================================================================
+// ANSWER MODEL
+// Individual answer to a question within a submission
+// ============================================================================
+
+model Answer {
+  id           String @id @default(uuid())
+  submissionId String @map("submission_id")
+  questionId   String @map("question_id")
+
+  // Answer Content
+  answerText     String? @map("answer_text") @db.Text // Free response or selected option
+  selectedOption String? @map("selected_option") // 'A', 'B', 'C', or 'D' for MC
+
+  // Grading
+  isCorrect      Boolean? @map("is_correct") // Null until graded
+  pointsEarned   Float?   @map("points_earned")
+  pointsPossible Float?   @map("points_possible")
+
+  // AI Grading (for free response)
+  aiGraded     Boolean @default(false) @map("ai_graded")
+  aiFeedback   String? @map("ai_feedback") @db.Text
+  aiScore      Float?  @map("ai_score") // AI-assigned score
+  aiConfidence Float?  @map("ai_confidence") // AI confidence level 0-1
+
+  // Manual Override
+  manuallyGraded  Boolean @default(false) @map("manually_graded")
+  teacherFeedback String? @map("teacher_feedback") @db.Text
+  teacherOverride Boolean @default(false) @map("teacher_override") // Did teacher override AI grade?
+
+  // Timestamps
+  answeredAt DateTime? @map("answered_at")
+  gradedAt   DateTime? @map("graded_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, questionId]) // One answer per question per submission
+  @@index([submissionId])
+  @@index([questionId])
+  @@index([isCorrect])
+  @@map("answers")
+}
+
+// ============================================================================
+// ANALYTICS EVENT MODEL
+// Tracks all student interactions for detailed analytics
+// ============================================================================
+
+model AnalyticsEvent {
+  id           String  @id @default(uuid())
+  studentId    String  @map("student_id")
+  assignmentId String? @map("assignment_id")
+  submissionId String? @map("submission_id")
+  questionId   String? @map("question_id")
+  schoolId     String  @map("school_id") // For multi-tenancy
+
+  // Event Details
+  eventType String @map("event_type") // e.g., 'assignment_opened', 'question_viewed', 'answer_changed', etc.
+  eventData Json?  @map("event_data") // Flexible JSON for event-specific data
+
+  // Context
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([studentId])
+  @@index([assignmentId])
+  @@index([submissionId])
+  @@index([questionId])
+  @@index([schoolId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+// ============================================================================
+// GRADE CATEGORY MODEL
+// Defines grading categories for a class (Homework, Quizzes, Tests, etc.)
+// ============================================================================
+
+model GradeCategory {
+  id       String @id @default(uuid())
+  classId  String @map("class_id")
+  schoolId String @map("school_id") // For multi-tenancy
+
+  // Category Details
+  name   String // e.g., "Homework", "Quizzes", "Tests", "Final Exam"
+  weight Float  @default(0) // Weight as percentage (0-100)
+
+  // Drop Lowest Scores
+  dropLowest Int @default(0) @map("drop_lowest") // Number of lowest scores to drop
+
+  // Late Penalty
+  latePenaltyPerDay Float? @map("late_penalty_per_day") // Percentage penalty per day late
+  maxLatePenalty    Float? @map("max_late_penalty") // Maximum late penalty percentage
+
+  // Extra Credit
+  allowExtraCredit Boolean @default(false) @map("allow_extra_credit")
+
+  // Display Order
+  sortOrder Int @default(0) @map("sort_order")
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@index([classId])
+  @@index([schoolId])
+  @@map("grade_categories")
+}
+
+// ============================================================================
+// GRADE MODEL
+// Stores calculated grades for students
+// ============================================================================
+
+model Grade {
+  id        String @id @default(uuid())
+  studentId String @map("student_id")
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy
+
+  // Assignment-Specific Grade (if tied to a single assignment)
+  assignmentId String? @map("assignment_id")
+
+  // Grade Details
+  gradeType    String  @map("grade_type") // "assignment", "category", "overall"
+  categoryName String? @map("category_name") // e.g., "Homework", "Quizzes" (for category grades)
+
+  // Scores
+  pointsEarned   Float        @map("points_earned")
+  pointsPossible Float        @map("points_possible")
+  percentage     Float // Percentage score (0-100)
+  letterGrade    LetterGrade? @map("letter_grade")
+
+  // Weighted Score (for category/overall grades)
+  weightedScore Float? @map("weighted_score") // Score after applying category weight
+
+  // Grade Adjustments
+  extraCredit Float @default(0) @map("extra_credit")
+  latePenalty Float @default(0) @map("late_penalty")
+  curve       Float @default(0) // Curve adjustment (can be positive or negative)
+
+  // Metadata
+  isDropped Boolean  @default(false) @map("is_dropped") // If this grade was dropped (lowest N)
+  gradeDate DateTime @default(now()) @map("grade_date") // When this grade was recorded
+
+  // Comments
+  teacherComments String? @map("teacher_comments") @db.Text
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  student    User        @relation("StudentGrades", fields: [studentId], references: [id], onDelete: Cascade)
+  class      Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
+  assignment Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
+
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([assignmentId])
+  @@index([gradeType])
+  @@index([categoryName])
+  @@index([gradeDate])
+  @@map("grades")
+}
+
+// ============================================================================
+// CONCEPT MASTERY MODEL
+// Tracks student proficiency in specific concepts over time
+// ============================================================================
+
+model ConceptMastery {
+  id        String @id @default(uuid())
+  studentId String @map("student_id")
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy
+
+  // Concept Details
+  concept String // e.g., "quadratic equations", "photosynthesis"
+  subject String? // e.g., "Math", "Science"
+
+  // Mastery Metrics
+  masteryLevel   MasteryLevel @default(NOT_STARTED) @map("mastery_level")
+  masteryPercent Float        @default(0) @map("mastery_percent") // 0-100
+
+  // Attempt Statistics
+  totalAttempts     Int @default(0) @map("total_attempts")
+  correctAttempts   Int @default(0) @map("correct_attempts")
+  incorrectAttempts Int @default(0) @map("incorrect_attempts")
+
+  // Trend Analysis
+  trend           TrendDirection @default(STABLE)
+  previousPercent Float?         @map("previous_percent") // For trend calculation
+
+  // Difficulty-Weighted Score
+  weightedScore Float? @map("weighted_score") // Considers question difficulty
+
+  // Prerequisite Tracking (for personalized learning paths)
+  prerequisites   String[] @default([]) // Array of prerequisite concept names
+  recommendedNext String[] @default([]) @map("recommended_next") // Suggested next concepts to learn
+
+  // Progression tracking (Batch 8 additions)
+  lastPracticed         DateTime? @map("last_practiced")
+  practiceCount         Int       @default(0) @map("practice_count")
+  improvementRate       Float?    @map("improvement_rate") // percentage improvement over time
+  suggestedNextConcepts String[]  @default([]) @map("suggested_next_concepts") // array of concept IDs
+  remediationNeeded     Boolean   @default(false) @map("remediation_needed")
+
+  // Timestamps
+  lastAssessed  DateTime? @map("last_assessed") // Last time concept was tested
+  firstAssessed DateTime? @map("first_assessed") // First time concept was tested
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  student User  @relation("StudentConceptMastery", fields: [studentId], references: [id], onDelete: Cascade)
+  class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId, concept]) // One mastery record per student per concept per class
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([concept])
+  @@index([masteryLevel])
+  @@index([lastAssessed])
+  @@map("concept_masteries")
+}
+
+// ============================================================================
+// STUDENT INSIGHT MODEL
+// Stores calculated insights and alerts about student performance
+// ============================================================================
+
+model StudentInsight {
+  id        String @id @default(uuid())
+  studentId String @map("student_id")
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy
+
+  // Performance Indicators (Boolean Flags)
+  isStruggling         Boolean @default(false) @map("is_struggling")
+  hasMissedAssignments Boolean @default(false) @map("has_missed_assignments")
+  hasDecliningGrade    Boolean @default(false) @map("has_declining_grade")
+  hasLowEngagement     Boolean @default(false) @map("has_low_engagement")
+  hasConceptGaps       Boolean @default(false) @map("has_concept_gaps")
+
+  // Performance Metrics
+  completionRate Float? @map("completion_rate") // % of assignments completed
+  averageScore   Float? @map("average_score") // Average score across all assignments
+  classRank      Int?   @map("class_rank") // Ranking in class (1 = highest)
+  percentile     Float? // Percentile ranking (0-100)
+
+  // Time Metrics
+  avgTimeOnTask  Float? @map("avg_time_on_task") // Average seconds per assignment
+  totalTimeSpent Int?   @map("total_time_spent") // Total seconds across all assignments
+
+  // Concept Gaps
+  strugglingConcepts Json? @map("struggling_concepts") // Array of concepts with mastery < 50%
+  masteredConcepts   Json? @map("mastered_concepts") // Array of concepts with mastery > 90%
+
+  // Performance History (Time-Series for charts)
+  performanceHistory Json? @map("performance_history") // Array of {date, score, rank, timeSpent}
+
+  // Prediction Metrics
+  predictedNextScore Float? @map("predicted_next_score") // Predicted score on next assignment
+  riskScore          Float? @default(0) @map("risk_score") // 0-100, higher = more at risk
+
+  // Engagement Metrics
+  lastActivityAt DateTime? @map("last_activity_at") // Last time student engaged with platform
+  streakDays     Int?      @default(0) @map("streak_days") // Consecutive days active
+
+  // Recommendations
+  recommendations   Json? // AI-generated recommendations
+  interventionLevel AlertSeverity @default(LOW) @map("intervention_level")
+  teacherNotes      String?       @map("teacher_notes") @db.Text
+
+  // Alert Status
+  alertSent      Boolean   @default(false) @map("alert_sent")
+  alertSentAt    DateTime? @map("alert_sent_at")
+  alertDismissed Boolean   @default(false) @map("alert_dismissed")
+
+  // Calculation Metadata
+  lastCalculated DateTime @default(now()) @map("last_calculated")
+  dataPoints     Int      @default(0) @map("data_points") // Number of assignments used in calculation
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  student User  @relation("StudentInsights", fields: [studentId], references: [id], onDelete: Cascade)
+  class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId]) // One insight record per student per class
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([isStruggling])
+  @@index([interventionLevel])
+  @@index([lastCalculated])
+  @@map("student_insights")
+}
+
+// ============================================================================
+// MESSAGE MODEL
+// Real-time messaging between teachers and students
+// ============================================================================
+
+enum MessageType {
+  DIRECT // One-on-one message (student to teacher, teacher to student)
+  CLASS_GROUP // Teacher to entire class
+  ANNOUNCEMENT // Class announcement (persisted in announcements tab)
+}
+
+model Message {
+  id       String @id @default(uuid())
+  schoolId String @map("school_id") // For multi-tenancy
+
+  // Participants
+  senderId    String  @map("sender_id")
+  recipientId String? @map("recipient_id") // Null for group messages
+  classId     String? @map("class_id") // For class-wide messages and announcements
+
+  // Message Details
+  messageType MessageType @default(DIRECT) @map("message_type")
+  content     String      @db.Text
+  subject     String? // Optional subject line for announcements
+
+  // Status
+  isRead Boolean   @default(false) @map("is_read")
+  readAt DateTime? @map("read_at")
+
+  // Metadata
+  isSystemMessage Boolean @default(false) @map("is_system_message")
+  isPinned        Boolean @default(false) @map("is_pinned") // Pinned announcements
+  replyToId       String? @map("reply_to_id") // For threaded conversations
+
+  // Soft Delete
+  deletedAt          DateTime? @map("deleted_at")
+  deletedBySender    Boolean   @default(false) @map("deleted_by_sender")
+  deletedByRecipient Boolean   @default(false) @map("deleted_by_recipient")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  sender    User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User?     @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  class     Class?    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  replyTo   Message?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("MessageReplies")
+
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([messageType])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ============================================================================
+// CONVERSATION MODEL
+// Tracks conversation metadata for quick access
+// ============================================================================
+
+model Conversation {
+  id             String  @id @default(uuid())
+  participant1Id String  @map("participant1_id")
+  participant2Id String  @map("participant2_id")
+  classId        String? @map("class_id") // If conversation is class-specific context
+
+  // Status
+  lastMessageId      String?   @map("last_message_id")
+  lastMessageAt      DateTime? @map("last_message_at")
+  lastMessagePreview String?   @map("last_message_preview") @db.Text // Preview of last message
+  unreadCount1       Int       @default(0) @map("unread_count1") // Unread for participant1
+  unreadCount2       Int       @default(0) @map("unread_count2") // Unread for participant2
+
+  // Muted/Archived
+  isMutedBy1    Boolean @default(false) @map("is_muted_by1")
+  isMutedBy2    Boolean @default(false) @map("is_muted_by2")
+  isArchivedBy1 Boolean @default(false) @map("is_archived_by1")
+  isArchivedBy2 Boolean @default(false) @map("is_archived_by2")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  participant1 User @relation("ConversationsAsParticipant1", fields: [participant1Id], references: [id], onDelete: Cascade)
+  participant2 User @relation("ConversationsAsParticipant2", fields: [participant2Id], references: [id], onDelete: Cascade)
+
+  @@unique([participant1Id, participant2Id]) // One conversation per pair
+  @@index([participant1Id])
+  @@index([participant2Id])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+// ============================================================================
+// USER PRESENCE MODEL
+// Tracks online/offline status for real-time features
+// ============================================================================
+
+model UserPresence {
+  id         String   @id @default(uuid())
+  userId     String   @unique @map("user_id")
+  isOnline   Boolean  @default(false) @map("is_online")
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
+  socketId   String?  @map("socket_id") // Current WebSocket connection ID
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isOnline])
+  @@map("user_presence")
+}
+
+// ============================================================================
+// NOTIFICATION MODEL
+// Real-time notifications for users
+// ============================================================================
+
+enum NotificationType {
+  // Enrollment
+  ENROLLMENT_REQUEST
+  ENROLLMENT_APPROVED
+  ENROLLMENT_REJECTED
+  ADDED_TO_CLASS
+  REMOVED_FROM_CLASS
+
+  // Assignments & Grades
+  NEW_ASSIGNMENT
+  ASSIGNMENT_DUE_SOON
+  GRADE_PUBLISHED
+
+  // Messaging
+  NEW_MESSAGE
+  NEW_ANNOUNCEMENT
+
+  // AI Teaching Assistant
+  AI_CONVERSATION_SHARED // Student shared AI conversation with teacher
+  AI_STUDENT_STRUGGLING  // AI detected student struggling pattern
+  AI_HELP_REQUEST        // Student clicked "I need help" button
+
+  // System
+  SYSTEM_ANNOUNCEMENT
+  ACCOUNT_UPDATE
+}
+
+model Notification {
+  id       String @id @default(uuid())
+  userId   String @map("user_id")
+  schoolId String @map("school_id") // For multi-tenancy
+
+  // Notification Details
+  type    NotificationType
+  title   String
+  message String           @db.Text
+
+  // Related Resources
+  relatedResourceType String? @map("related_resource_type") // e.g., 'assignment', 'class', 'message'
+  relatedResourceId   String? @map("related_resource_id")
+  classId             String? @map("class_id") // If notification is class-specific
+
+  // Action URL
+  actionUrl String? @map("action_url") // Deep link to relevant page
+
+  // Status
+  isRead      Boolean   @default(false) @map("is_read")
+  readAt      DateTime? @map("read_at")
+  isDismissed Boolean   @default(false) @map("is_dismissed")
+
+  // Priority
+  priority Int @default(0) // 0 = normal, 1 = high, 2 = urgent
+
+  // Metadata
+  metadata Json? // Flexible JSON for notification-specific data
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  expiresAt DateTime? @map("expires_at") // Optional expiration
+
+  // Relations
+  user  User   @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  class Class? @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([schoolId])
+  @@index([classId])
+  @@index([type])
+  @@index([isRead])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("notifications")
+}
+
+// ============================================================================
+// STUDENT PROGRESS MODEL
+// Tracks overall student progress metrics per class
+// ============================================================================
+
+model StudentProgress {
+  id        String @id @default(uuid())
+  studentId String @map("student_id")
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy
+
+  // Completion metrics
+  totalAssignments      Int   @default(0) @map("total_assignments")
+  completedAssignments  Int   @default(0) @map("completed_assignments")
+  inProgressAssignments Int   @default(0) @map("in_progress_assignments")
+  notStartedAssignments Int   @default(0) @map("not_started_assignments")
+  completionRate        Float @default(0) @map("completion_rate") // percentage
+
+  // Grade trends
+  averageGrade    Float?         @map("average_grade")
+  trendDirection  TrendDirection @default(STABLE) @map("trend_direction")
+  trendPercentage Float?         @map("trend_percentage") // percentage change
+
+  // Time metrics
+  totalTimeSpent           Int    @default(0) @map("total_time_spent") // minutes
+  averageTimePerAssignment Float? @map("average_time_per_assignment") // minutes
+
+  // Learning velocity (assignments completed per week)
+  learningVelocity Float @default(0) @map("learning_velocity")
+
+  // Timestamps
+  lastCalculated DateTime @default(now()) @map("last_calculated")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  student User  @relation("StudentProgress", fields: [studentId], references: [id], onDelete: Cascade)
+  class   Class @relation("ClassProgress", fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId])
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([lastCalculated])
+  @@map("student_progress")
+}
+
+// ============================================================================
+// ASSIGNMENT PROGRESS MODEL
+// Tracks individual assignment progress for each student
+// ============================================================================
+
+model AssignmentProgress {
+  id           String @id @default(uuid())
+  studentId    String @map("student_id")
+  assignmentId String @map("assignment_id")
+  classId      String @map("class_id")
+  schoolId     String @map("school_id") // For multi-tenancy
+
+  // Status tracking
+  status SubmissionStatus @default(NOT_STARTED)
+
+  // Progress metrics
+  questionsTotal     Int   @map("questions_total")
+  questionsAnswered  Int   @default(0) @map("questions_answered")
+  questionsCorrect   Int   @default(0) @map("questions_correct")
+  progressPercentage Float @default(0) @map("progress_percentage")
+
+  // Time tracking
+  timeSpent   Int       @default(0) @map("time_spent") // minutes
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Attempt tracking
+  attemptCount  Int       @default(0) @map("attempt_count")
+  lastAttemptAt DateTime? @map("last_attempt_at")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  student    User       @relation("StudentAssignmentProgress", fields: [studentId], references: [id], onDelete: Cascade)
+  assignment Assignment @relation("AssignmentProgress", fields: [assignmentId], references: [id], onDelete: Cascade)
+  class      Class      @relation("ClassAssignmentProgress", fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, assignmentId])
+  @@index([studentId])
+  @@index([assignmentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([status])
+  @@map("assignment_progress")
+}
+
+// ============================================================================
+// CONCEPT MASTERY PATH MODEL
+// Defines concept prerequisites and learning paths
+// ============================================================================
+
+model ConceptMasteryPath {
+  id             String  @id @default(uuid())
+  classId        String  @map("class_id") // Paths can be customized per class
+  schoolId       String  @map("school_id") // For multi-tenancy
+  conceptName    String  @map("concept_name")
+  prerequisiteId String? @map("prerequisite_id") // null if it's a foundational concept
+
+  // Metadata
+  orderIndex     Int     @map("order_index") // sequence in learning path
+  difficulty     Int     @default(1) // 1-5 scale
+  estimatedHours Float?  @map("estimated_hours")
+  description    String? @db.Text
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  class        Class                @relation("ClassConceptPaths", fields: [classId], references: [id], onDelete: Cascade)
+  prerequisite ConceptMasteryPath?  @relation("ConceptPrerequisites", fields: [prerequisiteId], references: [id], onDelete: SetNull)
+  dependents   ConceptMasteryPath[] @relation("ConceptPrerequisites")
+
+  @@unique([classId, conceptName])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([conceptName])
+  @@index([prerequisiteId])
+  @@map("concept_mastery_paths")
+}
+
+// ============================================================================
+// LEARNING VELOCITY LOG MODEL
+// Historical learning velocity tracking
+// ============================================================================
+
+model LearningVelocityLog {
+  id        String @id @default(uuid())
+  studentId String @map("student_id")
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy
+
+  // Velocity metrics
+  weekStartDate        DateTime @map("week_start_date")
+  weekEndDate          DateTime @map("week_end_date")
+  assignmentsCompleted Int      @map("assignments_completed")
+  velocity             Float // assignments per week
+
+  // Quality metrics
+  averageScore     Float? @map("average_score")
+  timeSpentMinutes Int    @map("time_spent_minutes")
+
+  // Trend indicators
+  velocityChange Float? @map("velocity_change") // % change from previous week
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  student User  @relation("StudentVelocityLogs", fields: [studentId], references: [id], onDelete: Cascade)
+  class   Class @relation("ClassVelocityLogs", fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, classId, weekStartDate])
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([weekStartDate])
+  @@map("learning_velocity_logs")
+}
+
+// ============================================================================
+// CURRICULUM MATERIAL MODEL
+// Stores uploaded curriculum files and extracted content for assignment generation
+// ============================================================================
+
+model CurriculumMaterial {
+  id        String @id @default(uuid())
+  schoolId  String @map("school_id")
+  teacherId String @map("teacher_id")
+
+  // File metadata
+  title            String
+  description      String? @db.Text
+  originalFileName String  @map("original_file_name")
+  fileType         String  @map("file_type") // "pdf", "docx", "txt", "image"
+  fileSize         Int     @map("file_size") // bytes
+  filePath         String  @map("file_path") // S3 key or local path
+  mimeType         String? @map("mime_type") // e.g., "application/pdf"
+
+  // Processing status
+  processingStatus      String    @default("pending") @map("processing_status") // "pending", "processing", "completed", "failed"
+  extractedText         String?   @map("extracted_text") @db.Text
+  textExtractionError   String?   @map("text_extraction_error") @db.Text
+  processingStartedAt   DateTime? @map("processing_started_at")
+  processingCompletedAt DateTime? @map("processing_completed_at")
+
+  // AI-generated content
+  aiSummary          String?  @map("ai_summary") @db.Text
+  aiOutline          Json?    @map("ai_outline") // Structured curriculum outline
+  suggestedTopics    String[] @default([]) @map("suggested_topics")
+  learningObjectives String[] @default([]) @map("learning_objectives")
+
+  // Usage tracking
+  usageCount Int       @default(0) @map("usage_count") // Times used to generate assignments
+  lastUsedAt DateTime? @map("last_used_at")
+
+  // File lifecycle
+  expiresAt  DateTime? @map("expires_at") // Auto-delete after X days
+  isArchived Boolean   @default(false) @map("is_archived")
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  teacher     User         @relation("TeacherCurriculum", fields: [teacherId], references: [id], onDelete: Cascade)
+  assignments Assignment[] @relation("AssignmentFromCurriculum")
+
+  @@index([schoolId])
+  @@index([teacherId])
+  @@index([processingStatus])
+  @@index([fileType])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@index([isArchived])
+  @@map("curriculum_materials")
+}
+
+// ============================================================================
+// FILE UPLOAD LOG MODEL
+// FERPA/COPPA compliance - tracks all file operations
+// ============================================================================
+
+model FileUploadLog {
+  id           String  @id @default(uuid())
+  userId       String  @map("user_id")
+  schoolId     String  @map("school_id")
+  curriculumId String? @map("curriculum_id")
+
+  // Action tracking
+  action   String // "upload", "process", "delete", "download", "generate_assignment"
+  fileName String @map("file_name")
+  fileSize Int?   @map("file_size")
+
+  // Metadata
+  ipAddress      String  @map("ip_address")
+  userAgent      String? @map("user_agent")
+  processingTime Int?    @map("processing_time") // milliseconds
+
+  // Status
+  status       String // "success", "failed"
+  errorMessage String? @map("error_message") @db.Text
+
+  // Timestamp
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([schoolId])
+  @@index([curriculumId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("file_upload_logs")
+}
+
+// ============================================================================
+// AI TEACHING ASSISTANT SYSTEM
+// Conversational AI tutoring with context awareness and analytics
+// ============================================================================
+
+// ============================================================================
+// AI MESSAGE ROLE ENUM
+// Defines participant roles in AI conversations
+// ============================================================================
+
+enum AIMessageRole {
+  USER // Student's message/question
+  ASSISTANT // AI TA's response
+  SYSTEM // System message (context setting)
+}
+
+// ============================================================================
+// AI CONVERSATION TYPE ENUM
+// Different types of AI tutoring sessions
+// ============================================================================
+
+enum AIConversationType {
+  GENERAL_HELP // General tutoring and questions
+  ASSIGNMENT_HELP // Help with specific assignment
+  CONCEPT_REVIEW // Reviewing specific concept
+  HOMEWORK_HELP // Homework assistance
+  EXAM_PREP // Test/exam preparation
+}
+
+// ============================================================================
+// AI CONVERSATION MODEL
+// Manages AI tutoring conversation sessions
+// ============================================================================
+
+model AIConversation {
+  id        String  @id @default(uuid())
+  studentId String  @map("student_id")
+  classId   String? @map("class_id") // Optional: class context
+  schoolId  String  @map("school_id") // For multi-tenancy
+
+  // Conversation metadata
+  title            String? // Auto-generated from first message
+  conversationType AIConversationType @default(GENERAL_HELP) @map("conversation_type")
+
+  // Context linking
+  assignmentId String?  @map("assignment_id") // If helping with specific assignment
+  conceptTags  String[] @default([]) @map("concept_tags") // Concepts discussed
+
+  // Status and visibility
+  isActive            Boolean @default(true) @map("is_active")
+  isPinned            Boolean @default(false) @map("is_pinned")
+  isSharedWithTeacher Boolean @default(false) @map("is_shared_with_teacher") // Student shares with teacher
+
+  // Usage metrics
+  messageCount Int   @default(0) @map("message_count")
+  totalTokens  Int   @default(0) @map("total_tokens") // OpenAI token usage
+  totalCost    Float @default(0) @map("total_cost") // Estimated cost in USD
+
+  // Quality metrics
+  helpfulnessRating Float?   @map("helpfulness_rating") // 0-5 stars (optional student rating)
+  resolvedIssue     Boolean? @map("resolved_issue") // Did AI help solve the problem?
+
+  // Data retention (FERPA compliance)
+  expiresAt DateTime @default(dbgenerated("NOW() + INTERVAL '90 days'")) @map("expires_at")
+
+  // Timestamps
+  startedAt     DateTime  @default(now()) @map("started_at")
+  lastMessageAt DateTime  @default(now()) @map("last_message_at")
+  endedAt       DateTime? @map("ended_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at") // Soft delete
+
+  // Relations
+  student      User               @relation("StudentAIConversations", fields: [studentId], references: [id], onDelete: Cascade)
+  class        Class?             @relation(fields: [classId], references: [id], onDelete: SetNull)
+  assignment   Assignment?        @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
+  messages     AIMessage[]
+  interactions AIInteractionLog[]
+
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([assignmentId])
+  @@index([conversationType])
+  @@index([isActive])
+  @@index([isSharedWithTeacher])
+  @@index([lastMessageAt])
+  @@index([expiresAt])
+  @@index([deletedAt])
+  @@map("ai_conversations")
+}
+
+// ============================================================================
+// AI MESSAGE MODEL
+// Individual messages within AI conversations
+// ============================================================================
+
+model AIMessage {
+  id             String @id @default(uuid())
+  conversationId String @map("conversation_id")
+
+  // Message content
+  role    AIMessageRole
+  content String        @db.Text
+
+  // AI metadata (for ASSISTANT role messages)
+  model            String? // e.g., "gpt-3.5-turbo", "gpt-4"
+  promptTokens     Int?    @map("prompt_tokens")
+  completionTokens Int?    @map("completion_tokens")
+  totalTokens      Int?    @map("total_tokens")
+  temperature      Float? // Temperature used for this response
+
+  // Context debugging (stores what context was sent to AI)
+  contextUsed Json? @map("context_used")
+  // Example: { "studentLevel": "9th grade", "recentGrades": [85, 90], "strugglingConcepts": ["algebra"] }
+
+  rawPrompt String? @map("raw_prompt") @db.Text // Full prompt sent to OpenAI (debugging)
+
+  // Quality and feedback
+  wasHelpful   Boolean? @map("was_helpful") // Student feedback
+  feedbackNote String?  @map("feedback_note") @db.Text // Optional student comment
+
+  // Content moderation
+  flaggedContent    Boolean @default(false) @map("flagged_content")
+  flagReason        String? @map("flag_reason") // Why it was flagged
+  reviewedByTeacher Boolean @default(false) @map("reviewed_by_teacher")
+
+  // Citations and references
+  citedQuestions   String[] @default([]) @map("cited_questions") // Question IDs mentioned
+  citedConcepts    String[] @default([]) @map("cited_concepts") // Concepts explained
+  citedAssignments String[] @default([]) @map("cited_assignments") // Assignment IDs referenced
+
+  // Performance
+  responseTime Int? @map("response_time") // Milliseconds to generate response
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([role])
+  @@index([flaggedContent])
+  @@index([createdAt])
+  @@map("ai_messages")
+}
+
+// ============================================================================
+// AI INTERACTION LOG MODEL
+// Analytics tracking for AI TA usage (FERPA audit trail)
+// ============================================================================
+
+model AIInteractionLog {
+  id             String @id @default(uuid())
+  conversationId String @map("conversation_id")
+  studentId      String @map("student_id")
+  schoolId       String @map("school_id")
+
+  // Interaction details
+  interactionType String @map("interaction_type")
+  // Types: "question_asked", "concept_explained", "hint_requested", "problem_solved",
+  //        "assignment_help", "exam_prep", "clarification"
+
+  // Performance data
+  studentQuestion String? @map("student_question") @db.Text
+  aiResponse      String? @map("ai_response") @db.Text
+  wasSuccessful   Boolean @default(true) @map("was_successful")
+
+  // Context
+  conceptTags  String[] @default([]) @map("concept_tags")
+  assignmentId String?  @map("assignment_id")
+  classId      String?  @map("class_id")
+  questionId   String?  @map("question_id") // If helping with specific question
+
+  // Metrics
+  responseTime Int?   @map("response_time") // Milliseconds
+  tokensUsed   Int?   @map("tokens_used")
+  costUSD      Float? @map("cost_usd") // Cost of this interaction
+
+  // Outcome tracking
+  leadToCorrectAnswer    Boolean? @map("lead_to_correct_answer") // Did student get question right after AI help?
+  conceptMasteryImproved Boolean? @map("concept_mastery_improved") // Did mastery increase?
+
+  // FERPA audit fields
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+
+  // Timestamp
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([studentId])
+  @@index([schoolId])
+  @@index([interactionType])
+  @@index([assignmentId])
+  @@index([classId])
+  @@index([createdAt])
+  @@map("ai_interaction_logs")
+}
+
+// ============================================================================
+// AI TEACHER INSIGHT MODEL
+// Aggregated insights for teachers from AI TA interactions
+// ============================================================================
+
+model AITeacherInsight {
+  id        String @id @default(uuid())
+  teacherId String @map("teacher_id")
+  classId   String @map("class_id")
+  schoolId  String @map("school_id")
+
+  // Time period for this insight
+  periodStart DateTime @map("period_start")
+  periodEnd   DateTime @map("period_end")
+  periodType  String   @default("daily") @map("period_type") // "daily", "weekly", "monthly"
+
+  // Aggregated conversation data
+  totalConversations   Int    @default(0) @map("total_conversations")
+  totalMessages        Int    @default(0) @map("total_messages")
+  totalStudents        Int    @default(0) @map("total_students") // Unique students who used AI
+  averageSessionLength Float? @map("average_session_length") // Minutes
+
+  // Common questions (Top 10)
+  commonQuestions Json? @map("common_questions")
+  // Format: [{ question: "How do I...", count: 15, concepts: ["algebra"] }]
+
+  // Struggling concepts
+  strugglingConcepts Json? @map("struggling_concepts")
+  // Format: [{ concept: "quadratic equations", helpRequestCount: 25, students: ["id1", "id2"] }]
+
+  // Most active students
+  mostActiveStudents Json? @map("most_active_students")
+  // Format: [{ studentId: "...", name: "John D.", conversationCount: 12, messageCount: 45 }]
+
+  // Success metrics
+  problemsSolved     Int?     @default(0) @map("problems_solved")
+  averageHelpfulness Float?   @map("average_helpfulness") // Average student rating
+  conceptsImproved   String[] @default([]) @map("concepts_improved") // Concepts where mastery increased
+
+  // Intervention recommendations
+  interventionNeeded Json? @map("intervention_needed")
+  // Format: [{ studentId: "...", reason: "Asked for help 10 times on same concept", severity: "high" }]
+
+  // Topic recommendations
+  suggestedTopics Json? @map("suggested_topics")
+  // Format: [{ topic: "Need more practice on...", priority: "high", affectedStudents: 8 }]
+
+  // Cost tracking
+  totalTokensUsed Int   @default(0) @map("total_tokens_used")
+  totalCostUSD    Float @default(0) @map("total_cost_usd")
+
+  // Calculation metadata
+  lastCalculated DateTime @default(now()) @map("last_calculated")
+  dataPoints     Int      @default(0) @map("data_points") // Number of interactions analyzed
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Class     Class    @relation(fields: [classId], references: [id])
+
+  @@unique([classId, periodStart, periodEnd])
+  @@index([teacherId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([periodStart])
+  @@index([periodEnd])
+  @@index([periodType])
+  @@map("ai_teacher_insights")
+}
+
+// ============================================================================
+// AI PROMPT TEMPLATE MODEL
+// Reusable AI prompts for different scenarios
+// ============================================================================
+
+model AIPromptTemplate {
+  id        String  @id @default(uuid())
+  schoolId  String? @map("school_id") // null = system-wide template
+  teacherId String? @map("teacher_id") // null = school or system template
+
+  // Template details
+  name         String
+  description  String? @db.Text
+  templateType String  @map("template_type")
+  // Types: "general_help", "concept_explanation", "hint_generation",
+  //        "assignment_help", "exam_prep", "problem_solving"
+
+  // Prompt content
+  systemPrompt String @map("system_prompt") @db.Text
+  // Example: "You are a helpful tutor for {gradeLevel} students learning {subject}..."
+
+  // Context variables available
+  availableVariables String[] @default([]) @map("available_variables")
+  // e.g., ["gradeLevel", "subject", "studentName", "strugglingConcepts", "masteredConcepts"]
+
+  // OpenAI settings
+  temperature Float  @default(0.7)
+  maxTokens   Int    @default(500) @map("max_tokens")
+  model       String @default("gpt-3.5-turbo")
+  topP        Float? @default(1.0) @map("top_p")
+
+  // Behavior settings
+  allowDirectAnswers Boolean @default(false) @map("allow_direct_answers") // Almost always false
+  useExamples        Boolean @default(true) @map("use_examples")
+  useSocraticMethod  Boolean @default(true) @map("use_socratic_method")
+
+  // Usage and status
+  isActive   Boolean @default(true) @map("is_active")
+  isDefault  Boolean @default(false) @map("is_default") // Default template for this type
+  usageCount Int     @default(0) @map("usage_count")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([schoolId])
+  @@index([teacherId])
+  @@index([templateType])
+  @@index([isActive])
+  @@index([isDefault])
+  @@map("ai_prompt_templates")
+}

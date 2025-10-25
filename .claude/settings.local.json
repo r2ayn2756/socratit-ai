@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmitOnError false)",
+      "Bash(npx tsc)",
+      "Bash(psql -U postgres -d socratit_dev -c \"SELECT id, title, status, \"\"classId\"\", \"\"createdAt\"\" FROM \"\"Assignment\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 5;\")",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, title, status, \"\"classId\"\", \"\"createdAt\"\" FROM \"\"Assignment\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 5;\")",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT a.id, a.title, a.status, a.\"\"classId\"\", c.name as class_name FROM \"\"Assignment\"\" a JOIN \"\"Class\"\" c ON a.\"\"classId\"\" = c.id ORDER BY a.\"\"createdAt\"\" DESC LIMIT 5;\")",
+      "Bash(psql -U postgres -d socratit_dev -c \"SELECT a.id, a.title, a.status, a.\"\"classId\"\", c.name as class_name FROM \"\"Assignment\"\" a JOIN \"\"Class\"\" c ON a.\"\"classId\"\" = c.id ORDER BY a.\"\"createdAt\"\" DESC LIMIT 5;\")",
+      "Bash(npx ts-node debug-student-assignments.ts)",
+      "Bash(npx ts-node fix-student-enrollment.ts)",
+      "Bash(npx prisma migrate dev --name add_grading_system --create-only)",
+      "Bash(npx prisma format)",
+      "Bash(npx prisma migrate dev --name add_grading_system)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx prisma migrate dev --name add_analytics_system)",
+      "Bash(npm run build)",
+      "Bash(cat socratit-backend/package.json)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(cat:*)",
+      "Bash(timeout 10 npm start)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx prisma:*)",
+      "Bash(dir:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
