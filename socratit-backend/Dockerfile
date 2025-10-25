@@ -18,7 +18,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client with dummy DATABASE_URL for build
+# Railway will provide the real DATABASE_URL at runtime
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
+ENV DATABASE_URL=$DATABASE_URL
 RUN npx prisma generate
 
 # Build TypeScript
