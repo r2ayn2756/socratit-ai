@@ -23,11 +23,11 @@ export const apiLimiter = rateLimit({
 
 /**
  * Strict rate limiter for auth endpoints
- * 5 requests per 15 minutes per IP
+ * 20 requests per 15 minutes per IP (increased for testing/development)
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5,
+  max: 20, // Increased from 5 to 20 for better UX during testing
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later',
@@ -39,11 +39,11 @@ export const authLimiter = rateLimit({
 
 /**
  * Password reset rate limiter
- * 3 requests per hour per IP
+ * 10 requests per hour per IP (increased for better UX)
  */
 export const passwordResetLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3,
+  max: 10, // Increased from 3 to 10
   message: {
     success: false,
     message: 'Too many password reset attempts, please try again later',
