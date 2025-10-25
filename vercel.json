@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm --prefix socratit-wireframes run build",
+  "buildCommand": "CI=false npm --prefix socratit-wireframes run build",
   "outputDirectory": "socratit-wireframes/build",
   "installCommand": "npm --prefix socratit-wireframes install"
 }
