@@ -34,9 +34,30 @@ const app: Application = express();
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration - support multiple Vercel URLs (production + preview)
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  'https://socratit-ai.vercel.app',
+  'https://socratit-ai-git-main-r2ayn2756s-projects.vercel.app',
+];
+
+// Also allow any Vercel preview URLs
+const isVercelPreview = (origin: string) => {
+  return origin.endsWith('.vercel.app') && origin.includes('r2ayn2756');
+};
+
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in allowed list or is a Vercel preview
+    if (allowedOrigins.includes(origin) || isVercelPreview(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
