@@ -69,9 +69,6 @@ export const LandingPage: React.FC = () => {
               <a href="#how-it-works" className="text-slate-700 hover:text-brand-blue transition-colors font-medium">
                 How It Works
               </a>
-              <a href="#pricing" className="text-slate-700 hover:text-brand-blue transition-colors font-medium">
-                Pricing
-              </a>
               <Button
                 variant="ghost"
                 size="sm"
@@ -497,11 +494,15 @@ export const LandingPage: React.FC = () => {
                 quote: "Between passes, student arrivals, behavior issues, fire drills, active shooter drills, lockdowns, and announcements—there are constant disruptions. Each one breaks teaching flow. I have to restart attention, re-explain material, or pause grading. It makes consistency impossible.",
                 role: "High School Science Teacher",
               },
+              {
+                icon: MessageSquare,
+                quote: "Some parents don't respond to emails or calls; others don't speak English. I use Outlook for emails but have to look up parent info in TAC. Sometimes there's no email listed, only a phone number. Communication often stops there. A multilingual parent-communication system integrated with grades would save significant time.",
+                role: "Elementary School Teacher",
+              },
             ].map((struggle, idx) => (
               <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className={idx === 3 ? "md:col-start-2" : idx === 4 ? "" : ""}
               >
                 <Card padding="lg" className="h-full bg-white border border-slate-200 shadow-none">
                   <struggle.icon className="w-8 h-8 text-slate-600 mb-4" />
@@ -589,6 +590,11 @@ export const LandingPage: React.FC = () => {
                 icon: BarChart3,
                 title: 'Proactive Daily Insights',
                 desc: 'Morning briefings with actionable recommendations—no more chasing data across multiple systems',
+              },
+              {
+                icon: MessageSquare,
+                title: 'Smart Parent Communication',
+                desc: 'AI-drafted emails in multiple languages, integrated with grades and attendance. One click to update parents',
               },
             ].map((solution, idx) => (
               <motion.div key={idx} variants={fadeInUp}>
