@@ -18,7 +18,13 @@ import {
   Users,
   Zap,
   Shield,
-  Star
+  Star,
+  Layers,
+  CalendarX,
+  Calendar,
+  FileText,
+  AlertCircle,
+  Link
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
@@ -50,10 +56,10 @@ export const LandingPage: React.FC = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="Socratit.ai" className="h-16 w-auto" />
+              <img src="/logo.svg" alt="Socratit.ai" className="h-20 w-auto" />
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
@@ -439,8 +445,8 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* SOCIAL PROOF */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* TEACHER STRUGGLES SECTION */}
+      <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -450,65 +456,142 @@ export const LandingPage: React.FC = () => {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              Loved by Teachers Everywhere
+              We Want to Hear What You Struggle With
             </motion.h2>
+            <motion.p variants={fadeInUp} className="text-xl text-slate-600">
+              You're not alone. These are the challenges teachers face every day.
+            </motion.p>
           </motion.div>
 
+          {/* Struggle Testimonials */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-6 mb-12"
           >
             {[
-              { stat: '15+ hours', label: 'Saved per week' },
-              { stat: '94%', label: 'Teacher satisfaction' },
-              { stat: '10,000+', label: 'Students helped' },
-            ].map((item, idx) => (
-              <motion.div key={idx} variants={fadeInUp}>
-                <Card variant="glass" padding="lg" className="text-center">
-                  <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-purple mb-2">
-                    {item.stat}
-                  </div>
-                  <div className="text-slate-600 text-lg">{item.label}</div>
+              {
+                icon: Layers,
+                quote: "In one day, I toggle between Schoology for lessons, TAC for grades, Outlook for communication, Review360 for behavior tracking, and Frontline for absences. None of them sync. That fragmentation is one of the biggest time-wasters in my job.",
+                role: "High School Teacher",
+              },
+              {
+                icon: FileText,
+                quote: "Grading is endless. District policy requires at least two grades per week per student—about 90-130 students total. I create, review, and input each manually. Paper assignments pile up. Students don't write their names, so tracking submissions becomes detective work.",
+                role: "Middle School English Teacher",
+              },
+              {
+                icon: Clock,
+                quote: "Tutorials were supposed to help students, but they became overwhelming. Students drop in unannounced, sometimes several at once, all needing help with different assignments. 30-minute sessions always stretch much longer. And I have to track who came and what they worked on.",
+                role: "7th Grade Math Teacher",
+              },
+              {
+                icon: CalendarX,
+                quote: "Every day's content is prescribed. There's no time to pause or reteach. Tutorials are the only option, but attendance depends on students showing up. Those who miss class need to make up multiple lessons at once, creating even more back-tracking for me.",
+                role: "French Language Teacher",
+              },
+              {
+                icon: AlertCircle,
+                quote: "Between passes, student arrivals, behavior issues, fire drills, active shooter drills, lockdowns, and announcements—there are constant disruptions. Each one breaks teaching flow. I have to restart attention, re-explain material, or pause grading. It makes consistency impossible.",
+                role: "High School Science Teacher",
+              },
+            ].map((struggle, idx) => (
+              <motion.div key={idx} variants={fadeInUp} className={idx >= 3 ? "md:col-span-1 lg:col-start-2" : ""}>
+                <Card padding="lg" className="h-full bg-white border border-slate-200 shadow-none">
+                  <struggle.icon className="w-8 h-8 text-slate-600 mb-4" />
+                  <p className="text-slate-700 text-base mb-4 leading-relaxed italic">
+                    "{struggle.quote}"
+                  </p>
+                  <div className="text-slate-500 text-sm">— {struggle.role}</div>
                 </Card>
               </motion.div>
             ))}
           </motion.div>
 
-          {/* Testimonials */}
+          {/* Supporting Text & CTA */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="mt-16 grid md:grid-cols-2 gap-8"
+            className="text-center max-w-3xl mx-auto"
+          >
+            <motion.p variants={fadeInUp} className="text-lg text-slate-700 mb-8">
+              These challenges are exactly why we built Socratit.ai. Let's show you how we can help.
+            </motion.p>
+            <motion.div variants={fadeInUp}>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => window.open('https://calendly.com/cc283-rice/30min?month=2025-10', '_blank')}
+                rightIcon={<Calendar className="w-5 h-5" />}
+              >
+                Book a Demo - Let's Solve These Together
+              </Button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* HOW SOCRATIT.AI HELPS */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="text-center mb-12"
+          >
+            <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
+              How Socratit.ai Solves These Challenges
+            </motion.h2>
+            <motion.p variants={fadeInUp} className="text-xl text-slate-600">
+              One unified platform that addresses your biggest pain points
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {[
               {
-                quote: "Socratit.ai gave me my evenings back. I actually have time for my family now.",
-                author: "Sarah Martinez",
-                role: "8th Grade Math Teacher",
+                icon: Link,
+                title: 'One Unified Platform',
+                desc: 'All tools in one place: lessons, grades, attendance, behavior tracking, and parent communication—fully integrated',
               },
               {
-                quote: "The AI TA helps my struggling students without me having to stay after school every day.",
-                author: "James Chen",
-                role: "High School Science Teacher",
+                icon: CheckCircle,
+                title: 'AI-Powered Auto-Grading',
+                desc: 'Instant grading with personalized feedback for every student. No more detective work tracking submissions',
               },
-            ].map((testimonial, idx) => (
+              {
+                icon: Brain,
+                title: '24/7 AI Teaching Assistant',
+                desc: 'Students get help anytime through Socratic questioning—reducing tutorial chaos and makeup work',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Adaptive Learning Paths',
+                desc: 'Automatically identifies gaps and pushes personalized review materials to students who need it',
+              },
+              {
+                icon: BarChart3,
+                title: 'Proactive Daily Insights',
+                desc: 'Morning briefings with actionable recommendations—no more chasing data across multiple systems',
+              },
+            ].map((solution, idx) => (
               <motion.div key={idx} variants={fadeInUp}>
-                <Card variant="elevated" padding="lg">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-warning text-warning" />
-                    ))}
-                  </div>
-                  <p className="text-slate-700 text-lg mb-4 leading-relaxed italic">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="font-semibold text-slate-900">{testimonial.author}</div>
-                  <div className="text-slate-600 text-sm">{testimonial.role}</div>
+                <Card padding="lg" className="h-full bg-gradient-to-br from-blue-50 to-purple-50 border border-slate-100">
+                  <solution.icon className="w-8 h-8 text-brand-blue mb-3" />
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{solution.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{solution.desc}</p>
                 </Card>
               </motion.div>
             ))}
@@ -517,7 +600,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ADMIN APPEAL */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div

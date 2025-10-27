@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
@@ -87,8 +88,11 @@ interface TeacherAnalyticsProps {
 }
 
 export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClassId }) => {
-  // State
-  const [classFilter, setClassFilter] = useState<string>(selectedClassId || 'all');
+  // Get classId from URL params if available
+  const { classId: urlClassId } = useParams<{ classId: string }>();
+
+  // State - prioritize URL param, then prop, then 'all'
+  const [classFilter, setClassFilter] = useState<string>(urlClassId || selectedClassId || 'all');
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [timeGranularity, setTimeGranularity] = useState<'day' | 'week' | 'month'>('week');
   const [loading, setLoading] = useState(false);
@@ -248,6 +252,13 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
   };
 
   // Effects
+  useEffect(() => {
+    // Update classFilter when URL params change
+    if (urlClassId && urlClassId !== classFilter) {
+      setClassFilter(urlClassId);
+    }
+  }, [urlClassId]);
+
   useEffect(() => {
     if (classFilter !== 'all') {
       fetchAnalytics();

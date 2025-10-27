@@ -18,6 +18,7 @@ import {
   trackAnalyticsEvent,
   getStudentEvents,
   compareClassToSchool,
+  calculateStudentMetrics,
 } from '../services/analytics.service';
 import { getCachedAnalytics, setCachedAnalytics } from '../utils/analyticsCache';
 import { exportClassGradesCSV, exportStudentReportJSON } from '../utils/exportUtils';
@@ -832,6 +833,196 @@ export async function exportStudentReport(
     res.status(500).json({
       success: false,
       message: 'Failed to export student report',
+      errors: [error.message],
+    });
+  }
+}
+
+// ============================================================================
+// GET COMPREHENSIVE CLASS ANALYTICS (OPTIMIZED FOR CLASS ANALYTICS PAGE)
+// GET /api/v1/analytics/class/:classId/comprehensive
+// ============================================================================
+
+export async function getComprehensiveClassAnalytics(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
+  try {
+    const user = req.user as UserPayload;
+    const { classId } = req.params;
+
+    // Verify teacher teaches this class
+    const classTeacher = await prisma.classTeacher.findFirst({
+      where: {
+        classId,
+        teacherId: user.id,
+      },
+    });
+
+    if (!classTeacher && user.role !== 'ADMIN') {
+      res.status(403).json({
+        success: false,
+        message: 'You do not teach this class',
+      });
+      return;
+    }
+
+    // Check Redis cache first
+    const cacheKey = `${classId}:${user.schoolId}`;
+    const cached = await getCachedAnalytics('CLASS_OVERVIEW', cacheKey);
+
+    if (cached) {
+      res.status(200).json({
+        success: true,
+        data: cached,
+        cached: true,
+      });
+      return;
+    }
+
+    // Fetch all analytics data in parallel for better performance
+    const [
+      classInfo,
+      insights,
+      performanceDistribution,
+      conceptHeatmap,
+      engagementMetrics,
+      assignmentPerformance,
+      strugglingStudents,
+    ] = await Promise.all([
+      // Get class basic info
+      prisma.class.findUnique({
+        where: { id: classId },
+        select: {
+          id: true,
+          name: true,
+          subject: true,
+          gradeLevel: true,
+          academicYear: true,
+        },
+      }),
+
+      // Get all student insights for this class
+      prisma.studentInsight.findMany({
+        where: {
+          classId,
+          schoolId: user.schoolId,
+        },
+        include: {
+          student: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      }),
+
+      // Performance distribution
+      calculatePerformanceDistribution(classId, user.schoolId),
+
+      // Concept heatmap
+      generateConceptMasteryHeatmap(classId, user.schoolId),
+
+      // Engagement metrics
+      calculateEngagementMetrics(classId, user.schoolId),
+
+      // Assignment performance
+      getAssignmentPerformance(classId, user.schoolId),
+
+      // Struggling students
+      prisma.studentInsight.findMany({
+        where: {
+          classId,
+          schoolId: user.schoolId,
+          isStruggling: true,
+        },
+        include: {
+          student: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          interventionLevel: 'desc',
+        },
+      }),
+    ]);
+
+    // Calculate summary statistics
+    const totalStudents = insights.length;
+    const strugglingCount = insights.filter((i) => i.isStruggling).length;
+    const avgCompletionRate =
+      insights.reduce((sum, i) => sum + (i.completionRate || 0), 0) / (totalStudents || 1);
+    const avgScore = insights.reduce((sum, i) => sum + (i.averageScore || 0), 0) / (totalStudents || 1);
+
+    // Get intervention level distribution
+    const interventionLevels = {
+      LOW: insights.filter((i) => i.interventionLevel === 'LOW').length,
+      MEDIUM: insights.filter((i) => i.interventionLevel === 'MEDIUM').length,
+      HIGH: insights.filter((i) => i.interventionLevel === 'HIGH').length,
+      CRITICAL: insights.filter((i) => i.interventionLevel === 'CRITICAL').length,
+    };
+
+    // Compile comprehensive analytics response
+    const comprehensiveAnalytics = {
+      classInfo,
+      overview: {
+        totalStudents,
+        strugglingCount,
+        avgCompletionRate: Math.round(avgCompletionRate * 100) / 100,
+        avgScore: Math.round(avgScore * 100) / 100,
+        interventionLevels,
+      },
+      performanceDistribution,
+      conceptHeatmap,
+      engagementMetrics,
+      assignmentPerformance,
+      strugglingStudents: strugglingStudents.map(s => ({
+        studentId: s.student.id,
+        studentName: `${s.student.firstName} ${s.student.lastName}`,
+        email: s.student.email,
+        averageScore: s.averageScore,
+        completionRate: s.completionRate,
+        interventionLevel: s.interventionLevel,
+        isStruggling: s.isStruggling,
+        hasMissedAssignments: s.hasMissedAssignments,
+        hasDecliningGrade: s.hasDecliningGrade,
+        hasLowEngagement: s.hasLowEngagement,
+        hasConceptGaps: s.hasConceptGaps,
+        strugglingConcepts: s.strugglingConcepts,
+        recommendations: s.recommendations,
+      })),
+      insights: insights.map(i => ({
+        studentId: i.student.id,
+        studentName: `${i.student.firstName} ${i.student.lastName}`,
+        averageScore: i.averageScore,
+        completionRate: i.completionRate,
+        classRank: i.classRank,
+        percentile: i.percentile,
+      })),
+      generatedAt: new Date().toISOString(),
+    };
+
+    // Cache the result for 5 minutes
+    await setCachedAnalytics('CLASS_OVERVIEW', comprehensiveAnalytics, cacheKey);
+
+    res.status(200).json({
+      success: true,
+      data: comprehensiveAnalytics,
+      cached: false,
+    });
+  } catch (error: any) {
+    console.error('Error fetching comprehensive class analytics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch comprehensive class analytics',
       errors: [error.message],
     });
   }

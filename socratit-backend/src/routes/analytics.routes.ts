@@ -28,6 +28,7 @@ import {
   getStudentEventsHandler,
   exportClassGrades,
   exportStudentReport,
+  getComprehensiveClassAnalytics,
 } from '../controllers/analytics.extended.controller';
 
 const router = Router();
@@ -81,6 +82,14 @@ router.get(
   requireAuth,
   standardLimiter,
   getClassOverview
+);
+
+// Get comprehensive class analytics (teacher only) - OPTIMIZED ENDPOINT
+router.get(
+  '/class/:classId/comprehensive',
+  requireAuth,
+  standardLimiter,
+  getComprehensiveClassAnalytics
 );
 
 // Recalculate class analytics (teacher only)

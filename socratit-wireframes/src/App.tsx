@@ -57,6 +57,7 @@ function App() {
             <Route path="/teacher/curriculum" element={<CurriculumManagement />} />
             <Route path="/teacher/messages" element={<TeacherMessages />} />
             <Route path="/teacher/analytics" element={<TeacherAnalytics />} />
+            <Route path="/teacher/classes/:classId/analytics" element={<TeacherAnalytics />} />
 
             {/* STUDENT ROUTES */}
             <Route path="/student/dashboard" element={<StudentDashboard />} />
