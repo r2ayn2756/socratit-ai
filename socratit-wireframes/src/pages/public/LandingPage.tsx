@@ -498,7 +498,11 @@ export const LandingPage: React.FC = () => {
                 role: "High School Science Teacher",
               },
             ].map((struggle, idx) => (
-              <motion.div key={idx} variants={fadeInUp} className={idx >= 3 ? "md:col-span-1 lg:col-start-2" : ""}>
+              <motion.div
+                key={idx}
+                variants={fadeInUp}
+                className={idx === 3 ? "md:col-start-2" : idx === 4 ? "" : ""}
+              >
                 <Card padding="lg" className="h-full bg-white border border-slate-200 shadow-none">
                   <struggle.icon className="w-8 h-8 text-slate-600 mb-4" />
                   <p className="text-slate-700 text-base mb-4 leading-relaxed italic">
