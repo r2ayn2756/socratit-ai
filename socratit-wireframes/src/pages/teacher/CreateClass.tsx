@@ -7,9 +7,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Plus, AlertCircle, CheckCircle, Upload } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { classService, CreateClassDTO } from '../../services/class.service';
+import { FileUpload } from '../../components/common/FileUpload';
+import { curriculumService } from '../../services/curriculum.service';
 
 interface FormData {
   name: string;
@@ -20,6 +22,9 @@ interface FormData {
   room: string;
   scheduleTime: string;
   color: 'blue' | 'purple' | 'orange';
+  curriculumFile?: File;
+  curriculumTitle?: string;
+  curriculumDescription?: string;
 }
 
 export const CreateClass: React.FC = () => {
@@ -41,9 +46,32 @@ export const CreateClass: React.FC = () => {
 
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const [uploadingCurriculum, setUploadingCurriculum] = useState(false);
 
   const createClassMutation = useMutation({
-    mutationFn: (data: CreateClassDTO) => classService.createClass(data),
+    mutationFn: async (data: CreateClassDTO & { classId?: string }) => {
+      // First create the class
+      const classResponse = await classService.createClass(data);
+
+      // If there's a curriculum file, upload it
+      if (formData.curriculumFile && formData.curriculumTitle) {
+        try {
+          setUploadingCurriculum(true);
+          await curriculumService.uploadCurriculum({
+            title: formData.curriculumTitle,
+            description: formData.curriculumDescription,
+            file: formData.curriculumFile,
+          });
+        } catch (error) {
+          console.error('Failed to upload curriculum:', error);
+          // Don't fail the class creation if curriculum upload fails
+        } finally {
+          setUploadingCurriculum(false);
+        }
+      }
+
+      return classResponse;
+    },
     onSuccess: (response) => {
       setShowSuccess(true);
       setTimeout(() => {
@@ -80,6 +108,11 @@ export const CreateClass: React.FC = () => {
       }
     }
 
+    // If curriculum file is selected, title is required
+    if (formData.curriculumFile && !formData.curriculumTitle?.trim()) {
+      newErrors.curriculumTitle = 'Curriculum title is required when uploading a file';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -112,6 +145,23 @@ export const CreateClass: React.FC = () => {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  const handleFileSelect = (file: File) => {
+    setFormData((prev) => ({
+      ...prev,
+      curriculumFile: file,
+      curriculumTitle: prev.curriculumTitle || file.name.replace(/\.[^/.]+$/, ''), // Auto-fill title from filename
+    }));
+  };
+
+  const handleFileRemove = () => {
+    setFormData((prev) => ({
+      ...prev,
+      curriculumFile: undefined,
+      curriculumTitle: '',
+      curriculumDescription: '',
+    }));
   };
 
   const colorOptions = [
@@ -148,7 +198,9 @@ export const CreateClass: React.FC = () => {
             <CheckCircle className="text-green-600" size={24} />
             <div>
               <p className="font-medium text-green-900">Class created successfully!</p>
-              <p className="text-sm text-green-700">Redirecting to your classes...</p>
+              <p className="text-sm text-green-700">
+                {uploadingCurriculum ? 'Uploading curriculum...' : 'Redirecting to your classes...'}
+              </p>
             </div>
           </motion.div>
         )}
@@ -320,6 +372,77 @@ export const CreateClass: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Curriculum Upload Section */}
+          <div className="mb-8 border-t border-gray-200 pt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Upload className="text-gray-700" size={20} />
+              <h2 className="text-lg font-semibold text-gray-900">
+                Curriculum Materials (Optional)
+              </h2>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Upload a curriculum file now to quickly generate AI-powered assignments later. You can also add curriculum materials later from the class page.
+            </p>
+
+            {/* File Upload */}
+            <div className="mb-4">
+              <FileUpload
+                onFileSelect={handleFileSelect}
+                onFileRemove={handleFileRemove}
+                label="Curriculum File"
+                acceptedTypes={['.pdf', '.docx', '.doc', '.txt']}
+                maxSizeMB={10}
+                error={errors.curriculumFile}
+              />
+            </div>
+
+            {/* Curriculum Title - Only show if file is selected */}
+            {formData.curriculumFile && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-4"
+              >
+                <div>
+                  <label htmlFor="curriculumTitle" className="block text-sm font-medium text-gray-700 mb-2">
+                    Curriculum Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="curriculumTitle"
+                    value={formData.curriculumTitle || ''}
+                    onChange={(e) => handleChange('curriculumTitle', e.target.value)}
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.curriculumTitle ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="e.g., Unit 1: Cell Biology"
+                  />
+                  {errors.curriculumTitle && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle size={16} />
+                      {errors.curriculumTitle}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="curriculumDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                    Curriculum Description
+                  </label>
+                  <textarea
+                    id="curriculumDescription"
+                    value={formData.curriculumDescription || ''}
+                    onChange={(e) => handleChange('curriculumDescription', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Brief description of the curriculum content..."
+                  />
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Form Actions */}

@@ -32,7 +32,7 @@ const prisma = new PrismaClient();
  */
 export async function uploadCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { title, description } = req.body;
     const file = req.file;
 
@@ -130,7 +130,7 @@ export async function uploadCurriculum(req: Request, res: Response): Promise<voi
  */
 export async function getCurriculumStatus(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
 
     const curriculum = await prisma.curriculumMaterial.findFirst({
@@ -192,7 +192,7 @@ export async function getCurriculumStatus(req: Request, res: Response): Promise<
  */
 export async function triggerProcessing(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
 
     // Trigger processing
@@ -234,7 +234,7 @@ export async function triggerProcessing(req: Request, res: Response): Promise<vo
  */
 export async function listCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const {
       page = 1,
       limit = 20,
@@ -280,7 +280,7 @@ export async function listCurriculum(req: Request, res: Response): Promise<void>
  */
 export async function getCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
 
     const curriculum = await getCurriculumMaterial(id, userId, schoolId);
@@ -318,7 +318,7 @@ export async function getCurriculum(req: Request, res: Response): Promise<void> 
  */
 export async function updateCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
     const { title, description, aiSummary, aiOutline, isArchived } = req.body;
 
@@ -376,7 +376,7 @@ export async function updateCurriculum(req: Request, res: Response): Promise<voi
  */
 export async function deleteCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
 
     await deleteCurriculumMaterial(id, userId, schoolId, req.ip || '0.0.0.0');
@@ -425,7 +425,7 @@ export async function deleteCurriculum(req: Request, res: Response): Promise<voi
  */
 export async function downloadCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
 
     const filePath = await getCurriculumFilePath(id, userId, schoolId, req.ip || '0.0.0.0');
@@ -464,7 +464,7 @@ export async function downloadCurriculum(req: Request, res: Response): Promise<v
  */
 export async function generateAssignmentFromCurriculum(req: Request, res: Response): Promise<void> {
   try {
-    const { userId, schoolId } = (req as any).user;
+    const { id: userId, schoolId } = (req as any).user;
     const { id } = req.params;
     const {
       title,

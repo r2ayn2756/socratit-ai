@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
   destination: async (req, _file, cb) => {
     try {
       // Extract user info from request (set by requireAuth middleware)
-      const userId = (req as any).user?.userId;
+      const userId = (req as any).user?.id;
       const schoolId = (req as any).user?.schoolId;
 
       if (!userId || !schoolId) {
