@@ -81,7 +81,7 @@ export const LandingPage: React.FC = () => {
                 size="sm"
                 onClick={() => navigate('/signup')}
               >
-                Start Free Trial
+                Get Started
               </Button>
             </nav>
           </div>
@@ -120,7 +120,7 @@ export const LandingPage: React.FC = () => {
                 variants={fadeInUp}
                 className="text-xl text-slate-600 mb-8 leading-relaxed"
               >
-                Socratit.ai gives you back 15+ hours per week by automating grading,
+                We're dedicated to saving teachers time by automating grading,
                 generating personalized feedback, and proactively identifying struggling students—all
                 while helping students learn through Socratic questioning.
               </motion.p>
@@ -135,7 +135,7 @@ export const LandingPage: React.FC = () => {
                   onClick={() => navigate('/signup')}
                   rightIcon={<Sparkles className="w-5 h-5" />}
                 >
-                  Start Free Trial
+                  Try It Now
                 </Button>
                 <Button
                   variant="ghost"
@@ -144,20 +144,6 @@ export const LandingPage: React.FC = () => {
                 >
                   Watch Demo
                 </Button>
-              </motion.div>
-
-              <motion.div
-                variants={fadeInUp}
-                className="mt-8 flex items-center gap-6 text-sm text-slate-600"
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-success" />
-                  <span>No credit card required</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-success" />
-                  <span>14-day free trial</span>
-                </div>
               </motion.div>
             </motion.div>
 
@@ -349,7 +335,7 @@ export const LandingPage: React.FC = () => {
               How Socratit.ai Works
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-slate-600">
-              Three simple steps to transform your teaching workflow
+              Three simple steps to get started
             </motion.p>
           </motion.div>
 
@@ -408,10 +394,10 @@ export const LandingPage: React.FC = () => {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              Features That Save Time
+              What's Inside
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-slate-600">
-              Everything you need to teach smarter, not harder
+              Tools built to support teachers and students
             </motion.p>
           </motion.div>
 
@@ -619,10 +605,10 @@ export const LandingPage: React.FC = () => {
             variants={staggerContainer}
           >
             <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Transform Your Teaching?
+              Ready to Help Your Students Succeed?
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-white/90 mb-8">
-              Join thousands of teachers who've reclaimed their time and improved student outcomes.
+              Join teachers using Socratit.ai to support every student in their classroom.
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -631,7 +617,7 @@ export const LandingPage: React.FC = () => {
                 onClick={() => navigate('/signup')}
                 className="bg-white text-brand-blue hover:bg-slate-50"
               >
-                Start Free Trial
+                Get Started Free
               </Button>
               <Button
                 variant="ghost"
@@ -652,14 +638,13 @@ export const LandingPage: React.FC = () => {
             <div>
               <img src="/logo.svg" alt="Socratit.ai" className="h-8 w-auto mb-4 brightness-0 invert" />
               <p className="text-slate-400 text-sm">
-                AI-powered teaching assistant that gives teachers their time back.
+                Free AI-powered platform built to help teachers support every student.
               </p>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Demo</a></li>
               </ul>
             </div>
