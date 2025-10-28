@@ -5,18 +5,10 @@
 
 import fs from 'fs/promises';
 import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import { PrismaClient } from '@prisma/client';
 import { analyzeCurriculumContent } from './ai.service';
 import { createFileUploadLog } from './fileLog.service';
-
-// Dynamic import for pdf-parse (ESM module)
-let pdfParse: any;
-async function loadPdfParse() {
-  if (!pdfParse) {
-    pdfParse = (await import('pdf-parse')).default;
-  }
-  return pdfParse;
-}
 
 const prisma = new PrismaClient();
 
@@ -90,14 +82,33 @@ export async function createCurriculumMaterial(data: CurriculumUploadData) {
 // ============================================================================
 
 /**
- * Extracts text from PDF file
+ * Extracts text from PDF file using pdfjs-dist
  */
 async function extractTextFromPDF(filePath: string): Promise<string> {
   try {
     const dataBuffer = await fs.readFile(filePath);
-    const pdf = await loadPdfParse();
-    const pdfData = await pdf(dataBuffer);
-    return pdfData.text;
+    const data = new Uint8Array(dataBuffer);
+
+    // Load the PDF document
+    const loadingTask = pdfjsLib.getDocument({ data });
+    const pdf = await loadingTask.promise;
+
+    let fullText = '';
+
+    // Extract text from each page
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+
+      // Concatenate all text items
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+
+      fullText += pageText + '\n';
+    }
+
+    return fullText.trim();
   } catch (error: any) {
     throw new Error(`PDF extraction failed: ${error.message}`);
   }
