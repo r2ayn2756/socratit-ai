@@ -615,14 +615,14 @@ export const LandingPage: React.FC = () => {
                 variant="secondary"
                 size="lg"
                 onClick={() => navigate('/signup')}
-                className="bg-white text-brand-blue hover:bg-slate-50"
+                className="bg-white text-brand-blue hover:bg-slate-100 font-semibold shadow-lg"
               >
                 Get Started Free
               </Button>
               <Button
                 variant="ghost"
                 size="lg"
-                className="border-white text-white hover:bg-white/10"
+                className="border-2 border-white text-white hover:bg-white hover:text-brand-blue font-semibold transition-all"
               >
                 Schedule Demo
               </Button>
