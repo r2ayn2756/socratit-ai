@@ -30,15 +30,17 @@ import { createRateLimiter } from '../middleware/rateLimiter';
 const router = Router();
 
 // Rate limiters
+// Development: generous limits for testing
+// Production: tighter limits to prevent abuse
 const classCreationLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // 20 classes per hour
+  max: process.env.NODE_ENV === 'development' ? 100 : 20, // 100 dev, 20 prod
   message: 'Too many class creation attempts. Please try again later.',
 });
 
 const classCodeLimiter = createRateLimiter({
   windowMs: 60 * 1000, // 1 minute
-  max: 10, // 10 requests per minute
+  max: process.env.NODE_ENV === 'development' ? 50 : 10, // 50 dev, 10 prod
   message: 'Too many class code requests. Please slow down.',
 });
 

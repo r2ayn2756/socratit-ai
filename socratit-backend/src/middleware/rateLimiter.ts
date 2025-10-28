@@ -8,7 +8,10 @@ import { env } from '../config/env';
 
 /**
  * General API rate limiter
- * 100 requests per 15 minutes per IP
+ * Development: Relaxed limits (1000 requests/15min) for testing
+ * Production: Strict limits (100 requests/15min) for security
+ *
+ * Auto-disabled in development when RATE_LIMIT_MAX_REQUESTS >= 1000
  */
 export const apiLimiter = rateLimit({
   windowMs: env.RATE_LIMIT_WINDOW_MS,
@@ -19,6 +22,10 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting in development if limits are very high (>= 1000)
+  skip: (req) => {
+    return env.NODE_ENV === 'development' && env.RATE_LIMIT_MAX_REQUESTS >= 1000;
+  },
 });
 
 /**
