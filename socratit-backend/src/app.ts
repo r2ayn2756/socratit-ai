@@ -35,14 +35,16 @@ const app: Application = express();
 // Security middleware
 app.use(helmet());
 
-// CORS configuration - support multiple Vercel URLs (production + preview)
+// CORS configuration - support custom domain + Vercel URLs (production + preview)
 const allowedOrigins = [
   env.FRONTEND_URL,
-  'https://socratit-ai.vercel.app',
+  'https://socratit.com',              // Custom domain (production)
+  'https://www.socratit.com',          // www subdomain
+  'https://socratit-ai.vercel.app',    // Original Vercel domain
   'https://socratit-ai-git-main-r2ayn2756s-projects.vercel.app',
 ];
 
-// Also allow any Vercel preview URLs
+// Also allow any Vercel preview URLs for testing
 const isVercelPreview = (origin: string) => {
   return origin.endsWith('.vercel.app') && origin.includes('r2ayn2756');
 };
