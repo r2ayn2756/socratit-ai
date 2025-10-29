@@ -8,8 +8,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Cache bust to force Railway to rebuild - Update: 2025-10-29-v2
-ARG CACHE_BUST=2025-10-29-v2
+# Cache bust to force Railway to rebuild - Update: 2025-10-29-v3
+ARG CACHE_BUST=2025-10-29-v3
 RUN echo "Cache bust: $CACHE_BUST"
 
 # Install build dependencies for native modules and Prisma
@@ -56,8 +56,8 @@ RUN echo "=== Checking tsconfig.json ===" && cat tsconfig.json
 # Debug: Show package.json build script
 RUN echo "=== Build script ===" && cat package.json | grep -A 2 '"build"'
 
-# Build TypeScript with verbose output
-RUN echo "=== Starting TypeScript build ===" && npm run build 2>&1 || (echo "=== Build failed, showing details ===" && npx tsc --listFiles 2>&1 | head -50 && exit 1)
+# Build TypeScript - Show all compiler output
+RUN echo "=== Running: npx tsc ===" && npx tsc
 
 # Stage 2: Production
 FROM node:20-alpine
