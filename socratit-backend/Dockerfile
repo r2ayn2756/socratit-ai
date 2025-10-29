@@ -14,9 +14,22 @@ RUN apk add --no-cache python3 make g++ openssl
 # Copy package files
 COPY package*.json ./
 
+# Debug: Show what package files exist
+RUN echo "=== Package files ===" && ls -la package*.json
+
+# Debug: Check if pdfjs-dist is in package.json
+RUN echo "=== Checking for pdfjs in package.json ===" && (grep -i pdf package.json || echo "No PDF packages found")
+
 # Install all dependencies (including devDependencies for build)
 # Use npm install if package-lock.json doesn't exist, otherwise use npm ci
-RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; else npm install --legacy-peer-deps; fi
+RUN if [ -f package-lock.json ]; then \
+      echo "=== Using npm ci ===" && npm ci --legacy-peer-deps; \
+    else \
+      echo "=== Using npm install ===" && npm install --legacy-peer-deps; \
+    fi
+
+# Debug: Verify pdfjs-dist was NOT installed
+RUN echo "=== Checking installed packages ===" && (ls node_modules | grep -i pdf || echo "No PDF packages in node_modules")
 
 # Copy Prisma schema
 COPY prisma ./prisma/
@@ -30,8 +43,17 @@ RUN npx prisma generate
 # Copy source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build
+# Debug: Show what files were copied
+RUN echo "=== Files in /app ===" && ls -la
+
+# Debug: Show tsconfig.json exists
+RUN echo "=== Checking tsconfig.json ===" && cat tsconfig.json
+
+# Debug: Show package.json build script
+RUN echo "=== Build script ===" && cat package.json | grep -A 2 '"build"'
+
+# Build TypeScript with verbose output
+RUN echo "=== Starting TypeScript build ===" && npm run build 2>&1 || (echo "=== Build failed, showing details ===" && npx tsc --listFiles 2>&1 | head -50 && exit 1)
 
 # Stage 2: Production
 FROM node:20-alpine
