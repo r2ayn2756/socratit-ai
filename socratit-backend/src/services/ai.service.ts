@@ -129,7 +129,7 @@ async function callGemini(systemPrompt: string, userPrompt: string, maxTokens: n
   try {
     const client = getGeminiClient();
     const model = client.getGenerativeModel({
-      model: env.GEMINI_MODEL || 'gemini-pro',
+      model: env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
       generationConfig: {
         maxOutputTokens: maxTokens,
         temperature: 0.7,

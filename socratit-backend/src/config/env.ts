@@ -128,7 +128,7 @@ export const env: EnvConfig = {
   // AI Configuration
   AI_PROVIDER: getEnv('AI_PROVIDER', 'gemini'),
   GEMINI_API_KEY: getEnv('GEMINI_API_KEY', ''),
-  GEMINI_MODEL: getEnv('GEMINI_MODEL', 'gemini-pro'),
+  GEMINI_MODEL: getEnv('GEMINI_MODEL', 'gemini-2.0-flash-exp'),
 
   // Anthropic (Backup)
   ANTHROPIC_API_KEY: getEnv('ANTHROPIC_API_KEY', ''),
