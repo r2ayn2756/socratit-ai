@@ -11,15 +11,6 @@ import { createFileUploadLog } from './fileLog.service';
 
 const prisma = new PrismaClient();
 
-// Lazy load pdfjs-dist to avoid build issues
-let pdfjsLib: any = null;
-async function getPdfJsLib() {
-  if (!pdfjsLib) {
-    pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  }
-  return pdfjsLib;
-}
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -90,41 +81,15 @@ export async function createCurriculumMaterial(data: CurriculumUploadData) {
 // ============================================================================
 
 /**
- * Extracts text from PDF file using pdfjs-dist
+ * Extract text from PDF file
+ * TEMPORARY: PDF extraction disabled due to build compatibility issues
  */
 async function extractTextFromPDF(filePath: string): Promise<string> {
-  try {
-    const dataBuffer = await fs.readFile(filePath);
-    const data = new Uint8Array(dataBuffer);
+  const stats = await fs.stat(filePath);
+  const fileName = filePath.split('/').pop() || filePath.split('\\').pop() || 'unknown.pdf';
+  const fileSize = Math.round(stats.size / 1024);
 
-    // Dynamically load PDF.js
-    const pdfjs = await getPdfJsLib();
-
-    // Load PDF document
-    const loadingTask = pdfjs.getDocument({ data });
-    const pdfDocument = await loadingTask.promise;
-
-    let fullText = '';
-
-    // Extract text from each page
-    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
-      const page = await pdfDocument.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ');
-      fullText += pageText + '\n';
-    }
-
-    const extractedText = fullText.trim();
-    if (!extractedText) {
-      throw new Error('No text could be extracted from PDF');
-    }
-
-    return extractedText;
-  } catch (error: any) {
-    throw new Error(`PDF extraction failed: ${error.message}`);
-  }
+  return `PDF File Uploaded: ${fileName} (${fileSize}KB)\n\nPDF text extraction is currently unavailable. Please upload a DOCX file instead for automatic text extraction.`;
 }
 
 /**

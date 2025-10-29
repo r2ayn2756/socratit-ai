@@ -10,50 +10,23 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Lazy load pdfjs-dist to avoid build issues
-let pdfjsLib: any = null;
-async function getPdfJsLib() {
-  if (!pdfjsLib) {
-    pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  }
-  return pdfjsLib;
-}
-
 // ============================================================================
 // TEXT EXTRACTION
 // ============================================================================
 
 /**
- * Extract text from PDF file using pdfjs-dist
+ * Extract text from PDF file
+ * TEMPORARY: PDF extraction disabled due to build compatibility issues
+ * Users should upload DOCX files for automatic text extraction
  */
 async function extractTextFromPDF(filePath: string): Promise<string> {
-  try {
-    const dataBuffer = await fs.readFile(filePath);
-    const data = new Uint8Array(dataBuffer);
+  // PDF text extraction is temporarily disabled
+  // Return a placeholder message
+  const stats = await fs.stat(filePath);
+  const fileName = path.basename(filePath);
+  const fileSize = Math.round(stats.size / 1024);
 
-    // Dynamically load PDF.js
-    const pdfjs = await getPdfJsLib();
-
-    // Load PDF document
-    const loadingTask = pdfjs.getDocument({ data });
-    const pdfDocument = await loadingTask.promise;
-
-    let fullText = '';
-
-    // Extract text from each page
-    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
-      const page = await pdfDocument.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => item.str)
-        .join(' ');
-      fullText += pageText + '\n';
-    }
-
-    return fullText;
-  } catch (error: any) {
-    throw new Error(`Failed to extract text from PDF: ${error.message}`);
-  }
+  return `PDF File Uploaded: ${fileName} (${fileSize}KB)\n\nPDF text extraction is currently unavailable. Please either:\n1. Upload a DOCX file instead for automatic text extraction, or\n2. Manually enter curriculum content in the editor.\n\nThis limitation will be resolved in a future update.`;
 }
 
 /**
