@@ -27,7 +27,20 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(if not exist uploads mkdir uploads)"
+      "Bash(if not exist uploads mkdir uploads)",
+      "Bash(npm uninstall:*)",
+      "Bash(git pull:*)",
+      "Bash(lsof:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(npm start)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(timeout 3 echo:*)",
+      "Bash(timeout:*)",
+      "Bash(awk:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
