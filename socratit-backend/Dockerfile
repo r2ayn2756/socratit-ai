@@ -8,6 +8,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Cache bust to force Railway to rebuild - Update: 2025-10-29-v2
+ARG CACHE_BUST=2025-10-29-v2
+RUN echo "Cache bust: $CACHE_BUST"
+
 # Install build dependencies for native modules and Prisma
 RUN apk add --no-cache python3 make g++ openssl
 
