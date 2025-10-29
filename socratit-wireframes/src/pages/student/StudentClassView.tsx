@@ -108,7 +108,7 @@ export const StudentClassView: React.FC = () => {
 
       let currentUnit: CurriculumUnit | null = null;
       if (currentUnitProgress) {
-        currentUnit = await curriculumApi.units.getUnit(currentUnitProgress.unitId) as CurriculumUnit;
+        currentUnit = await curriculumApi.units.getUnit(currentUnitProgress.unitId) as unknown as CurriculumUnit;
       }
 
       // Filter upcoming assignments (not submitted yet, due in future)

@@ -81,7 +81,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
               curriculumMaterialId,
               preferences: {
                 targetUnits: wizardState.aiPreferences.targetUnits || 8,
-                pacingPreference: wizardState.aiPreferences.pacingPreference || 'standard',
+                pacingPreference: (wizardState.aiPreferences.pacingPreference || 'standard') as 'standard' | 'accelerated' | 'extended',
               },
             }
           );

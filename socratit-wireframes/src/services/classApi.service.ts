@@ -27,10 +27,10 @@ export interface CreateClassResponse {
     gradeLevel: string;
     description: string | null;
     schoolId: string;
-    scheduleId?: string;
-    studentCount?: number;
+    scheduleId: string | null;
+    studentCount: number;
     createdAt: string;
-    updatedAt?: string;
+    updatedAt: string;
   };
 }
 

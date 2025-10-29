@@ -46,7 +46,7 @@ export const CurriculumManagementModal: React.FC<CurriculumManagementModalProps>
         curriculumApi.units.getScheduleUnits(scheduleId),
       ]);
 
-      setSchedule(scheduleData as CurriculumSchedule);
+      setSchedule(scheduleData as unknown as CurriculumSchedule);
       setUnits(unitsData);
     } catch (error) {
       console.error('Failed to load schedule:', error);
