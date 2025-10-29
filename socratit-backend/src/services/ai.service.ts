@@ -129,7 +129,7 @@ async function callGemini(systemPrompt: string, userPrompt: string, maxTokens: n
   try {
     const client = getGeminiClient();
     const model = client.getGenerativeModel({
-      model: env.GEMINI_MODEL || 'gemini-1.5-flash',
+      model: env.GEMINI_MODEL || 'gemini-pro',
       generationConfig: {
         maxOutputTokens: maxTokens,
         temperature: 0.7,
@@ -520,7 +520,7 @@ export async function testAIConnection(): Promise<boolean> {
 
     if (provider === 'gemini') {
       const client = getGeminiClient();
-      const model = client.getGenerativeModel({ model: env.GEMINI_MODEL || 'gemini-1.5-flash' });
+      const model = client.getGenerativeModel({ model: env.GEMINI_MODEL || 'gemini-pro' });
       await model.generateContent('Test');
     } else if (provider === 'claude') {
       const client = getAnthropicClient();
