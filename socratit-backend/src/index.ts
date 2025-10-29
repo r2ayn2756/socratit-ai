@@ -13,6 +13,7 @@ import { cleanupStalePresence } from './services/presence.service';
 import { initializeVelocityCron } from './jobs/velocity.cron';
 import { startCurriculumCleanupJob } from './jobs/curriculum.cron';
 import { scheduleAIInsightsCron } from './jobs/aiInsights.cron';
+import { startFileProcessingJob } from './jobs/fileProcessing.cron';
 
 // Validate environment variables
 validateEnv();
@@ -58,6 +59,7 @@ const startServer = async (): Promise<void> => {
     initializeVelocityCron();
     startCurriculumCleanupJob();
     scheduleAIInsightsCron();
+    startFileProcessingJob();
 
     // Graceful shutdown handlers
     const gracefulShutdown = async (signal: string): Promise<void> => {

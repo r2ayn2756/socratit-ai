@@ -8,7 +8,12 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { authenticate, requireRole } from '../middleware/auth';
-import { uploadCurriculumFile, getCurriculumFile } from '../controllers/upload.controller';
+import {
+  uploadCurriculumFile,
+  getCurriculumFile,
+  getCurriculumFileStatus,
+  processCurriculumFileManually,
+} from '../controllers/upload.controller';
 
 const router = Router();
 
@@ -81,6 +86,30 @@ router.get(
   '/curriculum/:fileId',
   authenticate,
   getCurriculumFile
+);
+
+/**
+ * GET /api/upload/curriculum/:fileId/status
+ * Get file processing status
+ * @auth Required - TEACHER role
+ */
+router.get(
+  '/curriculum/:fileId/status',
+  authenticate,
+  requireRole('TEACHER'),
+  getCurriculumFileStatus
+);
+
+/**
+ * POST /api/upload/curriculum/:fileId/process
+ * Manually trigger file processing
+ * @auth Required - TEACHER role
+ */
+router.post(
+  '/curriculum/:fileId/process',
+  authenticate,
+  requireRole('TEACHER'),
+  processCurriculumFileManually
 );
 
 export default router;
