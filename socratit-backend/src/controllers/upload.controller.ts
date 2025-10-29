@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { Response, NextFunction } from 'express';
-import { AuthRequest } from '../types/auth.types';
+import { AuthRequest } from '../types';
 import path from 'path';
 import fs from 'fs';
 import { PrismaClient } from '@prisma/client';
