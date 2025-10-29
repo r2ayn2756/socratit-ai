@@ -64,16 +64,45 @@ interface AICurriculumAnalysisResult {
 }
 
 // ============================================================================
-// AI CLIENTS
+// AI CLIENTS - LAZY INITIALIZATION
 // ============================================================================
 
-const anthropic = new Anthropic({
-  apiKey: env.ANTHROPIC_API_KEY || undefined,
-});
+// Debug logging
+console.log('🔍 AI Service Initialization:');
+console.log('  AI_PROVIDER:', env.AI_PROVIDER);
+console.log('  ANTHROPIC_API_KEY exists:', !!(env.ANTHROPIC_API_KEY && env.ANTHROPIC_API_KEY.length > 0));
+console.log('  ANTHROPIC_API_KEY length:', env.ANTHROPIC_API_KEY?.length || 0);
+console.log('  CLAUDE_MODEL:', env.CLAUDE_MODEL);
+console.log('  OPENAI_API_KEY exists:', !!(env.OPENAI_API_KEY && env.OPENAI_API_KEY.length > 0));
 
-const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY || undefined,
-});
+// Lazy initialization - clients are created on first use to avoid empty string issues
+let anthropicClient: Anthropic | null = null;
+let openaiClient: OpenAI | null = null;
+
+function getAnthropicClient(): Anthropic {
+  if (!anthropicClient) {
+    if (!env.ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY.length === 0) {
+      throw new Error('ANTHROPIC_API_KEY is not configured');
+    }
+    console.log('🔑 Initializing Anthropic client with key length:', env.ANTHROPIC_API_KEY.length);
+    anthropicClient = new Anthropic({
+      apiKey: env.ANTHROPIC_API_KEY,
+    });
+  }
+  return anthropicClient;
+}
+
+function getOpenAIClient(): OpenAI {
+  if (!openaiClient) {
+    if (!env.OPENAI_API_KEY || env.OPENAI_API_KEY.length === 0) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+    openaiClient = new OpenAI({
+      apiKey: env.OPENAI_API_KEY,
+    });
+  }
+  return openaiClient;
+}
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -84,7 +113,8 @@ const openai = new OpenAI({
  */
 async function callClaude(systemPrompt: string, userPrompt: string, maxTokens: number = 2000): Promise<any> {
   try {
-    const response = await anthropic.messages.create({
+    const client = getAnthropicClient();
+    const response = await client.messages.create({
       model: env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
       max_tokens: maxTokens,
       system: systemPrompt,
@@ -139,7 +169,8 @@ async function callClaude(systemPrompt: string, userPrompt: string, maxTokens: n
  */
 async function callOpenAI(systemPrompt: string, userPrompt: string, maxTokens: number = 2000): Promise<any> {
   try {
-    const response = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const response = await client.chat.completions.create({
       model: env.OPENAI_MODEL || 'gpt-3.5-turbo',
       messages: [
         {
@@ -421,13 +452,15 @@ export async function testAIConnection(): Promise<boolean> {
     const provider = env.AI_PROVIDER || 'claude';
 
     if (provider === 'claude') {
-      await anthropic.messages.create({
+      const client = getAnthropicClient();
+      await client.messages.create({
         model: env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
         max_tokens: 10,
         messages: [{ role: 'user', content: 'Test' }],
       });
     } else if (provider === 'openai') {
-      await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      await client.chat.completions.create({
         model: env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: [{ role: 'user', content: 'Test' }],
         max_tokens: 5,
@@ -577,7 +610,8 @@ export async function chatCompletion(
         content: m.content,
       }));
 
-      const response = await anthropic.messages.create({
+      const client = getAnthropicClient();
+      const response = await client.messages.create({
         model: model || env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
         max_tokens: maxTokens,
         system: systemMessage?.content,
@@ -598,7 +632,8 @@ export async function chatCompletion(
       return { content: content.text, usage };
     } else {
       // Use OpenAI
-      const response = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      const response = await client.chat.completions.create({
         model: model || env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: messages.map((m) => ({
           role: m.role,
@@ -660,7 +695,8 @@ export async function streamChatCompletion(
         content: m.content,
       }));
 
-      const stream = await anthropic.messages.stream({
+      const client = getAnthropicClient();
+      const stream = await client.messages.stream({
         model: model || env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
         max_tokens: maxTokens,
         system: systemMessage?.content,
@@ -690,7 +726,8 @@ export async function streamChatCompletion(
       });
     } else {
       // Use OpenAI streaming
-      const stream = await openai.chat.completions.create({
+      const client = getOpenAIClient();
+      const stream = await client.chat.completions.create({
         model: model || env.OPENAI_MODEL || 'gpt-3.5-turbo',
         messages: messages.map((m) => ({
           role: m.role,
