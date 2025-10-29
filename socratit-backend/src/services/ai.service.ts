@@ -68,11 +68,11 @@ interface AICurriculumAnalysisResult {
 // ============================================================================
 
 const anthropic = new Anthropic({
-  apiKey: env.ANTHROPIC_API_KEY || '',
+  apiKey: env.ANTHROPIC_API_KEY || undefined,
 });
 
 const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY || '',
+  apiKey: env.OPENAI_API_KEY || undefined,
 });
 
 // ============================================================================
