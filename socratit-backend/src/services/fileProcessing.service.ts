@@ -7,24 +7,39 @@ import fs from 'fs/promises';
 import path from 'path';
 import mammoth from 'mammoth';
 import { PrismaClient } from '@prisma/client';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const prisma = new PrismaClient();
-
-// Dynamic import for pdf-parse (CommonJS module)
-const pdfParse = require('pdf-parse');
 
 // ============================================================================
 // TEXT EXTRACTION
 // ============================================================================
 
 /**
- * Extract text from PDF file
+ * Extract text from PDF file using pdfjs-dist
  */
 async function extractTextFromPDF(filePath: string): Promise<string> {
   try {
     const dataBuffer = await fs.readFile(filePath);
-    const pdfData = await pdfParse(dataBuffer);
-    return pdfData.text;
+    const data = new Uint8Array(dataBuffer);
+
+    // Load PDF document
+    const loadingTask = pdfjsLib.getDocument({ data });
+    const pdfDocument = await loadingTask.promise;
+
+    let fullText = '';
+
+    // Extract text from each page
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      fullText += pageText + '\n';
+    }
+
+    return fullText;
   } catch (error: any) {
     throw new Error(`Failed to extract text from PDF: ${error.message}`);
   }
