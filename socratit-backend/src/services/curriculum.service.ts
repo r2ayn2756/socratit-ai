@@ -5,7 +5,7 @@
 
 import fs from 'fs/promises';
 import mammoth from 'mammoth';
-import PDFParser from 'pdf2json';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { PrismaClient } from '@prisma/client';
 import { analyzeCurriculumContent } from './ai.service';
 import { createFileUploadLog } from './fileLog.service';
@@ -82,53 +82,38 @@ export async function createCurriculumMaterial(data: CurriculumUploadData) {
 // ============================================================================
 
 /**
- * Extracts text from PDF file using pdf2json
+ * Extracts text from PDF file using pdfjs-dist
  */
 async function extractTextFromPDF(filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new PDFParser();
+  try {
+    const dataBuffer = await fs.readFile(filePath);
+    const data = new Uint8Array(dataBuffer);
 
-    pdfParser.on('pdfParser_dataError', (errData: any) => {
-      reject(new Error(`PDF extraction failed: ${errData.parserError}`));
-    });
+    // Load PDF document
+    const loadingTask = pdfjsLib.getDocument({ data });
+    const pdfDocument = await loadingTask.promise;
 
-    pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
-      try {
-        let fullText = '';
+    let fullText = '';
 
-        // Extract text from all pages
-        if (pdfData.Pages && Array.isArray(pdfData.Pages)) {
-          for (const page of pdfData.Pages) {
-            if (page.Texts && Array.isArray(page.Texts)) {
-              for (const text of page.Texts) {
-                if (text.R && Array.isArray(text.R)) {
-                  for (const run of text.R) {
-                    if (run.T) {
-                      // Decode URI-encoded text
-                      fullText += decodeURIComponent(run.T) + ' ';
-                    }
-                  }
-                }
-              }
-              fullText += '\n'; // New line after each page
-            }
-          }
-        }
+    // Extract text from each page
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      fullText += pageText + '\n';
+    }
 
-        const extractedText = fullText.trim();
-        if (!extractedText) {
-          reject(new Error('No text could be extracted from PDF'));
-        } else {
-          resolve(extractedText);
-        }
-      } catch (error: any) {
-        reject(new Error(`PDF text processing failed: ${error.message}`));
-      }
-    });
+    const extractedText = fullText.trim();
+    if (!extractedText) {
+      throw new Error('No text could be extracted from PDF');
+    }
 
-    // Load PDF file
-    pdfParser.loadPDF(filePath);
-  });
+    return extractedText;
+  } catch (error: any) {
+    throw new Error(`PDF extraction failed: ${error.message}`);
+  }
 }
 
 /**
