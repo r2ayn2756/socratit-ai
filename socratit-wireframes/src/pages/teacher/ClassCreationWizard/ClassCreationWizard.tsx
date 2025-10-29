@@ -66,6 +66,7 @@ interface StepProps {
   onUpdate: (updates: Partial<ClassCreationState>) => void;
   onNext: () => void;
   onBack: () => void;
+  onComplete?: (classId: string) => void;
 }
 
 // ============================================================================
@@ -303,6 +304,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
                 onUpdate={handleUpdate}
                 onNext={handleNext}
                 onBack={handleBack}
+                onComplete={onComplete}
               />
             </motion.div>
           </AnimatePresence>

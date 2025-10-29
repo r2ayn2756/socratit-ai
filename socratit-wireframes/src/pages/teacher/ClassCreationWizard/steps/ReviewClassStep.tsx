@@ -19,12 +19,14 @@ interface ReviewClassStepProps {
   onUpdate: (updates: Partial<ClassCreationState>) => void;
   onNext: () => void;
   onBack: () => void;
+  onComplete?: (classId: string) => void;
 }
 
 export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
   wizardState,
   onUpdate,
   onNext,
+  onComplete,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +75,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       const newClass = await classApiService.createClass(classData);
 
       // Step 3: If AI generation was requested and we have a schedule, generate it
+      let aiGenerationFailed = false;
       if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialId) {
         try {
           await curriculumApi.schedules.generateScheduleFromAI(
@@ -85,18 +88,24 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
               },
             }
           );
-        } catch (aiError) {
+        } catch (aiError: any) {
           // AI generation failed, but class was created successfully
           console.error('AI generation failed:', aiError);
-          // Continue anyway - teacher can generate later
+          aiGenerationFailed = true;
+          const aiErrorMessage = aiError.response?.data?.message || aiError.message;
+          setError(`Class created successfully, but AI generation failed: ${aiErrorMessage || 'Unknown error'}. You can generate the curriculum later from the class dashboard. Click "Continue" to proceed to your class.`);
+          // Don't throw - teacher can generate later
         }
       }
 
       // Update wizard state with created class ID
       onUpdate({ classId: newClass.id });
 
-      // Navigate to class dashboard
-      onNext();
+      // Complete wizard and navigate to class dashboard (even if AI failed)
+      if (!aiGenerationFailed && onComplete) {
+        onComplete(newClass.id);
+      }
+      // If AI failed, don't auto-navigate - let teacher see the error and manually continue
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to create class. Please try again.';
       setError(errorMessage);
@@ -253,11 +262,12 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         <Button
           variant="primary"
           size="lg"
-          onClick={handleCreate}
+          onClick={wizardState.classId ? () => onComplete?.(wizardState.classId!) : handleCreate}
           loading={isCreating}
+          disabled={isCreating}
           icon={!isCreating ? <Check className="w-5 h-5" /> : undefined}
         >
-          {isCreating ? 'Creating Class...' : 'Create Class'}
+          {isCreating ? 'Creating Class...' : wizardState.classId ? 'Continue to Class' : 'Create Class'}
         </Button>
       </div>
     </div>
