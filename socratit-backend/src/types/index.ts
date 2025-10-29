@@ -211,6 +211,18 @@ export interface CreateClassRequestBody {
   scheduleTime?: string;
   color?: 'blue' | 'purple' | 'orange';
   codeExpiresAt?: Date;
+
+  // Optional curriculum schedule data
+  curriculumMaterialId?: string; // Reference to uploaded file
+  schoolYearStart?: string; // ISO date string
+  schoolYearEnd?: string; // ISO date string
+  meetingPattern?: string; // 'daily', 'mwf', 'tth', etc.
+  generateWithAI?: boolean;
+  aiPreferences?: {
+    targetUnits?: number;
+    pacingPreference?: 'slow' | 'standard' | 'fast';
+    focusAreas?: string[];
+  };
 }
 
 export interface UpdateClassRequestBody {

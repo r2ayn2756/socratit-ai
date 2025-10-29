@@ -24,6 +24,7 @@ import progressRoutes from './routes/progress.routes';
 import curriculumRoutes from './routes/curriculum.routes';
 import curriculumScheduleRoutes from './routes/curriculumSchedule.routes';
 import curriculumUnitRoutes from './routes/curriculumUnit.routes';
+import uploadRoutes from './routes/upload.routes';
 import aiTARoutes from './routes/aiTA.routes';
 import seedRoutes from './routes/seed.routes';
 
@@ -145,6 +146,7 @@ app.use(`${API_PREFIX}/progress`, progressRoutes);
 app.use(`${API_PREFIX}/curriculum`, curriculumRoutes);
 app.use(`${API_PREFIX}/curriculum-schedules`, curriculumScheduleRoutes);
 app.use(`${API_PREFIX}/curriculum-units`, curriculumUnitRoutes);
+app.use(`${API_PREFIX}/upload`, uploadRoutes);
 app.use(`${API_PREFIX}/ai-ta`, aiTARoutes);
 app.use(`${API_PREFIX}/seed`, seedRoutes); // One-time database seed endpoint
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -23,6 +23,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { classService, ClassWithStats } from '../../services/class.service';
+import { ClassCreationWizard } from './ClassCreationWizard';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -40,12 +41,19 @@ const staggerContainer = {
 
 export const TeacherClasses: React.FC = () => {
   const navigate = useNavigate();
+  const [showWizard, setShowWizard] = useState(false);
 
   // Fetch classes from backend
   const { data: classes, isLoading, error } = useQuery({
     queryKey: ['teacher-classes'],
     queryFn: () => classService.getTeacherClasses(),
   });
+
+  const handleWizardComplete = (classId: string) => {
+    setShowWizard(false);
+    // Navigate to the new class dashboard
+    navigate(`/teacher/classes/${classId}`);
+  };
 
   const getColorClasses = (color: string) => {
     const colors = {
@@ -99,6 +107,7 @@ export const TeacherClasses: React.FC = () => {
   }
 
   return (
+    <>
     <DashboardLayout userRole="teacher">
       <motion.div
         initial="initial"
@@ -114,7 +123,7 @@ export const TeacherClasses: React.FC = () => {
               Manage your classes and track student progress
             </p>
           </div>
-          <Button variant="primary" size="md" onClick={() => navigate('/teacher/classes/new')}>
+          <Button variant="primary" size="md" onClick={() => setShowWizard(true)}>
             <PlusCircle className="w-5 h-5 mr-2" />
             Create Class
           </Button>
@@ -130,7 +139,7 @@ export const TeacherClasses: React.FC = () => {
                   <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-slate-900 mb-2">No classes yet</h3>
                   <p className="text-slate-600 mb-4">Create your first class to get started</p>
-                  <Button variant="primary" onClick={() => navigate('/teacher/classes/new')}>
+                  <Button variant="primary" onClick={() => setShowWizard(true)}>
                     <PlusCircle className="w-5 h-5 mr-2" />
                     Create Class
                   </Button>
@@ -147,7 +156,7 @@ export const TeacherClasses: React.FC = () => {
                     variants={fadeInUp}
                     whileHover={{ scale: 1.01 }}
                     className="cursor-pointer"
-                    onClick={() => navigate(`/teacher/classes/${classItem.id}/roster`)}
+                    onClick={() => navigate(`/teacher/classes/${classItem.id}`)}
                   >
                     <Card padding="none" className="overflow-hidden">
                       {/* Header */}
@@ -336,7 +345,7 @@ export const TeacherClasses: React.FC = () => {
                     variant="secondary"
                     size="sm"
                     className="w-full bg-white text-brand-purple hover:bg-white/90 mb-4"
-                    onClick={() => navigate('/teacher/classes/new')}
+                    onClick={() => setShowWizard(true)}
                   >
                     <Target className="w-4 h-4 mr-2" />
                     Create New Class
@@ -364,5 +373,13 @@ export const TeacherClasses: React.FC = () => {
         </div>
       </motion.div>
     </DashboardLayout>
+
+      {/* Class Creation Wizard */}
+      <ClassCreationWizard
+        isOpen={showWizard}
+        onClose={() => setShowWizard(false)}
+        onComplete={handleWizardComplete}
+      />
+    </>
   );
 };
