@@ -1,0 +1,52 @@
+CURRICULUM MAPPING API - QUICK REFERENCE
+========================================
+
+BASE URL: /api/v1
+
+SCHEDULE ROUTES (Teacher Only)
+==============================
+POST   /curriculum-schedules                              Create schedule
+GET    /curriculum-schedules/:scheduleId                  Get schedule
+GET    /curriculum-schedules/class/:classId               Get class schedules
+PATCH  /curriculum-schedules/:scheduleId                  Update schedule
+POST   /curriculum-schedules/:scheduleId/publish          Publish schedule
+DELETE /curriculum-schedules/:scheduleId                  Delete schedule
+POST   /curriculum-schedules/:scheduleId/generate-ai      AI: Generate schedule
+POST   /curriculum-schedules/:scheduleId/refine-ai        AI: Refine schedule
+GET    /curriculum-schedules/:scheduleId/suggestions      AI: Get suggestions
+POST   /curriculum-schedules/:scheduleId/calculate-progress  Calculate progress
+
+UNIT ROUTES (Teacher)
+====================
+POST   /curriculum-units                                  Create unit
+GET    /curriculum-units/:unitId                          Get unit
+GET    /curriculum-units/schedule/:scheduleId             Get schedule units
+PATCH  /curriculum-units/:unitId                          Update unit
+DELETE /curriculum-units/:unitId                          Delete unit
+POST   /curriculum-units/schedule/:scheduleId/reorder     Reorder units
+GET    /curriculum-units/:unitId/progress                 Unit progress (all students)
+GET    /curriculum-units/:unitId/suggested-assignments    AI: Suggested assignments
+
+STUDENT ROUTES
+=============
+GET    /curriculum-units/schedule/:scheduleId/my-progress        My overall progress
+GET    /curriculum-units/:unitId/my-progress                     My unit progress
+POST   /curriculum-units/:unitId/calculate-progress              Calculate my progress
+POST   /curriculum-units/:unitId/record-time                     Record time spent
+POST   /curriculum-units/:unitId/record-participation            Record participation
+GET    /curriculum-units/schedule/:scheduleId/my-strengths       My strengths
+GET    /curriculum-units/schedule/:scheduleId/my-struggles       My struggles
+GET    /curriculum-units/schedule/:scheduleId/my-review          Review recommendations
+
+RATE LIMITS
+===========
+Standard CRUD:     100 requests / 15 minutes
+AI Operations:     20 requests / 15 minutes
+Progress Tracking: 100 requests / 5 minutes
+Time Tracking:     60 requests / 1 minute
+
+AUTH HEADER
+===========
+Authorization: Bearer <jwt_token>
+
+For detailed documentation, see: CURRICULUM_API_ROUTES.md

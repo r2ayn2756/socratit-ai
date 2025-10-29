@@ -40,7 +40,8 @@
       "Bash(timeout 3 echo:*)",
       "Bash(timeout:*)",
       "Bash(awk:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(node -e:*)"
     ],
     "deny": [],
     "ask": []

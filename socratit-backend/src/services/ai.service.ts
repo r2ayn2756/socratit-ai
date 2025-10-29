@@ -64,6 +64,57 @@ interface AICurriculumAnalysisResult {
   objectives: string[];
 }
 
+// Enhanced curriculum scheduling interfaces
+interface AISchedulingUnit {
+  title: string;
+  description: string;
+  topics: Array<{
+    name: string;
+    subtopics: string[];
+    concepts: string[];
+    learningObjectives: string[];
+  }>;
+  estimatedWeeks: number;
+  estimatedHours: number;
+  confidenceScore: number;
+  difficultyLevel: 1 | 2 | 3 | 4 | 5;
+  difficultyReasoning: string;
+  prerequisiteTopics: string[];
+  buildUponTopics: string[];
+  orderInSequence: number;
+  suggestedAssessments: Array<{
+    type: 'quiz' | 'test' | 'project' | 'homework';
+    timing: 'beginning' | 'middle' | 'end';
+    estimatedQuestions: number;
+  }>;
+}
+
+interface AISchedulingMetadata {
+  totalUnits: number;
+  estimatedTotalWeeks: number;
+  difficultyProgression: 'linear' | 'stepped' | 'spiral';
+  recommendedPacing: 'standard' | 'accelerated' | 'extended';
+  gradeLevel: string;
+  subject: string;
+}
+
+interface AIScheduleGenerationResult {
+  units: AISchedulingUnit[];
+  metadata: AISchedulingMetadata;
+}
+
+interface AIScheduleRefinementResult {
+  response: string;
+  suggestedChanges: Array<{
+    unitId: string;
+    unitTitle: string;
+    field: string;
+    currentValue: any;
+    suggestedValue: any;
+    reasoning: string;
+  }>;
+}
+
 // ============================================================================
 // AI CLIENTS - LAZY INITIALIZATION
 // ============================================================================
@@ -923,6 +974,321 @@ Respond with ONLY the JSON array, nothing else.`;
     return Array.isArray(result) ? result : [];
   } catch (error) {
     console.error('Error extracting concepts:', error);
+    return [];
+  }
+}
+
+// ============================================================================
+// CURRICULUM SCHEDULING - AI METHODS
+// ============================================================================
+
+/**
+ * Analyzes curriculum content and generates a year-long schedule with units
+ * @param curriculumText Extracted text from curriculum file
+ * @param options Scheduling options including school year configuration
+ * @returns AI-generated schedule with units, time estimates, difficulty levels
+ */
+export async function analyzeCurriculumForScheduling(
+  curriculumText: string,
+  options: {
+    gradeLevel: string;
+    subject: string;
+    schoolYearStart: Date;
+    schoolYearEnd: Date;
+    totalWeeks: number;
+    targetUnits?: number;
+    pacingPreference?: 'standard' | 'accelerated' | 'extended';
+  }
+): Promise<AIScheduleGenerationResult> {
+  const { gradeLevel, subject, totalWeeks, targetUnits, pacingPreference } = options;
+
+  const systemPrompt = 'You are an expert curriculum designer who creates year-long teaching schedules. You analyze educational content and structure it into logical teaching units with precise time estimates and difficulty assessments.';
+
+  const userPrompt = `Analyze this curriculum and create a complete year-long teaching schedule.
+
+**CONTEXT:**
+- Grade Level: ${gradeLevel}
+- Subject: ${subject}
+- School Year: ${totalWeeks} weeks available
+${targetUnits ? `- Target: Approximately ${targetUnits} units` : '- Target: 6-12 units'}
+${pacingPreference ? `- Pacing: ${pacingPreference}` : '- Pacing: standard'}
+
+**CURRICULUM CONTENT:**
+${curriculumText}
+
+**TASK:**
+Break this curriculum into logical teaching units that span the entire school year. Each unit should represent a major instructional block.
+
+**REQUIREMENTS:**
+1. **Unit Structure**: Identify ${targetUnits || '6-12'} major units that follow a logical progression
+2. **Time Estimation**: Estimate weeks needed for each unit based on:
+   - Content depth and complexity
+   - Number of subtopics to cover
+   - Typical ${gradeLevel} pacing for ${subject}
+   - Skill-building requirements
+3. **Difficulty Analysis**: Rate each unit 1-5:
+   - 1 = Introductory (foundational concepts, minimal prerequisites)
+   - 2 = Basic (building on foundations, moderate complexity)
+   - 3 = Intermediate (requires prior knowledge, moderate challenge)
+   - 4 = Advanced (complex concepts, significant prerequisites)
+   - 5 = Expert (highest complexity, cumulative knowledge required)
+4. **Sequencing**: Identify which topics are prerequisites for others
+5. **Assessment Points**: Suggest where to assess understanding
+
+**PACING GUIDELINES:**
+- Introductory units: 1-2 weeks
+- Core concept units: 2-4 weeks
+- Complex/cumulative units: 3-6 weeks
+- Review/assessment: 1 week
+- Total should approximately match ${totalWeeks} weeks
+
+**RESPONSE FORMAT (JSON):**
+{
+  "units": [
+    {
+      "title": "Unit 1: Introduction to [Topic]",
+      "description": "Clear 2-3 sentence description of what students will learn",
+      "topics": [
+        {
+          "name": "Topic Name",
+          "subtopics": ["Subtopic 1", "Subtopic 2", "Subtopic 3"],
+          "concepts": ["specific concept 1", "specific concept 2"],
+          "learningObjectives": ["Students will be able to...", "Students will understand..."]
+        }
+      ],
+      "estimatedWeeks": 2.5,
+      "estimatedHours": 12.5,
+      "confidenceScore": 0.85,
+      "difficultyLevel": 1,
+      "difficultyReasoning": "Why this difficulty level (1-2 sentences)",
+      "prerequisiteTopics": ["Topic from earlier unit"],
+      "buildUponTopics": ["Topic this leads into"],
+      "orderInSequence": 1,
+      "suggestedAssessments": [
+        {
+          "type": "quiz",
+          "timing": "end",
+          "estimatedQuestions": 10
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "totalUnits": 8,
+    "estimatedTotalWeeks": 32,
+    "difficultyProgression": "stepped",
+    "recommendedPacing": "standard",
+    "gradeLevel": "${gradeLevel}",
+    "subject": "${subject}"
+  }
+}
+
+**IMPORTANT:**
+- Units should build logically (easier → harder)
+- Total estimated weeks should be close to ${totalWeeks} (leave 2-4 weeks buffer for review/testing)
+- Difficulty progression should feel natural
+- Each unit should be substantial enough to warrant the time allocated
+- Respond ONLY with valid JSON, no other text
+
+Generate the schedule now:`;
+
+  try {
+    const result = await callAI(systemPrompt, userPrompt, 4000) as AIScheduleGenerationResult;
+
+    // Validate the response
+    if (!result.units || !Array.isArray(result.units) || result.units.length === 0) {
+      throw new Error('AI did not generate any units');
+    }
+
+    if (!result.metadata) {
+      throw new Error('AI did not generate metadata');
+    }
+
+    // Validate each unit has required fields
+    for (const unit of result.units) {
+      if (!unit.title || !unit.description || !unit.topics || unit.estimatedWeeks === undefined || unit.difficultyLevel === undefined) {
+        throw new Error('AI generated incomplete unit structure');
+      }
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error('Error analyzing curriculum for scheduling:', error);
+    throw new Error(`Failed to generate curriculum schedule: ${error.message}`);
+  }
+}
+
+/**
+ * Refines an existing curriculum schedule based on teacher feedback
+ * @param currentSchedule Current schedule units
+ * @param teacherRequest Natural language request for changes
+ * @param context Additional context about the class
+ * @returns AI-generated refinement suggestions
+ */
+export async function refineScheduleWithAI(
+  currentSchedule: {
+    units: Array<{
+      id: string;
+      title: string;
+      startDate: Date;
+      endDate: Date;
+      estimatedWeeks: number;
+      difficultyLevel: number;
+      topics: any;
+    }>;
+    schoolYearStart: Date;
+    schoolYearEnd: Date;
+    totalWeeks: number;
+  },
+  teacherRequest: string,
+  context: {
+    gradeLevel: string;
+    subject: string;
+  }
+): Promise<AIScheduleRefinementResult> {
+  const systemPrompt = 'You are a helpful curriculum planning assistant. You help teachers refine their year-long curriculum schedules based on their needs and constraints.';
+
+  const scheduleDescription = currentSchedule.units
+    .map((unit, index) => {
+      const startDate = new Date(unit.startDate);
+      const endDate = new Date(unit.endDate);
+      return `${index + 1}. ${unit.title}\n   - Dates: ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}\n   - Weeks: ${unit.estimatedWeeks}\n   - Difficulty: Level ${unit.difficultyLevel}/5\n   - Topics: ${Array.isArray(unit.topics) ? unit.topics.map((t: any) => t.name).join(', ') : 'N/A'}`;
+    })
+    .join('\n\n');
+
+  const userPrompt = `I'm teaching ${context.subject} to ${context.gradeLevel} students and need help refining my curriculum schedule.
+
+**CURRENT SCHEDULE:**
+School Year: ${currentSchedule.schoolYearStart.toLocaleDateString()} to ${currentSchedule.schoolYearEnd.toLocaleDateString()} (${currentSchedule.totalWeeks} weeks)
+
+${scheduleDescription}
+
+**TEACHER REQUEST:**
+"${teacherRequest}"
+
+**TASK:**
+Understand the teacher's request and suggest specific changes to the schedule. Provide:
+1. A clear natural language response explaining your suggestions
+2. Specific changes to make (which unit, what field, old value, new value, reasoning)
+
+**RESPONSE FORMAT (JSON):**
+{
+  "response": "Clear, friendly explanation of your suggestions addressing the teacher's request",
+  "suggestedChanges": [
+    {
+      "unitId": "unit-id-here",
+      "unitTitle": "Unit Title",
+      "field": "estimatedWeeks" | "startDate" | "endDate" | "difficultyLevel" | "orderInSequence",
+      "currentValue": "current value",
+      "suggestedValue": "new value",
+      "reasoning": "Why this change makes sense"
+    }
+  ]
+}
+
+**EXAMPLES:**
+- Request: "Make Unit 3 longer" → Suggest increasing estimatedWeeks from 2 to 3, adjust subsequent dates
+- Request: "This seems too rushed" → Suggest extending several units, removing optional content
+- Request: "Add more review time" → Suggest adding review units or extending existing units
+
+Respond ONLY with valid JSON:`;
+
+  try {
+    const result = await callAI(systemPrompt, userPrompt, 2000) as AIScheduleRefinementResult;
+
+    // Validate response
+    if (!result.response || !result.suggestedChanges) {
+      throw new Error('AI did not generate valid refinement suggestions');
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error('Error refining schedule with AI:', error);
+    throw new Error(`Failed to refine schedule: ${error.message}`);
+  }
+}
+
+/**
+ * Generates AI suggestions for improving a curriculum schedule
+ * @param schedule Current schedule data
+ * @param context Class context
+ * @returns Proactive suggestions for improvements
+ */
+export async function getScheduleImprovementSuggestions(
+  schedule: {
+    units: Array<{
+      title: string;
+      estimatedWeeks: number;
+      difficultyLevel: number;
+      orderInSequence: number;
+    }>;
+    totalWeeks: number;
+  },
+  context: {
+    gradeLevel: string;
+    subject: string;
+  }
+): Promise<Array<{
+  type: 'PACING' | 'DIFFICULTY' | 'SEQUENCING' | 'ASSESSMENT' | 'REVIEW';
+  title: string;
+  description: string;
+  affectedUnits: string[];
+  suggestedAction: string;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+}>> {
+  const systemPrompt = 'You are an expert curriculum designer who provides proactive suggestions to improve teaching schedules.';
+
+  const scheduleOverview = schedule.units
+    .map((unit, i) => `${i + 1}. ${unit.title} - ${unit.estimatedWeeks} weeks, Difficulty ${unit.difficultyLevel}/5`)
+    .join('\n');
+
+  const totalWeeksScheduled = schedule.units.reduce((sum, u) => sum + u.estimatedWeeks, 0);
+
+  const userPrompt = `Analyze this curriculum schedule and suggest improvements:
+
+**CONTEXT:**
+- Grade: ${context.gradeLevel}
+- Subject: ${context.subject}
+- Total weeks available: ${schedule.totalWeeks}
+- Total weeks scheduled: ${totalWeeksScheduled}
+
+**SCHEDULE:**
+${scheduleOverview}
+
+**TASK:**
+Identify potential improvements in these areas:
+1. PACING - Units too rushed or too slow
+2. DIFFICULTY - Difficulty progression issues
+3. SEQUENCING - Better ordering of topics
+4. ASSESSMENT - Missing assessment opportunities
+5. REVIEW - Insufficient review/practice time
+
+**RESPONSE FORMAT (JSON array):**
+[
+  {
+    "type": "PACING",
+    "title": "Brief title of suggestion",
+    "description": "Detailed explanation of the issue and solution",
+    "affectedUnits": ["Unit 1", "Unit 2"],
+    "suggestedAction": "Specific action to take",
+    "priority": "HIGH" | "MEDIUM" | "LOW"
+  }
+]
+
+Only suggest improvements that would genuinely help. If the schedule looks good, return an empty array [].
+
+Respond ONLY with valid JSON array:`;
+
+  try {
+    const result = await callAI(systemPrompt, userPrompt, 1500);
+
+    if (!Array.isArray(result)) {
+      return [];
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error('Error getting schedule improvement suggestions:', error);
     return [];
   }
 }

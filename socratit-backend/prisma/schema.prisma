@@ -151,6 +151,12 @@ model School {
   auditLogs AuditLog[]
   classes   Class[]
 
+  // Curriculum Scheduling Relations
+  curriculumSchedules  CurriculumSchedule[]
+  curriculumUnits      CurriculumUnit[]
+  unitProgress         UnitProgress[]
+  curriculumMilestones CurriculumMilestone[]
+
   @@index([schoolCode])
   @@index([districtName])
   @@map("schools")
@@ -224,6 +230,10 @@ model User {
 
   // AI Teaching Assistant Relations
   aiConversations AIConversation[] @relation("StudentAIConversations")
+
+  // Curriculum Scheduling Relations
+  curriculumSchedules CurriculumSchedule[] @relation("TeacherSchedules")
+  unitProgress        UnitProgress[]
 
   @@index([email])
   @@index([schoolId])
@@ -337,6 +347,10 @@ model Class {
   // AI Teaching Assistant Relations
   aiConversations AIConversation[]
   aiInsights      AITeacherInsight[]
+
+  // Curriculum Scheduling Relations
+  curriculumSchedules CurriculumSchedule[]
+  unitProgress        UnitProgress[]
 
   @@index([schoolId])
   @@index([classCode])
@@ -462,6 +476,10 @@ model Assignment {
   // AI Teaching Assistant Relations
   aiConversations AIConversation[]
 
+  // Curriculum Scheduling Relations
+  curriculumUnitId String?         @map("curriculum_unit_id")
+  curriculumUnit   CurriculumUnit? @relation("UnitAssignments", fields: [curriculumUnitId], references: [id], onDelete: SetNull)
+
   @@index([classId])
   @@index([schoolId])
   @@index([createdBy])
@@ -469,6 +487,7 @@ model Assignment {
   @@index([type])
   @@index([dueDate])
   @@index([publishedAt])
+  @@index([curriculumUnitId])
   @@map("assignments")
 }
 
@@ -1039,8 +1058,8 @@ enum NotificationType {
 
   // AI Teaching Assistant
   AI_CONVERSATION_SHARED // Student shared AI conversation with teacher
-  AI_STUDENT_STRUGGLING  // AI detected student struggling pattern
-  AI_HELP_REQUEST        // Student clicked "I need help" button
+  AI_STUDENT_STRUGGLING // AI detected student struggling pattern
+  AI_HELP_REQUEST // Student clicked "I need help" button
 
   // System
   SYSTEM_ANNOUNCEMENT
@@ -1312,6 +1331,9 @@ model CurriculumMaterial {
   // Relations
   teacher     User         @relation("TeacherCurriculum", fields: [teacherId], references: [id], onDelete: Cascade)
   assignments Assignment[] @relation("AssignmentFromCurriculum")
+
+  // Curriculum Scheduling Relations
+  schedules CurriculumSchedule[]
 
   @@index([schoolId])
   @@index([teacherId])
@@ -1686,4 +1708,319 @@ model AIPromptTemplate {
   @@index([isActive])
   @@index([isDefault])
   @@map("ai_prompt_templates")
+}
+
+// ============================================================================
+// CURRICULUM SCHEDULING MODELS
+// Year-long curriculum mapping and scheduling system
+// ============================================================================
+
+enum ScheduleStatus {
+  DRAFT // Being created, not visible to students
+  PUBLISHED // Published and visible to students
+  ARCHIVED // Archived for historical records
+}
+
+enum UnitType {
+  CORE // Core curriculum unit
+  ENRICHMENT // Optional enrichment content
+  REVIEW // Review/catch-up unit
+  ASSESSMENT // Dedicated assessment period
+  PROJECT // Project-based learning unit
+  OPTIONAL // Optional/if-time-permits unit
+}
+
+enum UnitStatus {
+  SCHEDULED // Not started yet (future unit)
+  IN_PROGRESS // Currently teaching this unit
+  COMPLETED // Finished teaching this unit
+  SKIPPED // Intentionally skipped this unit
+  POSTPONED // Moved to a later date
+}
+
+enum UnitProgressStatus {
+  NOT_STARTED // Student hasn't accessed unit content yet
+  IN_PROGRESS // Student working through unit
+  REVIEW_NEEDED // Student needs additional review
+  COMPLETED // Student finished all unit requirements
+  MASTERED // Student mastered unit (>90% on assessments)
+}
+
+enum MilestoneType {
+  UNIT_START // Beginning of unit
+  UNIT_MIDPOINT // Mid-unit checkpoint
+  UNIT_END // End of unit assessment
+  QUARTER_REVIEW // Quarterly review period
+  SEMESTER_EXAM // Semester exam
+  YEAR_END_REVIEW // End of year review
+  CUSTOM // Teacher-defined milestone
+}
+
+enum MilestoneStatus {
+  PLANNED // Scheduled but not yet reached
+  UPCOMING // Coming soon (within 1 week)
+  IN_PROGRESS // Currently at this milestone
+  COMPLETED // Milestone passed/completed
+  SKIPPED // Milestone skipped
+}
+
+// ============================================================================
+// CURRICULUM SCHEDULE
+// Class-specific curriculum plan for the entire school year
+// ============================================================================
+
+model CurriculumSchedule {
+  id String @id @default(uuid())
+
+  // Relationships
+  classId String @map("class_id")
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  curriculumMaterialId String?             @map("curriculum_material_id")
+  curriculumMaterial   CurriculumMaterial? @relation(fields: [curriculumMaterialId], references: [id], onDelete: SetNull)
+
+  teacherId String @map("teacher_id")
+  teacher   User   @relation("TeacherSchedules", fields: [teacherId], references: [id])
+
+  schoolId String @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+
+  // School year configuration
+  schoolYearStart DateTime @map("school_year_start")
+  schoolYearEnd   DateTime @map("school_year_end")
+  totalWeeks      Int      @map("total_weeks")
+  totalDays       Int      @map("total_days") // Instructional days
+  meetingPattern  String?  @map("meeting_pattern") // "Daily", "MWF", "TTh", etc.
+
+  // Schedule metadata
+  title       String
+  description String?        @db.Text
+  status      ScheduleStatus @default(DRAFT)
+
+  // AI generation data
+  aiGenerated      Boolean   @default(false) @map("ai_generated")
+  aiPromptUsed     String?   @map("ai_prompt_used") @db.Text
+  aiConfidence     Float?    @map("ai_confidence") // 0-1 confidence score
+  lastAiRefinement DateTime? @map("last_ai_refinement")
+
+  // Progress tracking
+  currentUnitId   String?         @map("current_unit_id")
+  currentUnit     CurriculumUnit? @relation("CurrentUnit", fields: [currentUnitId], references: [id], onDelete: SetNull)
+  completedUnits  Int             @default(0) @map("completed_units")
+  totalUnits      Int             @map("total_units")
+  percentComplete Float           @default(0) @map("percent_complete") // 0-100
+
+  // Relationships
+  units      CurriculumUnit[]
+  milestones CurriculumMilestone[]
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@index([classId])
+  @@index([teacherId])
+  @@index([schoolId])
+  @@index([status])
+  @@index([schoolYearStart])
+  @@index([schoolYearEnd])
+  @@map("curriculum_schedules")
+}
+
+// ============================================================================
+// CURRICULUM UNIT
+// Individual teaching units within a curriculum schedule
+// ============================================================================
+
+model CurriculumUnit {
+  id String @id @default(uuid())
+
+  // Relationships
+  scheduleId String             @map("schedule_id")
+  schedule   CurriculumSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  schoolId String @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+
+  // Unit identification
+  title       String
+  description String? @db.Text
+  unitNumber  Int     @map("unit_number") // 1, 2, 3... for display order
+  orderIndex  Int     @map("order_index") // For custom reordering via drag-and-drop
+
+  // Content structure
+  topics             Json // Array of topics with subtopics
+  // Structure: [{ name: "Linear Equations", subtopics: ["One-step", "Two-step"], concepts: ["solving", "variables"], learningObjectives: ["Solve one-step equations"] }]
+  learningObjectives String[] @map("learning_objectives")
+  concepts           String[] // Key concepts covered
+
+  // Scheduling
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime  @map("end_date")
+  estimatedWeeks  Float     @map("estimated_weeks") // Can be fractional: 2.5 weeks
+  estimatedHours  Float?    @map("estimated_hours") // Total instructional hours
+  actualStartDate DateTime? @map("actual_start_date") // When actually started teaching
+  actualEndDate   DateTime? @map("actual_end_date") // When actually completed
+
+  // Difficulty & pacing
+  difficultyLevel     Int     @map("difficulty_level") // 1-5 scale
+  difficultyReasoning String? @map("difficulty_reasoning") @db.Text
+  pacingNotes         String? @map("pacing_notes") @db.Text
+
+  // Unit type & importance
+  unitType   UnitType @default(CORE) @map("unit_type")
+  isOptional Boolean  @default(false) @map("is_optional")
+
+  // Prerequisites & sequencing
+  prerequisiteUnits String[] @default([]) @map("prerequisite_units") // Array of unit IDs
+  buildUponTopics   String[] @default([]) @map("build_upon_topics") // Topics this unit builds upon
+
+  // Assessment recommendations
+  suggestedAssessments Json? @map("suggested_assessments")
+  // Structure: [{ type: "quiz", timing: "end", estimatedQuestions: 10 }]
+
+  // AI metadata
+  aiGenerated     Boolean @default(false) @map("ai_generated")
+  aiConfidence    Float?  @map("ai_confidence") // 0-1
+  teacherModified Boolean @default(false) @map("teacher_modified")
+
+  // Status & progress
+  status          UnitStatus @default(SCHEDULED)
+  percentComplete Float      @default(0) @map("percent_complete") // 0-100
+
+  // Relationships
+  assignments     Assignment[]          @relation("UnitAssignments")
+  studentProgress UnitProgress[]
+  currentSchedule CurriculumSchedule[]  @relation("CurrentUnit")
+  milestones      CurriculumMilestone[]
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([scheduleId, unitNumber])
+  @@index([scheduleId])
+  @@index([schoolId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([orderIndex])
+  @@index([unitType])
+  @@map("curriculum_units")
+}
+
+// ============================================================================
+// UNIT PROGRESS
+// Tracks individual student progress through curriculum units
+// ============================================================================
+
+model UnitProgress {
+  id String @id @default(uuid())
+
+  // Relationships
+  unitId String         @map("unit_id")
+  unit   CurriculumUnit @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  studentId String @map("student_id")
+  student   User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  classId String @map("class_id")
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  schoolId String @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+
+  // Progress metrics
+  status          UnitProgressStatus @default(NOT_STARTED)
+  percentComplete Float              @default(0) @map("percent_complete") // 0-100
+
+  // Assignment-based progress
+  assignmentsTotal     Int    @default(0) @map("assignments_total")
+  assignmentsCompleted Int    @default(0) @map("assignments_completed")
+  assignmentsScore     Float? @map("assignments_score") // Average score on unit assignments
+
+  // Concept mastery (links to existing ConceptMastery)
+  conceptsMastered  Int   @default(0) @map("concepts_mastered")
+  conceptsTotal     Int   @default(0) @map("concepts_total")
+  masteryPercentage Float @default(0) @map("mastery_percentage")
+
+  // Time tracking
+  timeSpentMinutes Int       @default(0) @map("time_spent_minutes")
+  firstAccessedAt  DateTime? @map("first_accessed_at")
+  lastAccessedAt   DateTime? @map("last_accessed_at")
+  completedAt      DateTime? @map("completed_at")
+
+  // Performance indicators
+  strengths         String[] @default([]) // Concepts student excels at
+  struggles         String[] @default([]) // Concepts student struggles with
+  recommendedReview String[] @default([]) @map("recommended_review") // Topics needing review
+
+  // Engagement metrics
+  engagementScore    Float? @map("engagement_score") // 0-100
+  participationCount Int    @default(0) @map("participation_count")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([unitId, studentId])
+  @@index([studentId])
+  @@index([classId])
+  @@index([schoolId])
+  @@index([status])
+  @@index([percentComplete])
+  @@map("unit_progress")
+}
+
+// ============================================================================
+// CURRICULUM MILESTONE
+// AI-suggested checkpoints for assessment and review
+// ============================================================================
+
+model CurriculumMilestone {
+  id String @id @default(uuid())
+
+  // Relationships
+  scheduleId String             @map("schedule_id")
+  schedule   CurriculumSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  unitId String?         @map("unit_id")
+  unit   CurriculumUnit? @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  schoolId String @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+
+  // Milestone details
+  title         String
+  description   String?       @db.Text
+  milestoneType MilestoneType @map("milestone_type")
+  suggestedDate DateTime      @map("suggested_date")
+  actualDate    DateTime?     @map("actual_date")
+
+  // Assessment recommendations
+  recommendedAssessmentType String?  @map("recommended_assessment_type") // "quiz", "test", "project"
+  topicsCovered             String[] @default([]) @map("topics_covered") // Which topics should be assessed
+
+  // Status
+  status    MilestoneStatus @default(PLANNED)
+  completed Boolean         @default(false)
+
+  // AI metadata
+  aiGenerated     Boolean @default(false) @map("ai_generated")
+  teacherModified Boolean @default(false) @map("teacher_modified")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([scheduleId])
+  @@index([unitId])
+  @@index([schoolId])
+  @@index([suggestedDate])
+  @@index([milestoneType])
+  @@index([status])
+  @@map("curriculum_milestones")
 }
