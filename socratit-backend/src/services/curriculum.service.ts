@@ -5,12 +5,20 @@
 
 import fs from 'fs/promises';
 import mammoth from 'mammoth';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { PrismaClient } from '@prisma/client';
 import { analyzeCurriculumContent } from './ai.service';
 import { createFileUploadLog } from './fileLog.service';
 
 const prisma = new PrismaClient();
+
+// Lazy load pdfjs-dist to avoid build issues
+let pdfjsLib: any = null;
+async function getPdfJsLib() {
+  if (!pdfjsLib) {
+    pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  }
+  return pdfjsLib;
+}
 
 // ============================================================================
 // TYPES
@@ -89,8 +97,11 @@ async function extractTextFromPDF(filePath: string): Promise<string> {
     const dataBuffer = await fs.readFile(filePath);
     const data = new Uint8Array(dataBuffer);
 
+    // Dynamically load PDF.js
+    const pdfjs = await getPdfJsLib();
+
     // Load PDF document
-    const loadingTask = pdfjsLib.getDocument({ data });
+    const loadingTask = pdfjs.getDocument({ data });
     const pdfDocument = await loadingTask.promise;
 
     let fullText = '';

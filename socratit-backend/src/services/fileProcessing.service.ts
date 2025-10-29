@@ -7,9 +7,17 @@ import fs from 'fs/promises';
 import path from 'path';
 import mammoth from 'mammoth';
 import { PrismaClient } from '@prisma/client';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const prisma = new PrismaClient();
+
+// Lazy load pdfjs-dist to avoid build issues
+let pdfjsLib: any = null;
+async function getPdfJsLib() {
+  if (!pdfjsLib) {
+    pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  }
+  return pdfjsLib;
+}
 
 // ============================================================================
 // TEXT EXTRACTION
@@ -23,8 +31,11 @@ async function extractTextFromPDF(filePath: string): Promise<string> {
     const dataBuffer = await fs.readFile(filePath);
     const data = new Uint8Array(dataBuffer);
 
+    // Dynamically load PDF.js
+    const pdfjs = await getPdfJsLib();
+
     // Load PDF document
-    const loadingTask = pdfjsLib.getDocument({ data });
+    const loadingTask = pdfjs.getDocument({ data });
     const pdfDocument = await loadingTask.promise;
 
     let fullText = '';
