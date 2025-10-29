@@ -108,8 +108,8 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
 
   // Generate assignment mutation
   const generateMutation = useMutation({
-    mutationFn: (curriculumId: string) =>
-      curriculumService.generateAssignment(curriculumId, assignmentConfig),
+    mutationFn: ({ curriculumId, config }: { curriculumId: string; config: any }) =>
+      curriculumService.generateAssignment(curriculumId, config),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
       queryClient.invalidateQueries({ queryKey: ['curriculum-list'] });
@@ -156,8 +156,16 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
       return;
     }
 
+    // Convert datetime-local format to ISO 8601
+    const configToSend = {
+      ...assignmentConfig,
+      dueDate: assignmentConfig.dueDate
+        ? new Date(assignmentConfig.dueDate).toISOString()
+        : undefined,
+    };
+
     setStep('generating');
-    generateMutation.mutate(selectedCurriculumId);
+    generateMutation.mutate({ curriculumId: selectedCurriculumId, config: configToSend });
   };
 
   const handleClose = () => {
