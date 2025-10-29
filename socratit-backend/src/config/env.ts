@@ -43,7 +43,12 @@ interface EnvConfig {
   RATE_LIMIT_WINDOW_MS: number;
   RATE_LIMIT_MAX_REQUESTS: number;
 
-  // OpenAI
+  // AI Configuration
+  AI_PROVIDER: string;
+  ANTHROPIC_API_KEY: string;
+  CLAUDE_MODEL: string;
+
+  // OpenAI (Legacy/Backup)
   OPENAI_API_KEY: string;
   OPENAI_MODEL: string;
 
@@ -116,7 +121,12 @@ export const env: EnvConfig = {
   RATE_LIMIT_WINDOW_MS: getEnvNumber('RATE_LIMIT_WINDOW_MS', 900000),
   RATE_LIMIT_MAX_REQUESTS: getEnvNumber('RATE_LIMIT_MAX_REQUESTS', 100),
 
-  // OpenAI
+  // AI Configuration
+  AI_PROVIDER: getEnv('AI_PROVIDER', 'claude'),
+  ANTHROPIC_API_KEY: getEnv('ANTHROPIC_API_KEY', ''),
+  CLAUDE_MODEL: getEnv('CLAUDE_MODEL', 'claude-3-haiku-20240307'),
+
+  // OpenAI (Legacy/Backup)
   OPENAI_API_KEY: getEnv('OPENAI_API_KEY', ''),
   OPENAI_MODEL: getEnv('OPENAI_MODEL', 'gpt-3.5-turbo'),
 

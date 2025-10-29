@@ -26,6 +26,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "@prisma/client": "^6.18.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
