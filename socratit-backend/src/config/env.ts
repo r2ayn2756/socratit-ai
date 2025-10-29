@@ -45,6 +45,10 @@ interface EnvConfig {
 
   // AI Configuration
   AI_PROVIDER: string;
+  GEMINI_API_KEY: string;
+  GEMINI_MODEL: string;
+
+  // Anthropic (Backup)
   ANTHROPIC_API_KEY: string;
   CLAUDE_MODEL: string;
 
@@ -122,7 +126,11 @@ export const env: EnvConfig = {
   RATE_LIMIT_MAX_REQUESTS: getEnvNumber('RATE_LIMIT_MAX_REQUESTS', 100),
 
   // AI Configuration
-  AI_PROVIDER: getEnv('AI_PROVIDER', 'claude'),
+  AI_PROVIDER: getEnv('AI_PROVIDER', 'gemini'),
+  GEMINI_API_KEY: getEnv('GEMINI_API_KEY', ''),
+  GEMINI_MODEL: getEnv('GEMINI_MODEL', 'gemini-1.5-flash'),
+
+  // Anthropic (Backup)
   ANTHROPIC_API_KEY: getEnv('ANTHROPIC_API_KEY', ''),
   CLAUDE_MODEL: getEnv('CLAUDE_MODEL', 'claude-3-haiku-20240307'),
 

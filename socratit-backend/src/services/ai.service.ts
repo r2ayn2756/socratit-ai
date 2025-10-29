@@ -1,9 +1,10 @@
 // ============================================================================
 // AI SERVICE
-// Handles Anthropic Claude integration for quiz generation and grading
-// Supports both Claude and OpenAI as fallback
+// Handles Google Gemini integration for quiz generation and grading
+// Supports Gemini, Claude, and OpenAI as fallback
 // ============================================================================
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { env } from '../config/env';
@@ -70,14 +71,27 @@ interface AICurriculumAnalysisResult {
 // Debug logging
 console.log('🔍 AI Service Initialization:');
 console.log('  AI_PROVIDER:', env.AI_PROVIDER);
+console.log('  GEMINI_API_KEY exists:', !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 0));
+console.log('  GEMINI_API_KEY length:', env.GEMINI_API_KEY?.length || 0);
+console.log('  GEMINI_MODEL:', env.GEMINI_MODEL);
 console.log('  ANTHROPIC_API_KEY exists:', !!(env.ANTHROPIC_API_KEY && env.ANTHROPIC_API_KEY.length > 0));
-console.log('  ANTHROPIC_API_KEY length:', env.ANTHROPIC_API_KEY?.length || 0);
-console.log('  CLAUDE_MODEL:', env.CLAUDE_MODEL);
 console.log('  OPENAI_API_KEY exists:', !!(env.OPENAI_API_KEY && env.OPENAI_API_KEY.length > 0));
 
 // Lazy initialization - clients are created on first use to avoid empty string issues
+let geminiClient: GoogleGenerativeAI | null = null;
 let anthropicClient: Anthropic | null = null;
 let openaiClient: OpenAI | null = null;
+
+function getGeminiClient(): GoogleGenerativeAI {
+  if (!geminiClient) {
+    if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY.length === 0) {
+      throw new Error('GEMINI_API_KEY is not configured');
+    }
+    console.log('🔑 Initializing Gemini client with key length:', env.GEMINI_API_KEY.length);
+    geminiClient = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+  }
+  return geminiClient;
+}
 
 function getAnthropicClient(): Anthropic {
   if (!anthropicClient) {
@@ -107,6 +121,55 @@ function getOpenAIClient(): OpenAI {
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
+
+/**
+ * Calls Gemini API with a prompt and returns parsed JSON response
+ */
+async function callGemini(systemPrompt: string, userPrompt: string, maxTokens: number = 2000): Promise<any> {
+  try {
+    const client = getGeminiClient();
+    const model = client.getGenerativeModel({
+      model: env.GEMINI_MODEL || 'gemini-1.5-flash',
+      generationConfig: {
+        maxOutputTokens: maxTokens,
+        temperature: 0.7,
+      },
+    });
+
+    const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
+    const result = await model.generateContent(fullPrompt);
+    const response = result.response;
+    const text = response.text();
+
+    // Try to parse JSON from the response
+    // Gemini sometimes wraps JSON in markdown code blocks
+    let jsonText = text.trim();
+    if (jsonText.startsWith('```json')) {
+      jsonText = jsonText.slice(7);
+    }
+    if (jsonText.startsWith('```')) {
+      jsonText = jsonText.slice(3);
+    }
+    if (jsonText.endsWith('```')) {
+      jsonText = jsonText.slice(0, -3);
+    }
+    jsonText = jsonText.trim();
+
+    return JSON.parse(jsonText);
+  } catch (error: any) {
+    console.error('Error calling Gemini API:', error);
+
+    if (error.message?.includes('API key not valid')) {
+      throw new Error('Invalid Gemini API key. Please check your configuration.');
+    }
+
+    if (error.message?.includes('quota') || error.message?.includes('429')) {
+      throw new Error('Gemini rate limit exceeded. Please try again later.');
+    }
+
+    throw new Error(`Failed to call Gemini: ${error.message}`);
+  }
+}
 
 /**
  * Calls Claude API with a prompt and returns parsed JSON response
@@ -212,9 +275,11 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, maxTokens: n
  * Calls the configured AI provider
  */
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens: number = 2000): Promise<any> {
-  const provider = env.AI_PROVIDER || 'claude';
+  const provider = env.AI_PROVIDER || 'gemini';
 
-  if (provider === 'claude') {
+  if (provider === 'gemini') {
+    return await callGemini(systemPrompt, userPrompt, maxTokens);
+  } else if (provider === 'claude') {
     return await callClaude(systemPrompt, userPrompt, maxTokens);
   } else if (provider === 'openai') {
     return await callOpenAI(systemPrompt, userPrompt, maxTokens);
@@ -429,9 +494,11 @@ Respond ONLY with valid JSON. Do not include any other text.`;
  * Validates AI API key is configured
  */
 export function isAIConfigured(): boolean {
-  const provider = env.AI_PROVIDER || 'claude';
+  const provider = env.AI_PROVIDER || 'gemini';
 
-  if (provider === 'claude') {
+  if (provider === 'gemini') {
+    return !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 0);
+  } else if (provider === 'claude') {
     return !!(env.ANTHROPIC_API_KEY && env.ANTHROPIC_API_KEY.length > 0);
   } else if (provider === 'openai') {
     return !!(env.OPENAI_API_KEY && env.OPENAI_API_KEY !== 'your-openai-api-key');
@@ -449,9 +516,13 @@ export async function testAIConnection(): Promise<boolean> {
   }
 
   try {
-    const provider = env.AI_PROVIDER || 'claude';
+    const provider = env.AI_PROVIDER || 'gemini';
 
-    if (provider === 'claude') {
+    if (provider === 'gemini') {
+      const client = getGeminiClient();
+      const model = client.getGenerativeModel({ model: env.GEMINI_MODEL || 'gemini-1.5-flash' });
+      await model.generateContent('Test');
+    } else if (provider === 'claude') {
       const client = getAnthropicClient();
       await client.messages.create({
         model: env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
