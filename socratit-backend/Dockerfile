@@ -15,7 +15,8 @@ RUN apk add --no-cache python3 make g++ openssl
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci --legacy-peer-deps
+# Use npm install if package-lock.json doesn't exist, otherwise use npm ci
+RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; else npm install --legacy-peer-deps; fi
 
 # Copy Prisma schema
 COPY prisma ./prisma/
@@ -45,7 +46,8 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install production dependencies only
-RUN npm ci --production --legacy-peer-deps --ignore-scripts
+# Use npm install if package-lock.json doesn't exist, otherwise use npm ci
+RUN if [ -f package-lock.json ]; then npm ci --production --legacy-peer-deps --ignore-scripts; else npm install --production --legacy-peer-deps --ignore-scripts; fi
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
