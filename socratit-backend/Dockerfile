@@ -8,21 +8,26 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install build dependencies for native modules and Prisma
+RUN apk add --no-cache python3 make g++ openssl
+
 # Copy package files
 COPY package*.json ./
-COPY prisma ./prisma/
 
 # Install all dependencies (including devDependencies for build)
 RUN npm ci --legacy-peer-deps
 
-# Copy source code
-COPY . .
+# Copy Prisma schema
+COPY prisma ./prisma/
 
 # Generate Prisma client with dummy DATABASE_URL for build
 # Railway will provide the real DATABASE_URL at runtime
 ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
 ENV DATABASE_URL=$DATABASE_URL
-RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN npx prisma generate
+
+# Copy source code
+COPY . .
 
 # Build TypeScript
 RUN npm run build
@@ -32,12 +37,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Install runtime dependencies for Prisma
+RUN apk add --no-cache openssl
+
 # Copy package files
 COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install production dependencies only
-RUN npm ci --production --legacy-peer-deps
+RUN npm ci --production --legacy-peer-deps --ignore-scripts
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
