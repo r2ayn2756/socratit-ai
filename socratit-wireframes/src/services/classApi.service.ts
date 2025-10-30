@@ -109,7 +109,28 @@ export async function createClass(data: CreateClassRequest): Promise<ClassDetail
   console.log('[API] data.schoolYearEnd:', data.schoolYearEnd);
   console.log('[API] Stringified data:', JSON.stringify(data, null, 2));
 
-  const response = await apiService.post<CreateClassResponse>('/classes', data);
+  // CRITICAL FIX: Create a clean copy to ensure all fields are sent
+  const cleanData = {
+    name: data.name,
+    subject: data.subject,
+    gradeLevel: data.gradeLevel,
+    academicYear: data.academicYear,
+    color: data.color,
+    description: data.description,
+    meetingPattern: data.meetingPattern,
+    period: data.period,
+    room: data.room,
+    scheduleTime: data.scheduleTime,
+    curriculumMaterialId: data.curriculumMaterialId,
+    schoolYearStart: data.schoolYearStart,
+    schoolYearEnd: data.schoolYearEnd,
+    generateWithAI: data.generateWithAI,
+    aiPreferences: data.aiPreferences,
+  };
+
+  console.log('[API] Sending clean data:', JSON.stringify(cleanData, null, 2));
+
+  const response = await apiService.post<CreateClassResponse>('/classes', cleanData);
 
   console.log('[API] Response received:', response.data);
   return response.data.data;
