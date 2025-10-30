@@ -50,6 +50,40 @@ export const createClassSchema = Joi.object({
     'date.min': 'Code expiration date must be in the future',
     'date.base': 'Invalid date format for code expiration',
   }),
+
+  // Curriculum schedule fields
+  curriculumMaterialId: Joi.string().optional().uuid().messages({
+    'string.guid': 'Curriculum material ID must be a valid UUID',
+  }),
+
+  schoolYearStart: Joi.string().optional().isoDate().messages({
+    'string.isoDate': 'School year start must be a valid ISO date',
+  }),
+
+  schoolYearEnd: Joi.string().optional().isoDate().messages({
+    'string.isoDate': 'School year end must be a valid ISO date',
+  }),
+
+  meetingPattern: Joi.string().optional().valid('daily', 'mwf', 'tth', 'weekly', 'custom').messages({
+    'any.only': 'Meeting pattern must be one of: daily, mwf, tth, weekly, custom',
+  }),
+
+  generateWithAI: Joi.boolean().optional().messages({
+    'boolean.base': 'generateWithAI must be a boolean',
+  }),
+
+  aiPreferences: Joi.object({
+    targetUnits: Joi.number().optional().integer().min(1).max(20).messages({
+      'number.min': 'Target units must be at least 1',
+      'number.max': 'Target units must not exceed 20',
+    }),
+    pacingPreference: Joi.string().optional().valid('slow', 'standard', 'fast').messages({
+      'any.only': 'Pacing preference must be one of: slow, standard, fast',
+    }),
+    focusAreas: Joi.array().items(Joi.string()).optional().messages({
+      'array.base': 'Focus areas must be an array of strings',
+    }),
+  }).optional(),
 });
 
 /**
