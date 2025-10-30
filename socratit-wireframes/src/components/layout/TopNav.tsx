@@ -89,7 +89,7 @@ export const TopNav: React.FC = () => {
                     exit={{ opacity: 0, y: -10 }}
                     className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden"
                   >
-                    <div className="p-4 border-b border-white/10">
+                    <div className="p-4 border-b border-slate-200">
                       <div className="font-semibold text-slate-900">
                         {user?.firstName} {user?.lastName}
                       </div>
@@ -97,17 +97,17 @@ export const TopNav: React.FC = () => {
                     </div>
 
                     <div className="py-2">
-                      <button className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/50 transition-all text-slate-700">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-all text-slate-700">
                         <User className="w-4 h-4" />
                         <span className="text-sm">My Profile</span>
                       </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/50 transition-all text-slate-700">
+                      <button className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-all text-slate-700">
                         <Settings className="w-4 h-4" />
                         <span className="text-sm">Settings</span>
                       </button>
                     </div>
 
-                    <div className="border-t border-white/10 p-2">
+                    <div className="border-t border-slate-200 p-2">
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-50 transition-all text-error rounded-lg"
