@@ -1,9 +1,12 @@
 // ============================================================================
 // CURRICULUM API SERVICE
 // API client for curriculum scheduling operations
+//
+// REFACTORED: Now uses shared apiService instead of creating its own axios instance
+// This ensures consistent authentication, error handling, and base URL configuration
 // ============================================================================
 
-import axios from 'axios';
+import { apiService } from './api.service';
 import type {
   CurriculumSchedule,
   CurriculumUnit,
@@ -25,25 +28,6 @@ import type {
   APIResponse,
 } from '../types/curriculum.types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
-
-// Create axios instance with default config
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add auth token to requests
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 // ============================================================================
 // SCHEDULE API
 // ============================================================================
@@ -53,7 +37,7 @@ export const scheduleApi = {
    * Create a new curriculum schedule
    */
   async createSchedule(data: CreateScheduleRequest): Promise<ScheduleResponse> {
-    const response = await apiClient.post<APIResponse<ScheduleResponse>>(
+    const response = await apiService.post<APIResponse<ScheduleResponse>>(
       '/curriculum-schedules',
       data
     );
@@ -71,7 +55,7 @@ export const scheduleApi = {
     if (options?.includeProgress) params.append('includeProgress', 'true');
     if (options?.includeAssignments) params.append('includeAssignments', 'true');
 
-    const response = await apiClient.get<APIResponse<ScheduleResponse>>(
+    const response = await apiService.get<APIResponse<ScheduleResponse>>(
       `/curriculum-schedules/${scheduleId}?${params.toString()}`
     );
     return response.data.data!;
@@ -81,7 +65,7 @@ export const scheduleApi = {
    * Get all schedules for a class
    */
   async getClassSchedules(classId: string): Promise<CurriculumSchedule[]> {
-    const response = await apiClient.get<APIResponse<CurriculumSchedule[]>>(
+    const response = await apiService.get<APIResponse<CurriculumSchedule[]>>(
       `/curriculum-schedules/class/${classId}`
     );
     return response.data.data!;
@@ -94,7 +78,7 @@ export const scheduleApi = {
     scheduleId: string,
     data: UpdateScheduleRequest
   ): Promise<CurriculumSchedule> {
-    const response = await apiClient.patch<APIResponse<CurriculumSchedule>>(
+    const response = await apiService.patch<APIResponse<CurriculumSchedule>>(
       `/curriculum-schedules/${scheduleId}`,
       data
     );
@@ -105,7 +89,7 @@ export const scheduleApi = {
    * Publish schedule
    */
   async publishSchedule(scheduleId: string): Promise<CurriculumSchedule> {
-    const response = await apiClient.post<APIResponse<CurriculumSchedule>>(
+    const response = await apiService.post<APIResponse<CurriculumSchedule>>(
       `/curriculum-schedules/${scheduleId}/publish`
     );
     return response.data.data!;
@@ -115,7 +99,7 @@ export const scheduleApi = {
    * Delete schedule
    */
   async deleteSchedule(scheduleId: string): Promise<void> {
-    await apiClient.delete(`/curriculum-schedules/${scheduleId}`);
+    await apiService.delete(`/curriculum-schedules/${scheduleId}`);
   },
 
   /**
@@ -125,7 +109,7 @@ export const scheduleApi = {
     scheduleId: string,
     data: GenerateScheduleFromAIRequest
   ): Promise<AIScheduleResponse> {
-    const response = await apiClient.post<APIResponse<AIScheduleResponse>>(
+    const response = await apiService.post<APIResponse<AIScheduleResponse>>(
       `/curriculum-schedules/${scheduleId}/generate-ai`,
       data
     );
@@ -139,7 +123,7 @@ export const scheduleApi = {
     scheduleId: string,
     data: RefineScheduleWithAIRequest
   ): Promise<AIRefinementResponse> {
-    const response = await apiClient.post<APIResponse<AIRefinementResponse>>(
+    const response = await apiService.post<APIResponse<AIRefinementResponse>>(
       `/curriculum-schedules/${scheduleId}/refine-ai`,
       data
     );
@@ -150,7 +134,7 @@ export const scheduleApi = {
    * Get AI improvement suggestions
    */
   async getScheduleSuggestions(scheduleId: string): Promise<AISuggestionsResponse> {
-    const response = await apiClient.get<APIResponse<AISuggestionsResponse>>(
+    const response = await apiService.get<APIResponse<AISuggestionsResponse>>(
       `/curriculum-schedules/${scheduleId}/suggestions`
     );
     return response.data.data!;
@@ -160,7 +144,7 @@ export const scheduleApi = {
    * Calculate schedule progress
    */
   async calculateProgress(scheduleId: string): Promise<void> {
-    await apiClient.post(`/curriculum-schedules/${scheduleId}/calculate-progress`);
+    await apiService.post(`/curriculum-schedules/${scheduleId}/calculate-progress`);
   },
 };
 
@@ -173,7 +157,7 @@ export const unitApi = {
    * Create a new curriculum unit
    */
   async createUnit(data: CreateUnitRequest): Promise<CurriculumUnit> {
-    const response = await apiClient.post<APIResponse<CurriculumUnit>>(
+    const response = await apiService.post<APIResponse<CurriculumUnit>>(
       '/curriculum-units',
       data
     );
@@ -191,7 +175,7 @@ export const unitApi = {
     if (options?.includeProgress) params.append('includeProgress', 'true');
     if (options?.includeAssignments) params.append('includeAssignments', 'true');
 
-    const response = await apiClient.get<APIResponse<UnitResponse>>(
+    const response = await apiService.get<APIResponse<UnitResponse>>(
       `/curriculum-units/${unitId}?${params.toString()}`
     );
     return response.data.data!;
@@ -201,7 +185,7 @@ export const unitApi = {
    * Get all units for a schedule
    */
   async getScheduleUnits(scheduleId: string): Promise<CurriculumUnit[]> {
-    const response = await apiClient.get<APIResponse<CurriculumUnit[]>>(
+    const response = await apiService.get<APIResponse<CurriculumUnit[]>>(
       `/curriculum-units/schedule/${scheduleId}`
     );
     return response.data.data!;
@@ -211,7 +195,7 @@ export const unitApi = {
    * Update unit
    */
   async updateUnit(unitId: string, data: UpdateUnitRequest): Promise<CurriculumUnit> {
-    const response = await apiClient.patch<APIResponse<CurriculumUnit>>(
+    const response = await apiService.patch<APIResponse<CurriculumUnit>>(
       `/curriculum-units/${unitId}`,
       data
     );
@@ -222,21 +206,21 @@ export const unitApi = {
    * Delete unit
    */
   async deleteUnit(unitId: string): Promise<void> {
-    await apiClient.delete(`/curriculum-units/${unitId}`);
+    await apiService.delete(`/curriculum-units/${unitId}`);
   },
 
   /**
    * Reorder units (drag-and-drop)
    */
   async reorderUnits(data: ReorderUnitsRequest): Promise<void> {
-    await apiClient.post(`/curriculum-units/schedule/${data.scheduleId}/reorder`, data);
+    await apiService.post(`/curriculum-units/schedule/${data.scheduleId}/reorder`, data);
   },
 
   /**
    * Get unit progress for all students (teacher view)
    */
   async getUnitProgress(unitId: string): Promise<UnitProgressResponse> {
-    const response = await apiClient.get<APIResponse<UnitProgressResponse>>(
+    const response = await apiService.get<APIResponse<UnitProgressResponse>>(
       `/curriculum-units/${unitId}/progress`
     );
     return response.data.data!;
@@ -246,7 +230,7 @@ export const unitApi = {
    * Get AI-suggested assignments for a unit
    */
   async getSuggestedAssignments(unitId: string): Promise<SuggestedAssignmentsResponse> {
-    const response = await apiClient.get<APIResponse<SuggestedAssignmentsResponse>>(
+    const response = await apiService.get<APIResponse<SuggestedAssignmentsResponse>>(
       `/curriculum-units/${unitId}/suggested-assignments`
     );
     return response.data.data!;
@@ -262,7 +246,7 @@ export const progressApi = {
    * Get student's progress across all units
    */
   async getMyProgress(scheduleId: string): Promise<StudentUnitProgressResponse> {
-    const response = await apiClient.get<APIResponse<StudentUnitProgressResponse>>(
+    const response = await apiService.get<APIResponse<StudentUnitProgressResponse>>(
       `/curriculum-units/schedule/${scheduleId}/my-progress`
     );
     return response.data.data!;
@@ -272,7 +256,7 @@ export const progressApi = {
    * Get student's progress for a specific unit
    */
   async getMyUnitProgress(unitId: string): Promise<any> {
-    const response = await apiClient.get<APIResponse<any>>(
+    const response = await apiService.get<APIResponse<any>>(
       `/curriculum-units/${unitId}/my-progress`
     );
     return response.data.data!;
@@ -282,7 +266,7 @@ export const progressApi = {
    * Calculate unit progress
    */
   async calculateUnitProgress(unitId: string, studentId?: string): Promise<any> {
-    const response = await apiClient.post<APIResponse<any>>(
+    const response = await apiService.post<APIResponse<any>>(
       `/curriculum-units/${unitId}/calculate-progress`,
       studentId ? { studentId } : {}
     );
@@ -293,21 +277,21 @@ export const progressApi = {
    * Record time spent in a unit
    */
   async recordTimeSpent(unitId: string, minutes: number): Promise<void> {
-    await apiClient.post(`/curriculum-units/${unitId}/record-time`, { minutes });
+    await apiService.post(`/curriculum-units/${unitId}/record-time`, { minutes });
   },
 
   /**
    * Record participation in a unit
    */
   async recordParticipation(unitId: string): Promise<void> {
-    await apiClient.post(`/curriculum-units/${unitId}/record-participation`);
+    await apiService.post(`/curriculum-units/${unitId}/record-participation`);
   },
 
   /**
    * Get student's strengths
    */
   async getMyStrengths(scheduleId: string): Promise<{ strengths: string[] }> {
-    const response = await apiClient.get<APIResponse<{ strengths: string[] }>>(
+    const response = await apiService.get<APIResponse<{ strengths: string[] }>>(
       `/curriculum-units/schedule/${scheduleId}/my-strengths`
     );
     return response.data.data!;
@@ -317,7 +301,7 @@ export const progressApi = {
    * Get student's struggles
    */
   async getMyStruggles(scheduleId: string): Promise<{ struggles: string[] }> {
-    const response = await apiClient.get<APIResponse<{ struggles: string[] }>>(
+    const response = await apiService.get<APIResponse<{ struggles: string[] }>>(
       `/curriculum-units/schedule/${scheduleId}/my-struggles`
     );
     return response.data.data!;
@@ -327,7 +311,7 @@ export const progressApi = {
    * Get recommended review topics
    */
   async getMyReviewRecommendations(scheduleId: string): Promise<{ reviewTopics: string[] }> {
-    const response = await apiClient.get<APIResponse<{ reviewTopics: string[] }>>(
+    const response = await apiService.get<APIResponse<{ reviewTopics: string[] }>>(
       `/curriculum-units/schedule/${scheduleId}/my-review`
     );
     return response.data.data!;
