@@ -8,8 +8,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Cache bust to force Railway to rebuild - Update: 2025-10-29-v4
-ARG CACHE_BUST=2025-10-29-v4
+# Cache bust to force Railway to rebuild - Update: 2025-10-29-v5
+ARG CACHE_BUST=2025-10-29-v5
 RUN echo "Cache bust: $CACHE_BUST"
 
 # Install build dependencies for native modules and Prisma
@@ -56,13 +56,26 @@ RUN echo "=== Checking tsconfig.json ===" && cat tsconfig.json
 # Debug: Show package.json build script
 RUN echo "=== Build script ===" && cat package.json | grep -A 2 '"build"'
 
+# Debug: Check if TypeScript is installed
+RUN echo "=== Checking TypeScript installation ===" && \
+    ls -la node_modules/.bin/tsc && \
+    npx tsc --version || echo "TypeScript not found or failed to run"
+
+# Debug: Check if tsconfig.json is valid JSON
+RUN echo "=== Validating tsconfig.json ===" && \
+    cat tsconfig.json | head -30
+
 # Build TypeScript - Capture and display all output
 RUN echo "=== Running: npx tsc ===" && \
     npx tsc > /tmp/build.log 2>&1 && echo "Build succeeded" || \
     (echo "=== BUILD FAILED ===" && \
+     echo "=== Build log size: ===" && \
+     ls -lh /tmp/build.log && \
      echo "=== Full TypeScript output: ===" && \
      cat /tmp/build.log && \
      echo "=== End of output ===" && \
+     echo "=== Checking if tsc exists ===" && \
+     which tsc || echo "tsc not in PATH" && \
      false)
 
 # Stage 2: Production
