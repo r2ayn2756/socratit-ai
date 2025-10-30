@@ -44,7 +44,15 @@
       "Bash(node -e:*)",
       "Bash(echo:*)",
       "Bash(npm run dev:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(npm ls:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm ci:*)",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(tree:*)",
+      "Bash(wc -l \"c:\\Users\\towne\\Code\\Socratit.ai\\socratit-wireframes\\src\"/**/*.{ts,tsx})",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []

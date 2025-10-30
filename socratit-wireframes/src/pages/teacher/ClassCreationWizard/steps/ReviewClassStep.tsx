@@ -36,15 +36,20 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
     setError(null);
 
     try {
+      console.log('Starting class creation flow...');
+
       // Step 1: Upload curriculum file if provided
       let curriculumMaterialId: string | undefined;
       if (wizardState.curriculumFile) {
+        console.log('Uploading curriculum file:', wizardState.curriculumFile.name);
         try {
           const uploadedFile = await uploadService.uploadCurriculumFile(
             wizardState.curriculumFile
           );
           curriculumMaterialId = uploadedFile.id;
+          console.log('Curriculum file uploaded successfully:', curriculumMaterialId);
         } catch (uploadError: any) {
+          console.error('Upload error:', uploadError);
           throw new Error(`Failed to upload curriculum file: ${uploadError.message}`);
         }
       }
@@ -72,13 +77,16 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         classData.aiPreferences = wizardState.aiPreferences;
       }
 
+      console.log('Creating class with data:', classData);
       const newClass = await classApiService.createClass(classData);
+      console.log('Class created successfully:', newClass);
 
       // Step 3: If AI generation was requested and we have a schedule, generate it
       let aiGenerationFailed = false;
       if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialId) {
+        console.log('Starting AI schedule generation for schedule:', newClass.scheduleId);
         try {
-          await curriculumApi.schedules.generateScheduleFromAI(
+          const aiResult = await curriculumApi.schedules.generateScheduleFromAI(
             newClass.scheduleId,
             {
               curriculumMaterialId,
@@ -88,6 +96,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
               },
             }
           );
+          console.log('AI generation completed:', aiResult);
         } catch (aiError: any) {
           // AI generation failed, but class was created successfully
           console.error('AI generation failed:', aiError);
@@ -103,6 +112,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
       // Complete wizard and navigate to class dashboard (even if AI failed)
       if (!aiGenerationFailed && onComplete) {
+        console.log('Navigating to class dashboard:', newClass.id);
         onComplete(newClass.id);
       }
       // If AI failed, don't auto-navigate - let teacher see the error and manually continue

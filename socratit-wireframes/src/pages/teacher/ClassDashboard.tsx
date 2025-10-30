@@ -37,6 +37,7 @@ export const ClassDashboard: React.FC = () => {
 
   const [classData, setClassData] = useState<ClassData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showCurriculumModal, setShowCurriculumModal] = useState(false);
 
   useEffect(() => {
@@ -44,8 +45,17 @@ export const ClassDashboard: React.FC = () => {
   }, [classId]);
 
   const loadClassData = async () => {
+    if (!classId) {
+      setError('No class ID provided');
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
+    setError(null);
     try {
+      console.log('Loading class data for ID:', classId);
+
       // Load class info, students, and assignments in parallel
       const [classInfo, students, assignments] = await Promise.all([
         classApiService.getClass(classId!),
@@ -53,8 +63,11 @@ export const ClassDashboard: React.FC = () => {
         classApiService.getClassAssignments(classId!),
       ]);
 
+      console.log('Class info loaded:', classInfo);
+
       // Load curriculum schedule if it exists
       const schedule = await classApiService.getClassSchedule(classId!);
+      console.log('Schedule loaded:', schedule);
 
       // If schedule exists, load current and upcoming units
       let currentUnit = null;
@@ -66,8 +79,20 @@ export const ClassDashboard: React.FC = () => {
         ]);
       }
 
-      // Load progress data
-      const progressData = await classApiService.getClassProgress(classId!);
+      // Load progress data (gracefully handle if not available)
+      let progressData = null;
+      try {
+        progressData = await classApiService.getClassProgress(classId!);
+      } catch (progressError) {
+        console.warn('Progress data not available:', progressError);
+        // Set default progress data
+        progressData = {
+          classAverage: 0,
+          averageTrend: 'stable' as const,
+          strugglingStudents: [],
+          topPerformers: [],
+        };
+      }
 
       // Combine all data
       const classData: ClassData = {
@@ -84,9 +109,12 @@ export const ClassDashboard: React.FC = () => {
         progressData,
       };
 
+      console.log('Class data loaded successfully:', classData);
       setClassData(classData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load class data:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load class data';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -125,11 +153,25 @@ export const ClassDashboard: React.FC = () => {
     );
   }
 
-  if (!classData) {
+  if (error || !classData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Class not found</p>
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Class Not Found</h2>
+          <p className="text-gray-600 mb-6">
+            {error || 'The class you\'re looking for could not be loaded. It may have been deleted or you may not have permission to access it.'}
+          </p>
+          <button
+            onClick={() => navigate('/teacher/classes')}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to My Classes
+          </button>
         </div>
       </div>
     );

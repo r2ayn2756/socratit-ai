@@ -54,7 +54,8 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
   const [currentTask, setCurrentTask] = useState('');
   const [generatedUnits, setGeneratedUnits] = useState<any[]>([]);
 
-  // AI Generation simulation
+  // AI Generation - This is just a preview simulation
+  // The actual generation happens in ReviewClassStep after class creation
   const generateSchedule = async () => {
     setGenerationStage('generating');
 
@@ -74,20 +75,29 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
     }
 
     setProgress(100);
-    setCurrentTask('Schedule generated successfully!');
+    setCurrentTask('Preview generated successfully!');
 
-    // Simulate generated units
-    const mockUnits = Array.from({ length: wizardState.aiPreferences.targetUnits || 8 }, (_, i) => ({
-      id: `unit-${i + 1}`,
+    // Create preview units with descriptive placeholders
+    // The actual AI generation will happen after class creation
+    const targetUnits = wizardState.aiPreferences.targetUnits || 8;
+    const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
+      id: `preview-unit-${i + 1}`,
       title: `Unit ${i + 1}`,
-      estimatedWeeks: 4,
-      topics: 3,
+      description: 'Content will be generated from your curriculum',
+      estimatedWeeks: Math.ceil((wizardState.schoolYearEnd!.getTime() - wizardState.schoolYearStart!.getTime()) / (1000 * 60 * 60 * 24 * 7) / targetUnits),
+      topics: 'TBD',
     }));
     setGeneratedUnits(mockUnits);
 
     setTimeout(() => {
       setGenerationStage('complete');
-      onUpdate({ scheduleId: 'generated-schedule-id' });
+      onUpdate({
+        scheduleId: undefined, // Will be created with the class
+        aiPreferences: {
+          ...wizardState.aiPreferences,
+          targetUnits: targetUnits,
+        }
+      });
     }, 500);
   };
 
@@ -290,6 +300,9 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
             {/* Preview */}
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Schedule Preview</h4>
+              <p className="text-sm text-gray-600 mb-4">
+                This is a preview of your schedule structure. Actual unit titles, topics, and learning objectives will be generated from your curriculum materials when you finalize the class.
+              </p>
               <div className="space-y-2">
                 {generatedUnits.slice(0, 5).map((unit, index) => (
                   <motion.div
@@ -299,10 +312,10 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
                     transition={{ delay: index * 0.1 }}
                     className="px-4 py-3 rounded-xl bg-white/70 backdrop-blur-xl border border-gray-200 flex items-center justify-between"
                   >
-                    <div>
+                    <div className="flex-1">
                       <p className="font-medium text-gray-900">{unit.title}</p>
                       <p className="text-sm text-gray-600">
-                        {unit.estimatedWeeks} weeks • {unit.topics} topics
+                        ~{unit.estimatedWeeks} weeks • {unit.description}
                       </p>
                     </div>
                   </motion.div>
