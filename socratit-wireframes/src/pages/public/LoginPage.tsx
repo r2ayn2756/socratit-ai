@@ -22,16 +22,24 @@ export const LoginPage: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm<LoginFormData>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
+    shouldUnregister: false,
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
+  // Watch form values to ensure they're preserved
+  const emailValue = watch('email');
+  const passwordValue = watch('password');
+
   const onSubmit = async (data: LoginFormData) => {
+    // Prevent any default form behavior
     setIsLoading(true);
     setError('');
 
@@ -57,11 +65,16 @@ export const LoginPage: React.FC = () => {
       } else {
         throw new Error('User data not found after login');
       }
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
-    } finally {
+    } catch (err: any) {
+      // Ensure error is set without causing re-render issues
+      const errorMsg = err?.message || 'Invalid email or password. Please try again.';
+      setError(errorMsg);
       setIsLoading(false);
+      // Important: DO NOT reset form - values should be preserved
+      return; // Exit early on error
     }
+
+    setIsLoading(false);
   };
 
   return (
