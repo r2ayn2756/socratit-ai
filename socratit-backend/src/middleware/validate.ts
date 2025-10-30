@@ -16,10 +16,21 @@ export const validate = (schema: Joi.ObjectSchema, source: 'body' | 'query' = 'b
   return (req: Request, res: Response, next: NextFunction): void => {
     const dataToValidate = source === 'query' ? req.query : req.body;
 
+    // DEBUG: Log before validation
+    if (req.method === 'POST' && req.path.includes('/classes')) {
+      console.log('[VALIDATOR] Before validation - keys:', Object.keys(dataToValidate || {}).length);
+    }
+
     const { error, value } = schema.validate(dataToValidate, {
       abortEarly: false, // Return all errors
       stripUnknown: true, // Remove unknown fields
     });
+
+    // DEBUG: Log after validation
+    if (req.method === 'POST' && req.path.includes('/classes')) {
+      console.log('[VALIDATOR] After validation - keys:', Object.keys(value || {}).length);
+      console.log('[VALIDATOR] Validated value:', JSON.stringify(value, null, 2));
+    }
 
     if (error) {
       const errors: ValidationError[] = error.details.map((detail) => ({
