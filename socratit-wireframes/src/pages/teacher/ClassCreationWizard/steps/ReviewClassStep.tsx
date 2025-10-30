@@ -100,6 +100,10 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       }
 
       console.log('Creating class with data:', classData);
+      console.log('[DEBUG] classData.curriculumMaterialId:', classData.curriculumMaterialId);
+      console.log('[DEBUG] classData.schoolYearStart:', classData.schoolYearStart);
+      console.log('[DEBUG] classData.schoolYearEnd:', classData.schoolYearEnd);
+      console.log('[DEBUG] classData.generateWithAI:', classData.generateWithAI);
       console.log('[DEBUG] Calling API: POST /api/v1/classes');
       const newClass = await classApiService.createClass(classData);
       console.log('Class created successfully:', newClass);
