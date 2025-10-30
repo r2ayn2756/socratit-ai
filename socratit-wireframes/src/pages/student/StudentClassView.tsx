@@ -21,7 +21,7 @@ import { Timeline } from '../../components/curriculum/Timeline';
 import { Button } from '../../components/curriculum/Button';
 import type { CurriculumUnit } from '../../types/curriculum.types';
 import { format } from 'date-fns';
-import { classApiService } from '../../services/classApi.service';
+import { classCurriculumService } from '../../services/classCurriculum.service';
 import { curriculumApi } from '../../services/curriculumApi.service';
 import { assignmentService } from '../../services/assignment.service';
 
@@ -62,8 +62,8 @@ export const StudentClassView: React.FC = () => {
     setIsLoading(true);
     try {
       // Load class info and schedule
-      const classInfo = await classApiService.getClass(classId!);
-      const schedule = await classApiService.getClassSchedule(classId!);
+      const classInfo = await classCurriculumService.getClass(classId!);
+      const schedule = await classCurriculumService.getClassSchedule(classId!);
 
       // If no schedule exists, show a simpler view
       if (!schedule) {

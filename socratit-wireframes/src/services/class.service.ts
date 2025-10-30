@@ -1,6 +1,15 @@
 // ============================================================================
 // CLASS MANAGEMENT SERVICE
-// API functions for class and enrollment management
+// Handles basic class CRUD operations and student enrollment management
+//
+// Purpose: This service provides core class management features:
+// - Creating, reading, updating, and deleting classes
+// - Managing student enrollments (add, remove, approve)
+// - Class roster management
+// - Class code generation and enrollment
+//
+// NOTE: For curriculum-integrated class features (schedules, progress tracking),
+//       use classCurriculum.service.ts instead
 // ============================================================================
 
 import { apiService } from './api.service';

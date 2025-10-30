@@ -58,6 +58,10 @@ export interface ConversationWithMessages extends AIConversation {
 export const aiTAService = {
   // Create a new conversation
   createConversation: async (data: CreateConversationRequest): Promise<AIConversation> => {
+    console.log('🔍 DEBUG - API_URL:', API_URL);
+    console.log('🔍 DEBUG - API_PREFIX:', API_PREFIX);
+    console.log('🔍 DEBUG - baseURL:', apiClient.defaults.baseURL);
+    console.log('🔍 DEBUG - Full URL will be:', apiClient.defaults.baseURL + '/ai-ta/conversations');
     const response = await apiClient.post('/ai-ta/conversations', data);
     return response.data.data;
   },

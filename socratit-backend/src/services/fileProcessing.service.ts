@@ -129,10 +129,10 @@ export function validateExtractedText(text: string): {
     };
   }
 
-  if (wordCount < 50) {
+  if (wordCount < 10) {
     return {
       isValid: false,
-      reason: 'Not enough words (less than 50)',
+      reason: 'Not enough words (less than 10)',
       wordCount,
     };
   }

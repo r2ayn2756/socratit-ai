@@ -11,7 +11,7 @@ import { GlassCard } from '../../../../components/curriculum/GlassCard';
 import type { ClassCreationState } from '../ClassCreationWizard';
 import { format } from 'date-fns';
 import { uploadService } from '../../../../services/upload.service';
-import { classApiService } from '../../../../services/classApi.service';
+import { classCurriculumService } from '../../../../services/classCurriculum.service';
 import { curriculumApi } from '../../../../services/curriculumApi.service';
 
 interface ReviewClassStepProps {
@@ -105,7 +105,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       console.log('[DEBUG] classData.schoolYearEnd:', classData.schoolYearEnd);
       console.log('[DEBUG] classData.generateWithAI:', classData.generateWithAI);
       console.log('[DEBUG] Calling API: POST /api/v1/classes');
-      const newClass = await classApiService.createClass(classData);
+      const newClass = await classCurriculumService.createClass(classData);
       console.log('Class created successfully:', newClass);
       console.log('[DEBUG] Response includes scheduleId:', newClass.scheduleId);
 

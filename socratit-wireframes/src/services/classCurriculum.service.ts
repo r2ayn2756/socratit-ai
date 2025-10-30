@@ -1,6 +1,14 @@
 // ============================================================================
-// CLASS API SERVICE
-// API calls for class management with curriculum integration
+// CLASS CURRICULUM SERVICE
+// Handles class operations WITH curriculum integration features
+//
+// Purpose: This service provides curriculum-enhanced class operations:
+// - Creating classes with curriculum schedule generation
+// - Fetching class data with curriculum context
+// - Progress tracking tied to curriculum units
+// - Student performance within curriculum framework
+//
+// NOTE: For basic class CRUD without curriculum features, use class.service.ts
 // ============================================================================
 
 import { apiService } from './api.service';
@@ -100,14 +108,16 @@ export interface ProgressData {
 // ============================================================================
 
 /**
- * Create a new class
+ * Create a new class with optional curriculum schedule generation
+ * @param data - Class creation data including optional curriculum parameters
+ * @returns Created class details
  */
 export async function createClass(data: CreateClassRequest): Promise<ClassDetailsResponse> {
-  console.log('[API] createClass called with data:', data);
-  console.log('[API] data.curriculumMaterialId:', data.curriculumMaterialId);
-  console.log('[API] data.schoolYearStart:', data.schoolYearStart);
-  console.log('[API] data.schoolYearEnd:', data.schoolYearEnd);
-  console.log('[API] Stringified data:', JSON.stringify(data, null, 2));
+  console.log('[classCurriculum] createClass called with data:', data);
+  console.log('[classCurriculum] data.curriculumMaterialId:', data.curriculumMaterialId);
+  console.log('[classCurriculum] data.schoolYearStart:', data.schoolYearStart);
+  console.log('[classCurriculum] data.schoolYearEnd:', data.schoolYearEnd);
+  console.log('[classCurriculum] Stringified data:', JSON.stringify(data, null, 2));
 
   // CRITICAL FIX: Create a clean copy to ensure all fields are sent
   const cleanData = {
@@ -128,16 +138,18 @@ export async function createClass(data: CreateClassRequest): Promise<ClassDetail
     aiPreferences: data.aiPreferences,
   };
 
-  console.log('[API] Sending clean data:', JSON.stringify(cleanData, null, 2));
+  console.log('[classCurriculum] Sending clean data:', JSON.stringify(cleanData, null, 2));
 
   const response = await apiService.post<CreateClassResponse>('/classes', cleanData);
 
-  console.log('[API] Response received:', response.data);
+  console.log('[classCurriculum] Response received:', response.data);
   return response.data.data;
 }
 
 /**
  * Get class details
+ * @param classId - The class ID
+ * @returns Class details
  */
 export async function getClass(classId: string): Promise<ClassDetailsResponse> {
   const response = await apiService.get<{ success: boolean; data: ClassDetailsResponse }>(
@@ -147,7 +159,9 @@ export async function getClass(classId: string): Promise<ClassDetailsResponse> {
 }
 
 /**
- * Get class students
+ * Get students enrolled in a class
+ * @param classId - The class ID
+ * @returns Array of student information
  */
 export async function getClassStudents(classId: string): Promise<StudentInfo[]> {
   const response = await apiService.get<{ success: boolean; data: StudentInfo[] }>(
@@ -157,7 +171,9 @@ export async function getClassStudents(classId: string): Promise<StudentInfo[]> 
 }
 
 /**
- * Get class assignments
+ * Get assignments for a class
+ * @param classId - The class ID
+ * @returns Array of assignment information with curriculum context
  */
 export async function getClassAssignments(classId: string): Promise<AssignmentInfo[]> {
   const response = await apiService.get<{ success: boolean; data: AssignmentInfo[] }>(
@@ -167,7 +183,9 @@ export async function getClassAssignments(classId: string): Promise<AssignmentIn
 }
 
 /**
- * Get class progress data
+ * Get class-wide progress data
+ * @param classId - The class ID
+ * @returns Progress analytics including averages and trends
  */
 export async function getClassProgress(classId: string): Promise<ProgressData> {
   const response = await apiService.get<{ success: boolean; data: ProgressData }>(
@@ -178,6 +196,8 @@ export async function getClassProgress(classId: string): Promise<ProgressData> {
 
 /**
  * Get curriculum schedule for a class
+ * @param classId - The class ID
+ * @returns Curriculum schedule or null if none exists
  */
 export async function getClassSchedule(classId: string): Promise<CurriculumSchedule | null> {
   try {
@@ -194,8 +214,8 @@ export async function getClassSchedule(classId: string): Promise<CurriculumSched
   }
 }
 
-// Export all functions as a service object
-export const classApiService = {
+// Export all functions as a service object for convenient importing
+export const classCurriculumService = {
   createClass,
   getClass,
   getClassStudents,
@@ -204,4 +224,4 @@ export const classApiService = {
   getClassSchedule,
 };
 
-export default classApiService;
+export default classCurriculumService;

@@ -16,7 +16,7 @@ import {
 } from '../../components/class';
 import { CurriculumManagementModal } from '../../components/class/CurriculumManagementModal';
 import { UnitDetailsModal } from '../../components/curriculum/UnitDetailsModal';
-import { classApiService } from '../../services/classApi.service';
+import { classCurriculumService } from '../../services/classCurriculum.service';
 import { curriculumApi } from '../../services/curriculumApi.service';
 import { classService } from '../../services/class.service';
 import type { CurriculumUnit } from '../../types/curriculum.types';
@@ -65,7 +65,7 @@ export const ClassDashboard: React.FC = () => {
       console.log('Loading class data for ID:', classId);
 
       // Load class info from both services to get complete data
-      const classInfo = await classApiService.getClass(classId!);
+      const classInfo = await classCurriculumService.getClass(classId!);
       console.log('Class info loaded:', classInfo);
 
       // Also get class info from classService to get classCode and enrollment counts
@@ -80,7 +80,7 @@ export const ClassDashboard: React.FC = () => {
       // Load students (gracefully handle if endpoint doesn't exist yet)
       let students: any[] = [];
       try {
-        students = await classApiService.getClassStudents(classId!);
+        students = await classCurriculumService.getClassStudents(classId!);
       } catch (studentError: any) {
         console.warn('Students not available:', studentError);
         // Students endpoint may not exist yet, continue without it
@@ -98,14 +98,14 @@ export const ClassDashboard: React.FC = () => {
       // Load assignments (gracefully handle if endpoint doesn't exist yet)
       let assignments: any[] = [];
       try {
-        assignments = await classApiService.getClassAssignments(classId!);
+        assignments = await classCurriculumService.getClassAssignments(classId!);
       } catch (assignmentError: any) {
         console.warn('Assignments not available:', assignmentError);
         // Assignments endpoint may not exist yet, continue without it
       }
 
       // Load curriculum schedule if it exists
-      const schedule = await classApiService.getClassSchedule(classId!);
+      const schedule = await classCurriculumService.getClassSchedule(classId!);
       console.log('Schedule loaded:', schedule);
 
       // Extract units from schedule response
@@ -135,7 +135,7 @@ export const ClassDashboard: React.FC = () => {
       // Load progress data (gracefully handle if not available)
       let progressData = null;
       try {
-        progressData = await classApiService.getClassProgress(classId!);
+        progressData = await classCurriculumService.getClassProgress(classId!);
       } catch (progressError) {
         console.warn('Progress data not available:', progressError);
         // Set default progress data
