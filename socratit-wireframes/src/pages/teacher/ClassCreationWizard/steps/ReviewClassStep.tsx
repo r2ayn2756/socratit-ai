@@ -81,19 +81,29 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
       if (curriculumMaterialId && wizardState.schoolYearStart && wizardState.schoolYearEnd) {
         console.log('[DEBUG] Adding curriculum fields to classData');
-        classData.curriculumMaterialId = curriculumMaterialId;
-        classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
-        classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
-        classData.meetingPattern = wizardState.meetingPattern;
-        classData.generateWithAI = !wizardState.skipCurriculum;
-        classData.aiPreferences = wizardState.aiPreferences;
+        try {
+          classData.curriculumMaterialId = curriculumMaterialId;
+          classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
+          classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
+          classData.meetingPattern = wizardState.meetingPattern;
+          classData.generateWithAI = !wizardState.skipCurriculum;
+          classData.aiPreferences = wizardState.aiPreferences;
+          console.log('[DEBUG] Curriculum fields added successfully');
+        } catch (dateError) {
+          console.error('[ERROR] Failed to convert dates to ISO string:', dateError);
+          console.error('[ERROR] schoolYearStart type:', typeof wizardState.schoolYearStart);
+          console.error('[ERROR] schoolYearEnd type:', typeof wizardState.schoolYearEnd);
+          throw new Error('Invalid date format. Please refresh and try again.');
+        }
       } else {
         console.log('[DEBUG] Skipping curriculum fields - condition not met');
       }
 
       console.log('Creating class with data:', classData);
+      console.log('[DEBUG] Calling API: POST /api/v1/classes');
       const newClass = await classApiService.createClass(classData);
       console.log('Class created successfully:', newClass);
+      console.log('[DEBUG] Response includes scheduleId:', newClass.scheduleId);
 
       // Step 3: If AI generation was requested and we have a schedule, generate it
       let aiGenerationFailed = false;
@@ -131,9 +141,13 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       }
       // If AI failed, don't auto-navigate - let teacher see the error and manually continue
     } catch (err: any) {
+      console.error('[ERROR] Class creation failed:', err);
+      console.error('[ERROR] Error response:', err.response);
+      console.error('[ERROR] Error message:', err.message);
+      console.error('[ERROR] Full error object:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+
       const errorMessage = err.response?.data?.message || err.message || 'Failed to create class. Please try again.';
       setError(errorMessage);
-      console.error('Class creation error:', err);
     } finally {
       setIsCreating(false);
     }
