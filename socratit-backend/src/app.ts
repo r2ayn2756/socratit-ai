@@ -83,8 +83,16 @@ app.use(cors({
 }));
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({
+  limit: '10mb',
+  strict: false,  // Allow any JSON value
+  type: 'application/json'
+}));
+app.use(express.urlencoded({
+  extended: true,
+  limit: '10mb',
+  parameterLimit: 50000  // Increase from default 1000
+}));
 
 // Logging middleware (only in development)
 if (env.NODE_ENV === 'development') {
