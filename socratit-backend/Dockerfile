@@ -8,8 +8,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Cache bust to force Railway to rebuild - Update: 2025-10-29-v5
-ARG CACHE_BUST=2025-10-29-v5
+# Cache bust to force Railway to rebuild - Update: 2025-10-29-FINAL
+ARG CACHE_BUST=2025-10-29-FINAL
 RUN echo "Cache bust: $CACHE_BUST"
 
 # Install build dependencies for native modules and Prisma
@@ -34,6 +34,16 @@ RUN if [ -f package-lock.json ]; then \
 
 # Debug: Verify pdfjs-dist was NOT installed
 RUN echo "=== Checking installed packages ===" && (ls node_modules | grep -i pdf || echo "No PDF packages in node_modules")
+
+# CRITICAL FIX: Verify TypeScript is installed and install if missing
+RUN echo "=== Verifying TypeScript installation ===" && \
+    if [ ! -f node_modules/.bin/tsc ]; then \
+      echo "TypeScript NOT found - installing explicitly..." && \
+      npm install --save-dev typescript@5.9.3; \
+    else \
+      echo "TypeScript found at:" && ls -la node_modules/.bin/tsc && \
+      node_modules/.bin/tsc --version; \
+    fi
 
 # Copy Prisma schema
 COPY prisma ./prisma/
@@ -65,18 +75,9 @@ RUN echo "=== Checking TypeScript installation ===" && \
 RUN echo "=== Validating tsconfig.json ===" && \
     cat tsconfig.json | head -30
 
-# Build TypeScript - Capture and display all output
-RUN echo "=== Running: npx tsc ===" && \
-    npx tsc > /tmp/build.log 2>&1 && echo "Build succeeded" || \
-    (echo "=== BUILD FAILED ===" && \
-     echo "=== Build log size: ===" && \
-     ls -lh /tmp/build.log && \
-     echo "=== Full TypeScript output: ===" && \
-     cat /tmp/build.log && \
-     echo "=== End of output ===" && \
-     echo "=== Checking if tsc exists ===" && \
-     which tsc || echo "tsc not in PATH" && \
-     false)
+# Build TypeScript - Use explicit path to tsc binary
+RUN echo "=== Running TypeScript build ===" && \
+    ./node_modules/.bin/tsc --project tsconfig.json
 
 # Stage 2: Production
 FROM node:20-alpine
