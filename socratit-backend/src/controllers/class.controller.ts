@@ -76,38 +76,58 @@ export const createClass = async (
 
     // Create curriculum schedule if data provided
     let scheduleId: string | undefined;
+    console.log('[DEBUG] Checking curriculum data:', {
+      hasCurriculumMaterialId: !!body.curriculumMaterialId,
+      hasSchoolYearStart: !!body.schoolYearStart,
+      hasSchoolYearEnd: !!body.schoolYearEnd,
+      curriculumMaterialId: body.curriculumMaterialId,
+      schoolYearStart: body.schoolYearStart,
+      schoolYearEnd: body.schoolYearEnd,
+      generateWithAI: body.generateWithAI,
+    });
+
     if (body.curriculumMaterialId && body.schoolYearStart && body.schoolYearEnd) {
-      const schoolYearStart = new Date(body.schoolYearStart);
-      const schoolYearEnd = new Date(body.schoolYearEnd);
+      console.log('[DEBUG] Creating curriculum schedule...');
+      try {
+        const schoolYearStart = new Date(body.schoolYearStart);
+        const schoolYearEnd = new Date(body.schoolYearEnd);
 
-      // Calculate weeks and days
-      const diffTime = Math.abs(schoolYearEnd.getTime() - schoolYearStart.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const totalWeeks = Math.ceil(diffDays / 7);
+        // Calculate weeks and days
+        const diffTime = Math.abs(schoolYearEnd.getTime() - schoolYearStart.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const totalWeeks = Math.ceil(diffDays / 7);
 
-      // Create schedule in DRAFT status (AI will generate units)
-      const schedule = await prisma.curriculumSchedule.create({
-        data: {
-          classId: newClass.id,
-          teacherId: userId,
-          schoolId,
-          curriculumMaterialId: body.curriculumMaterialId,
-          schoolYearStart,
-          schoolYearEnd,
-          totalWeeks,
-          totalDays: diffDays,
-          meetingPattern: body.meetingPattern || 'daily',
-          title: `${body.name} - Curriculum Schedule`,
-          status: body.generateWithAI ? 'DRAFT' : 'PUBLISHED',
-          totalUnits: body.aiPreferences?.targetUnits || 0,
-          aiGenerated: false, // Will be set to true after AI generation
-        },
-      });
+        // Create schedule in DRAFT status (AI will generate units)
+        const schedule = await prisma.curriculumSchedule.create({
+          data: {
+            classId: newClass.id,
+            teacherId: userId,
+            schoolId,
+            curriculumMaterialId: body.curriculumMaterialId,
+            schoolYearStart,
+            schoolYearEnd,
+            totalWeeks,
+            totalDays: diffDays,
+            meetingPattern: body.meetingPattern || 'daily',
+            title: `${body.name} - Curriculum Schedule`,
+            status: body.generateWithAI ? 'DRAFT' : 'PUBLISHED',
+            totalUnits: body.aiPreferences?.targetUnits || 0,
+            aiGenerated: false, // Will be set to true after AI generation
+          },
+        });
 
-      scheduleId = schedule.id;
+        scheduleId = schedule.id;
+        console.log('[DEBUG] Curriculum schedule created successfully:', scheduleId);
+      } catch (scheduleError) {
+        console.error('[ERROR] Failed to create curriculum schedule:', scheduleError);
+        // Continue with class creation even if schedule fails
+        // Teacher can create schedule later
+      }
 
       // Note: AI generation will be triggered by frontend calling separate endpoint
       // POST /api/curriculum-schedules/:scheduleId/generate-ai
+    } else {
+      console.log('[DEBUG] Skipping curriculum schedule creation - missing required fields');
     }
 
     // Log audit event
@@ -153,6 +173,7 @@ export const createClass = async (
       message: 'Class created successfully',
     };
 
+    console.log('[DEBUG] Sending response with scheduleId:', scheduleId);
     res.status(201).json(response);
   } catch (error) {
     throw error;
