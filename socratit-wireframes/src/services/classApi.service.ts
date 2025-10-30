@@ -136,10 +136,11 @@ export async function getClassProgress(classId: string): Promise<ProgressData> {
  */
 export async function getClassSchedule(classId: string): Promise<CurriculumSchedule | null> {
   try {
-    const response = await apiService.get<{ success: boolean; data: CurriculumSchedule }>(
-      `/classes/${classId}/schedule`
+    const response = await apiService.get<{ success: boolean; data: CurriculumSchedule[] }>(
+      `/curriculum-schedules/class/${classId}`
     );
-    return response.data.data;
+    // Return the first (most recent) schedule, or null if none exist
+    return response.data.data && response.data.data.length > 0 ? response.data.data[0] : null;
   } catch (error: any) {
     if (error.response?.status === 404) {
       return null; // No schedule exists yet

@@ -56,14 +56,27 @@ export const ClassDashboard: React.FC = () => {
     try {
       console.log('Loading class data for ID:', classId);
 
-      // Load class info, students, and assignments in parallel
-      const [classInfo, students, assignments] = await Promise.all([
-        classApiService.getClass(classId!),
-        classApiService.getClassStudents(classId!),
-        classApiService.getClassAssignments(classId!),
-      ]);
-
+      // Load class info
+      const classInfo = await classApiService.getClass(classId!);
       console.log('Class info loaded:', classInfo);
+
+      // Load students (gracefully handle if endpoint doesn't exist yet)
+      let students: any[] = [];
+      try {
+        students = await classApiService.getClassStudents(classId!);
+      } catch (studentError: any) {
+        console.warn('Students not available:', studentError);
+        // Students endpoint may not exist yet, continue without it
+      }
+
+      // Load assignments (gracefully handle if endpoint doesn't exist yet)
+      let assignments: any[] = [];
+      try {
+        assignments = await classApiService.getClassAssignments(classId!);
+      } catch (assignmentError: any) {
+        console.warn('Assignments not available:', assignmentError);
+        // Assignments endpoint may not exist yet, continue without it
+      }
 
       // Load curriculum schedule if it exists
       const schedule = await classApiService.getClassSchedule(classId!);
