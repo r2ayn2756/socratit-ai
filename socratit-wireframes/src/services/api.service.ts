@@ -101,7 +101,15 @@ export const apiService = {
     console.log('[apiService.post] Called with URL:', url);
     console.log('[apiService.post] Data before axios:', data);
     console.log('[apiService.post] Data keys:', Object.keys(data || {}));
-    return apiClient.post<T>(url, data, config);
+
+    // CRITICAL FIX: Force JSON serialization for non-FormData requests
+    let requestData = data;
+    if (data && !(data instanceof FormData)) {
+      requestData = JSON.parse(JSON.stringify(data));
+      console.log('[apiService.post] Data after JSON round-trip:', requestData);
+    }
+
+    return apiClient.post<T>(url, requestData, config);
   },
 
   // PUT request
