@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   ArrowRight,
 } from 'lucide-react';
+import { DashboardLayout } from '../../components/layout';
 import { GlassCard, GlassPanel } from '../../components/curriculum/GlassCard';
 import { ProgressBar, CircularProgress } from '../../components/curriculum/ProgressBar';
 import { Timeline } from '../../components/curriculum/Timeline';
@@ -158,28 +159,32 @@ export const StudentClassView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading class...</p>
+      <DashboardLayout userRole="student">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading class...</p>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   if (!classData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Class not found</p>
+      <DashboardLayout userRole="student">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <p className="text-gray-600">Class not found</p>
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <DashboardLayout userRole="student">
+      <div className="space-y-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
