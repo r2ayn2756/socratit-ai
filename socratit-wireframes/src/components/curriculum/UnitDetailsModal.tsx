@@ -362,8 +362,8 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         className="w-full p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            {React.cloneElement(icon as React.ReactElement, { className: 'w-5 h-5 text-white' })}
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
+            {icon}
           </div>
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         </div>
