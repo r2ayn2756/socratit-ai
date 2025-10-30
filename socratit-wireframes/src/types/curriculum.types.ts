@@ -51,6 +51,7 @@ export interface CurriculumSchedule {
   updatedAt: string;
   publishedAt?: string;
   deletedAt?: string;
+  units?: CurriculumUnit[]; // Units may be included in API response
 }
 
 export interface CurriculumUnit {

@@ -83,14 +83,28 @@ export const ClassDashboard: React.FC = () => {
       const schedule = await classApiService.getClassSchedule(classId!);
       console.log('Schedule loaded:', schedule);
 
-      // If schedule exists, load current and upcoming units
-      let currentUnit = null;
+      // Extract units from schedule response
+      let currentUnit: any = null;
       let upcomingUnits: any[] = [];
-      if (schedule) {
-        [currentUnit, upcomingUnits] = await Promise.all([
-          classApiService.getCurrentUnit(schedule.id),
-          classApiService.getUpcomingUnits(schedule.id, 3),
-        ]);
+      if (schedule?.units && schedule.units.length > 0) {
+        const units = schedule.units;
+        console.log('Units found in schedule:', units.length, 'units');
+
+        // Find current unit (first IN_PROGRESS or SCHEDULED unit)
+        currentUnit = units.find((u) =>
+          u.status === 'IN_PROGRESS' || u.status === 'SCHEDULED'
+        ) || units[0];
+
+        // Get upcoming units (next 3 units after current)
+        if (currentUnit) {
+          const currentIndex = units.findIndex((u) => u.id === currentUnit!.id);
+          upcomingUnits = units.slice(currentIndex + 1, currentIndex + 4);
+        }
+
+        console.log('Current unit:', currentUnit?.title);
+        console.log('Upcoming units:', upcomingUnits.length);
+      } else {
+        console.log('No units found in schedule');
       }
 
       // Load progress data (gracefully handle if not available)

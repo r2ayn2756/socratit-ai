@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { apiService } from './api.service';
-import type { CurriculumSchedule, CurriculumUnit } from '../types/curriculum.types';
+import type { CurriculumSchedule } from '../types/curriculum.types';
 
 // ============================================================================
 // TYPES
@@ -149,33 +149,6 @@ export async function getClassSchedule(classId: string): Promise<CurriculumSched
   }
 }
 
-/**
- * Get current unit for a class
- */
-export async function getCurrentUnit(scheduleId: string): Promise<CurriculumUnit | null> {
-  try {
-    const response = await apiService.get<{ success: boolean; data: CurriculumUnit }>(
-      `/curriculum-schedules/${scheduleId}/current-unit`
-    );
-    return response.data.data;
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      return null;
-    }
-    throw error;
-  }
-}
-
-/**
- * Get upcoming units for a class
- */
-export async function getUpcomingUnits(scheduleId: string, limit: number = 3): Promise<CurriculumUnit[]> {
-  const response = await apiService.get<{ success: boolean; data: CurriculumUnit[] }>(
-    `/curriculum-schedules/${scheduleId}/upcoming-units?limit=${limit}`
-  );
-  return response.data.data;
-}
-
 // Export all functions as a service object
 export const classApiService = {
   createClass,
@@ -184,8 +157,6 @@ export const classApiService = {
   getClassAssignments,
   getClassProgress,
   getClassSchedule,
-  getCurrentUnit,
-  getUpcomingUnits,
 };
 
 export default classApiService;

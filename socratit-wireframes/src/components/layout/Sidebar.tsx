@@ -6,6 +6,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard,
   BookOpen,
@@ -22,6 +23,7 @@ import {
   Brain,
   FolderOpen
 } from 'lucide-react';
+import messageService from '../../services/message.service';
 
 interface SidebarProps {
   userRole: 'teacher' | 'student' | 'admin';
@@ -40,6 +42,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Fetch unread message count
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['unreadMessages'],
+    queryFn: messageService.getUnreadCount,
+    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 20000, // Consider data stale after 20 seconds
+  });
+
   // Role-specific navigation items
   const navItems: Record<string, NavItem[]> = {
     teacher: [
@@ -47,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'Classes', icon: BookOpen, path: '/teacher/classes' },
       { label: 'Assignments', icon: FileText, path: '/teacher/assignments' },
       { label: 'Curriculum', icon: FolderOpen, path: '/teacher/curriculum' },
-      { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: 5 },
+      { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
       { label: 'Analytics', icon: BarChart3, path: '/teacher/analytics' },
       { label: 'Settings', icon: Settings, path: '/teacher/settings' },
     ],
@@ -56,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'My Classes', icon: BookOpen, path: '/student/classes' },
       { label: 'Assignments', icon: FileText, path: '/student/assignments' },
       { label: 'Grades', icon: BarChart3, path: '/student/grades' },
-      { label: 'Messages', icon: MessageSquare, path: '/student/messages' },
+      { label: 'Messages', icon: MessageSquare, path: '/student/messages', badge: unreadCount },
       { label: 'Settings', icon: Settings, path: '/student/settings' },
     ],
     admin: [
@@ -133,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
                       <span className="font-medium text-sm">{item.label}</span>
                     )}
 
-                    {item.badge && !isCollapsed && (
+                    {item.badge !== undefined && item.badge > 0 && !isCollapsed && (
                       <span className={`
                         ml-auto px-2 py-0.5 rounded-full text-xs font-semibold
                         ${active ? 'bg-white/20 text-white' : 'bg-brand-orange text-white'}
@@ -146,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
                     {isCollapsed && (
                       <div className="absolute left-full ml-2 px-3 py-2 bg-slate-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                         {item.label}
-                        {item.badge && (
+                        {item.badge !== undefined && item.badge > 0 && (
                           <span className="ml-2 px-1.5 py-0.5 bg-brand-orange rounded-full text-xs">
                             {item.badge}
                           </span>
