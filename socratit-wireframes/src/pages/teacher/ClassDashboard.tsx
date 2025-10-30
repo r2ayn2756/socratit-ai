@@ -281,7 +281,6 @@ export const ClassDashboard: React.FC = () => {
           scheduleId={classData.schedule.id}
         />
       )}
-      </div>
     </DashboardLayout>
   );
 };
