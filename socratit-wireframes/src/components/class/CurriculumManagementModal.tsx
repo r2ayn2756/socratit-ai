@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Grid, Calendar, MessageSquare } from 'lucide-react';
+import { X, Grid, Calendar, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import { Modal } from '../shared/Modal';
 import { SortableUnitGrid } from '../curriculum/SortableUnitGrid';
 import { Timeline } from '../curriculum/Timeline';
@@ -30,6 +30,7 @@ export const CurriculumManagementModal: React.FC<CurriculumManagementModalProps>
   const [schedule, setSchedule] = useState<CurriculumSchedule | null>(null);
   const [units, setUnits] = useState<CurriculumUnit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -79,6 +80,30 @@ export const CurriculumManagementModal: React.FC<CurriculumManagementModalProps>
     loadSchedule();
   };
 
+  const handlePublishToggle = async () => {
+    if (!schedule) return;
+
+    setIsPublishing(true);
+    try {
+      if (schedule.status === 'PUBLISHED') {
+        // Unpublish: Set to DRAFT
+        await curriculumApi.schedules.updateSchedule(scheduleId, {
+          status: 'DRAFT',
+        });
+      } else {
+        // Publish the schedule
+        await curriculumApi.schedules.publishSchedule(scheduleId);
+      }
+
+      // Reload to get updated status
+      await loadSchedule();
+    } catch (error) {
+      console.error('Failed to toggle publish status:', error);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -91,21 +116,64 @@ export const CurriculumManagementModal: React.FC<CurriculumManagementModalProps>
       <div className="h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Curriculum Management
-            </h2>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Curriculum Management
+              </h2>
+              {schedule && (
+                <span
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                    schedule.status === 'PUBLISHED'
+                      ? 'bg-green-100 text-green-700 border border-green-300'
+                      : 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                  }`}
+                >
+                  {schedule.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+                </span>
+              )}
+            </div>
             <p className="text-gray-600 text-sm mt-1">
               Manage your year-long curriculum schedule
             </p>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
+          <div className="flex items-center gap-3">
+            {schedule && (
+              <button
+                onClick={handlePublishToggle}
+                disabled={isPublishing}
+                className={`
+                  px-4 py-2 rounded-xl font-medium transition-all duration-200
+                  flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed
+                  ${
+                    schedule.status === 'PUBLISHED'
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30'
+                  }
+                `}
+              >
+                {schedule.status === 'PUBLISHED' ? (
+                  <>
+                    <EyeOff className="w-4 h-4" />
+                    <span>{isPublishing ? 'Unpublishing...' : 'Unpublish'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4" />
+                    <span>{isPublishing ? 'Publishing...' : 'Publish to Students'}</span>
+                  </>
+                )}
+              </button>
+            )}
+
+            <button
+              onClick={onClose}
+              className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}

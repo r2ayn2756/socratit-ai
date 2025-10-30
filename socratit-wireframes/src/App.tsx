@@ -30,6 +30,7 @@ import { TeacherAnalytics } from './pages/teacher/TeacherAnalytics';
 import { StudentDashboard, Classes, Assignments, Grades, Messages } from './pages/student';
 import { TakeAssignment } from './pages/student/TakeAssignment';
 import { StudentClassView } from './pages/student/StudentClassView';
+import { StudentCurriculumView } from './pages/student/StudentCurriculumView';
 
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -64,6 +65,7 @@ function App() {
             <Route path="/student/dashboard" element={<StudentDashboard />} />
             <Route path="/student/classes" element={<Classes />} />
             <Route path="/student/classes/:classId" element={<StudentClassView />} />
+            <Route path="/student/classes/:classId/curriculum" element={<StudentCurriculumView />} />
             <Route path="/student/assignments" element={<Assignments />} />
             <Route path="/student/assignments/:assignmentId" element={<TakeAssignment />} />
             <Route path="/student/grades" element={<Grades />} />

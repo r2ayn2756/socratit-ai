@@ -304,6 +304,17 @@ export const ClassDashboard: React.FC = () => {
           scheduleId={classData.schedule.id}
         />
       )}
+
+      {/* Unit Details Modal */}
+      <UnitDetailsModal
+        unit={selectedUnit}
+        isOpen={showUnitDetails}
+        onClose={() => {
+          setShowUnitDetails(false);
+          setSelectedUnit(null);
+        }}
+        userRole="teacher"
+      />
     </DashboardLayout>
   );
 };

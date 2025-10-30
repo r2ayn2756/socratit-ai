@@ -56,7 +56,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'Dashboard', icon: LayoutDashboard, path: '/teacher/dashboard' },
       { label: 'Classes', icon: BookOpen, path: '/teacher/classes' },
       { label: 'Assignments', icon: FileText, path: '/teacher/assignments' },
-      { label: 'Curriculum', icon: FolderOpen, path: '/teacher/curriculum' },
       { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
       { label: 'Analytics', icon: BarChart3, path: '/teacher/analytics' },
     ],
