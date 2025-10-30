@@ -52,7 +52,8 @@
       "Bash(npx tsc:*)",
       "Bash(tree:*)",
       "Bash(wc -l \"c:\\Users\\towne\\Code\\Socratit.ai\\socratit-wireframes\\src\"/**/*.{ts,tsx})",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": [],
     "ask": []

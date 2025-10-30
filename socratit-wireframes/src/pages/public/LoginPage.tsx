@@ -40,6 +40,7 @@ export const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     // Prevent any default form behavior
+    console.log('Form submitted with:', { email: data.email, password: data.password });
     setIsLoading(true);
     setError('');
 
@@ -67,6 +68,8 @@ export const LoginPage: React.FC = () => {
       }
     } catch (err: any) {
       // Ensure error is set without causing re-render issues
+      console.log('Login error caught:', err);
+      console.log('Form values after error:', { email: emailValue, password: passwordValue });
       const errorMsg = err?.message || 'Invalid email or password. Please try again.';
       setError(errorMsg);
       setIsLoading(false);
@@ -124,6 +127,7 @@ export const LoginPage: React.FC = () => {
               placeholder="teacher@school.edu"
               leftIcon={<Mail className="w-5 h-5" />}
               error={errors.email?.message}
+              value={emailValue || ''}
               {...register('email', {
                 required: 'Email is required',
                 pattern: {
@@ -141,6 +145,7 @@ export const LoginPage: React.FC = () => {
               leftIcon={<Lock className="w-5 h-5" />}
               showPasswordToggle={true}
               error={errors.password?.message}
+              value={passwordValue || ''}
               {...register('password', {
                 required: 'Password is required',
                 minLength: {
