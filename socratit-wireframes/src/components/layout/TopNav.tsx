@@ -87,7 +87,7 @@ export const TopNav: React.FC = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 mt-2 w-56 glass rounded-xl shadow-xl border border-white/20 overflow-hidden"
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden"
                   >
                     <div className="p-4 border-b border-white/10">
                       <div className="font-semibold text-slate-900">

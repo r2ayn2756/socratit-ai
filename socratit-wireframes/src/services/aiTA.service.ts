@@ -108,4 +108,16 @@ export const aiTAService = {
     });
     return response.data.data;
   },
+
+  // Get student AI conversations (teacher only)
+  getStudentConversations: async (
+    studentId: string,
+    assignmentId?: string
+  ): Promise<{ conversations: AIConversation[] }> => {
+    const params = assignmentId ? { assignmentId } : {};
+    const response = await apiClient.get(`/ai-ta/conversations`, {
+      params: { ...params, studentId },
+    });
+    return response.data.data;
+  },
 };

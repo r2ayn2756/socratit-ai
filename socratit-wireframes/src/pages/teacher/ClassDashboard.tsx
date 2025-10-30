@@ -18,6 +18,7 @@ import { CurriculumManagementModal } from '../../components/class/CurriculumMana
 import { UnitDetailsModal } from '../../components/curriculum/UnitDetailsModal';
 import { classApiService } from '../../services/classApi.service';
 import { curriculumApi } from '../../services/curriculumApi.service';
+import { classService } from '../../services/class.service';
 import type { CurriculumUnit } from '../../types/curriculum.types';
 
 interface ClassData {
@@ -26,10 +27,12 @@ interface ClassData {
   subject: string;
   gradeLevel: string;
   studentCount: number;
+  classCode?: string;
   schedule: any;
   currentUnit: any;
   upcomingUnits: any[];
   students: any[];
+  pendingEnrollments: any[];
   assignments: any[];
   progressData: any;
 }
@@ -61,9 +64,18 @@ export const ClassDashboard: React.FC = () => {
     try {
       console.log('Loading class data for ID:', classId);
 
-      // Load class info
+      // Load class info from both services to get complete data
       const classInfo = await classApiService.getClass(classId!);
       console.log('Class info loaded:', classInfo);
+
+      // Also get class info from classService to get classCode and enrollment counts
+      let classWithStats: any = null;
+      try {
+        classWithStats = await classService.getClassById(classId!);
+        console.log('Class stats loaded:', classWithStats);
+      } catch (statsError: any) {
+        console.warn('Class stats not available:', statsError);
+      }
 
       // Load students (gracefully handle if endpoint doesn't exist yet)
       let students: any[] = [];
@@ -72,6 +84,15 @@ export const ClassDashboard: React.FC = () => {
       } catch (studentError: any) {
         console.warn('Students not available:', studentError);
         // Students endpoint may not exist yet, continue without it
+      }
+
+      // Load pending enrollments
+      let pendingEnrollments: any[] = [];
+      try {
+        pendingEnrollments = await classService.getClassEnrollments(classId!, 'PENDING');
+        console.log('Pending enrollments loaded:', pendingEnrollments);
+      } catch (enrollmentError: any) {
+        console.warn('Pending enrollments not available:', enrollmentError);
       }
 
       // Load assignments (gracefully handle if endpoint doesn't exist yet)
@@ -133,10 +154,12 @@ export const ClassDashboard: React.FC = () => {
         subject: classInfo.subject || '',
         gradeLevel: classInfo.gradeLevel || '',
         studentCount: students.length,
+        classCode: classWithStats?.classCode,
         schedule,
         currentUnit,
         upcomingUnits,
         students,
+        pendingEnrollments,
         assignments,
         progressData,
       };
@@ -233,6 +256,7 @@ export const ClassDashboard: React.FC = () => {
             studentCount={classData.studentCount}
             unitCount={classData.schedule?.totalUnits || 0}
             progressPercentage={classData.schedule?.percentComplete || 0}
+            classCode={classData.classCode}
             onEdit={handleEditClass}
           />
         </motion.div>
@@ -260,6 +284,7 @@ export const ClassDashboard: React.FC = () => {
         >
           <RosterSection
             students={classData.students}
+            pendingEnrollments={classData.pendingEnrollments}
             onViewFull={() => navigate(`/teacher/classes/${classId}/roster`)}
             onAddStudent={handleAddStudent}
             onStudentClick={(student) => console.log('Student clicked:', student)}

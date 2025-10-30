@@ -15,6 +15,7 @@ interface ClassHeaderProps {
   studentCount: number;
   unitCount: number;
   progressPercentage: number;
+  classCode?: string;
   onEdit?: () => void;
 }
 
@@ -25,13 +26,14 @@ export const ClassHeader: React.FC<ClassHeaderProps> = ({
   studentCount,
   unitCount,
   progressPercentage,
+  classCode,
   onEdit,
 }) => {
   return (
     <div className="bg-white/90 backdrop-blur-2xl border border-gray-200/50 rounded-2xl p-6 shadow-lg">
       <div className="flex items-start justify-between mb-6">
         {/* Class Info */}
-        <div>
+        <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {className}
           </h1>
@@ -45,8 +47,28 @@ export const ClassHeader: React.FC<ClassHeaderProps> = ({
           </div>
         </div>
 
-        {/* Edit Button */}
-        {onEdit && (
+        {/* Class Code Display */}
+        {classCode && (
+          <div className="flex items-center gap-4">
+            <div className="text-right px-4 py-2 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">
+              <p className="text-xs text-gray-600 mb-0.5">Class Code</p>
+              <p className="text-2xl font-bold text-gray-900 tracking-wider">{classCode}</p>
+            </div>
+            {/* Edit Button */}
+            {onEdit && (
+              <Button
+                variant="secondary"
+                onClick={onEdit}
+                icon={<Edit className="w-4 h-4" />}
+              >
+                Edit Class
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Edit Button (when no class code) */}
+        {!classCode && onEdit && (
           <Button
             variant="secondary"
             onClick={onEdit}
