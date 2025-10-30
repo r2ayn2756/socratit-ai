@@ -59,7 +59,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'Curriculum', icon: FolderOpen, path: '/teacher/curriculum' },
       { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
       { label: 'Analytics', icon: BarChart3, path: '/teacher/analytics' },
-      { label: 'Settings', icon: Settings, path: '/teacher/settings' },
     ],
     student: [
       { label: 'Dashboard', icon: LayoutDashboard, path: '/student/dashboard' },
@@ -67,7 +66,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'Assignments', icon: FileText, path: '/student/assignments' },
       { label: 'Grades', icon: BarChart3, path: '/student/grades' },
       { label: 'Messages', icon: MessageSquare, path: '/student/messages', badge: unreadCount },
-      { label: 'Settings', icon: Settings, path: '/student/settings' },
     ],
     admin: [
       { label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
@@ -75,7 +73,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'Teachers', icon: GraduationCap, path: '/admin/teachers' },
       { label: 'Students', icon: Users, path: '/admin/students' },
       { label: 'Reports', icon: FileText, path: '/admin/reports' },
-      { label: 'Settings', icon: Settings, path: '/admin/settings' },
     ],
   };
 

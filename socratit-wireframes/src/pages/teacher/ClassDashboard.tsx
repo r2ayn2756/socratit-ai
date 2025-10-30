@@ -15,8 +15,10 @@ import {
   ProgressSection,
 } from '../../components/class';
 import { CurriculumManagementModal } from '../../components/class/CurriculumManagementModal';
+import { UnitDetailsModal } from '../../components/curriculum/UnitDetailsModal';
 import { classApiService } from '../../services/classApi.service';
 import { curriculumApi } from '../../services/curriculumApi.service';
+import type { CurriculumUnit } from '../../types/curriculum.types';
 
 interface ClassData {
   id: string;
@@ -40,6 +42,8 @@ export const ClassDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCurriculumModal, setShowCurriculumModal] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState<CurriculumUnit | null>(null);
+  const [showUnitDetails, setShowUnitDetails] = useState(false);
 
   useEffect(() => {
     loadClassData();
@@ -157,6 +161,11 @@ export const ClassDashboard: React.FC = () => {
     setShowCurriculumModal(true);
   };
 
+  const handleUnitClick = (unit: CurriculumUnit) => {
+    setSelectedUnit(unit);
+    setShowUnitDetails(true);
+  };
+
   const handleViewAnalytics = () => {
     navigate(`/teacher/classes/${classId}/analytics`);
   };
@@ -239,7 +248,7 @@ export const ClassDashboard: React.FC = () => {
             currentUnit={classData.currentUnit}
             upcomingUnits={classData.upcomingUnits}
             onManageClick={handleManageCurriculum}
-            onUnitClick={(unit) => console.log('Unit clicked:', unit)}
+            onUnitClick={handleUnitClick}
           />
         </motion.div>
 
