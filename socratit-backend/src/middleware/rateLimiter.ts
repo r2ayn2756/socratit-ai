@@ -22,6 +22,8 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // CRITICAL: Configure for Railway/cloud proxy
+  validate: { trustProxy: false },  // Disable trust proxy validation
   // Skip rate limiting in development if limits are very high (>= 1000)
   skip: (req) => {
     return env.NODE_ENV === 'development' && env.RATE_LIMIT_MAX_REQUESTS >= 1000;
@@ -41,6 +43,7 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },  // Disable trust proxy validation
   skipSuccessfulRequests: true, // Don't count successful requests
 });
 
@@ -57,6 +60,7 @@ export const passwordResetLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },  // Disable trust proxy validation
 });
 
 /**
@@ -72,6 +76,7 @@ export const emailVerificationLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },  // Disable trust proxy validation
 });
 
 /**
@@ -92,5 +97,6 @@ export const createRateLimiter = (options: {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { trustProxy: false },  // Disable trust proxy validation
   });
 };
