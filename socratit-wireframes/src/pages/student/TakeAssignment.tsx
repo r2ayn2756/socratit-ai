@@ -19,7 +19,7 @@ import {
   Save,
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
-import { AIHelpButton } from '../../components/ai/AIHelpButton';
+import { PersistentAIChat } from '../../components/ai/PersistentAIChat';
 
 export const TakeAssignment: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>();
@@ -404,10 +404,10 @@ export const TakeAssignment: React.FC = () => {
         </Card>
       </div>
 
-      {/* AI Help Button */}
-      <AIHelpButton
+      {/* Persistent AI Chat */}
+      <PersistentAIChat
         assignmentId={assignmentId!}
-        questionId={currentQuestion.id}
+        assignmentTitle={assignment.title}
       />
     </DashboardLayout>
   );
