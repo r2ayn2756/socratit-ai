@@ -30,6 +30,8 @@ apiClient.interceptors.request.use(
       console.log('[AXIOS] POST /classes interceptor');
       console.log('[AXIOS] Request data:', config.data);
       console.log('[AXIOS] Stringified request:', JSON.stringify(config.data, null, 2));
+      console.log('[AXIOS] Config headers:', config.headers);
+      console.log('[AXIOS] Number of keys in data:', Object.keys(config.data || {}).length);
     }
 
     return config;
@@ -96,6 +98,9 @@ export const apiService = {
 
   // POST request
   post: <T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+    console.log('[apiService.post] Called with URL:', url);
+    console.log('[apiService.post] Data before axios:', data);
+    console.log('[apiService.post] Data keys:', Object.keys(data || {}));
     return apiClient.post<T>(url, data, config);
   },
 
