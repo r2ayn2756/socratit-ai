@@ -116,7 +116,14 @@ export const LoginPage: React.FC = () => {
                 className="bg-error/10 border border-error/20 rounded-lg p-4 flex items-start gap-3"
               >
                 <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-error">{error}</p>
+                <div className="flex-1">
+                  <p className="text-sm text-error">{error}</p>
+                  {error.includes('Too many') && (
+                    <p className="text-xs text-error/80 mt-1">
+                      This is a security measure. Please wait before trying again.
+                    </p>
+                  )}
+                </div>
               </motion.div>
             )}
 

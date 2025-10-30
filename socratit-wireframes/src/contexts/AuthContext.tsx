@@ -71,6 +71,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       console.error('Login failed:', error);
+
+      // Handle rate limiting specifically
+      if (error.response?.status === 429) {
+        throw new Error('Too many login attempts. Please wait 15 minutes and try again.');
+      }
+
       const errorMessage = error.response?.data?.message || 'Invalid email or password';
       throw new Error(errorMessage);
     } finally {

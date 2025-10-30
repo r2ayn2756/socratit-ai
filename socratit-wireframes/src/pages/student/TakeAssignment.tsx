@@ -19,7 +19,7 @@ import {
   Save,
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
-import { PersistentAIChat } from '../../components/ai/PersistentAIChat';
+import { AlwaysVisibleAIChat } from '../../components/ai/AlwaysVisibleAIChat';
 
 export const TakeAssignment: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>();
@@ -213,7 +213,14 @@ export const TakeAssignment: React.FC = () => {
 
   return (
     <DashboardLayout userRole="student">
-      <div className="max-w-4xl mx-auto space-y-6">
+      {/* Always-visible AI Chat (right sidebar) */}
+      <AlwaysVisibleAIChat
+        assignmentId={assignmentId!}
+        assignmentTitle={assignment.title}
+      />
+
+      {/* Main content area (with margin for chat) */}
+      <div className="max-w-4xl mx-auto space-y-6 mr-96 pr-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -403,12 +410,6 @@ export const TakeAssignment: React.FC = () => {
           </div>
         </Card>
       </div>
-
-      {/* Persistent AI Chat */}
-      <PersistentAIChat
-        assignmentId={assignmentId!}
-        assignmentTitle={assignment.title}
-      />
     </DashboardLayout>
   );
 };
