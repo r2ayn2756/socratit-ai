@@ -103,7 +103,15 @@ export interface ProgressData {
  * Create a new class
  */
 export async function createClass(data: CreateClassRequest): Promise<ClassDetailsResponse> {
+  console.log('[API] createClass called with data:', data);
+  console.log('[API] data.curriculumMaterialId:', data.curriculumMaterialId);
+  console.log('[API] data.schoolYearStart:', data.schoolYearStart);
+  console.log('[API] data.schoolYearEnd:', data.schoolYearEnd);
+  console.log('[API] Stringified data:', JSON.stringify(data, null, 2));
+
   const response = await apiService.post<CreateClassResponse>('/classes', data);
+
+  console.log('[API] Response received:', response.data);
   return response.data.data;
 }
 

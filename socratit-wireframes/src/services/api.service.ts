@@ -25,6 +25,13 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Debug logging for POST /classes requests
+    if (config.method === 'post' && config.url === '/classes') {
+      console.log('[AXIOS] POST /classes interceptor');
+      console.log('[AXIOS] Request data:', config.data);
+      console.log('[AXIOS] Stringified request:', JSON.stringify(config.data, null, 2));
+    }
+
     return config;
   },
   (error: AxiosError) => {
@@ -42,10 +49,12 @@ apiClient.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // Unauthorized - redirect to login
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
+          // Unauthorized - redirect to login (but not if we're already on login page)
+          if (!window.location.pathname.includes('/login')) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+          }
           break;
         case 403:
           // Forbidden
@@ -54,6 +63,10 @@ apiClient.interceptors.response.use(
         case 404:
           // Not found
           console.error('Resource not found');
+          break;
+        case 429:
+          // Rate limit exceeded
+          console.error('Rate limit exceeded - too many requests');
           break;
         case 500:
           // Server error
