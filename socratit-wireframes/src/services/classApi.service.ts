@@ -14,8 +14,24 @@ export interface CreateClassRequest {
   name: string;
   subject: string;
   gradeLevel: string;
+  academicYear: string;
   description?: string;
   meetingPattern: string;
+  color?: string;
+  period?: string;
+  room?: string;
+  scheduleTime?: string;
+
+  // Curriculum schedule fields
+  curriculumMaterialId?: string;
+  schoolYearStart?: string; // ISO date string
+  schoolYearEnd?: string; // ISO date string
+  generateWithAI?: boolean;
+  aiPreferences?: {
+    targetUnits?: number;
+    pacingPreference?: 'slow' | 'standard' | 'fast';
+    focusAreas?: string[];
+  };
 }
 
 export interface CreateClassResponse {
