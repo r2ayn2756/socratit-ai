@@ -24,6 +24,8 @@ export const createClass = async (
     const schoolId = req.user!.schoolId;
     const body = req.body as CreateClassRequestBody;
 
+    console.log('[DEBUG] Raw request body:', JSON.stringify(req.body, null, 2));
+
     // Generate unique class code
     let classCode = generateClassCode();
     let isUnique = false;

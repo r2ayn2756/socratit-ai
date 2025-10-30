@@ -31,6 +31,10 @@ import seedRoutes from './routes/seed.routes';
 // Create Express application
 const app: Application = express();
 
+// Trust proxy - Required for Railway/Heroku and rate limiting to work correctly
+// This allows Express to trust the X-Forwarded-For header from the proxy
+app.set('trust proxy', true);
+
 // ============================================================================
 // MIDDLEWARE
 // ============================================================================
