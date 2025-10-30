@@ -119,6 +119,7 @@ export const LoginPage: React.FC = () => {
               type="password"
               placeholder="Enter your password"
               leftIcon={<Lock className="w-5 h-5" />}
+              showPasswordToggle={true}
               error={errors.password?.message}
               {...register('password', {
                 required: 'Password is required',

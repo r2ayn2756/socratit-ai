@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
+import { ConfirmationModal } from '../../components/shared/Modal';
 import {
   BookOpen,
   Users,
@@ -21,6 +22,9 @@ import {
   Target,
   CheckCircle,
   Loader2,
+  Trash2,
+  MoreVertical,
+  Settings,
 } from 'lucide-react';
 import { classService, ClassWithStats } from '../../services/class.service';
 import { ClassCreationWizard } from './ClassCreationWizard';
@@ -41,7 +45,10 @@ const staggerContainer = {
 
 export const TeacherClasses: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [classToDelete, setClassToDelete] = useState<ClassWithStats | null>(null);
 
   // Fetch classes from backend
   const { data: classes, isLoading, error } = useQuery({
@@ -49,10 +56,37 @@ export const TeacherClasses: React.FC = () => {
     queryFn: () => classService.getTeacherClasses(),
   });
 
+  // Delete class mutation
+  const deleteClassMutation = useMutation({
+    mutationFn: (classId: string) => classService.deleteClass(classId),
+    onSuccess: () => {
+      // Invalidate and refetch classes
+      queryClient.invalidateQueries({ queryKey: ['teacher-classes'] });
+      setDeleteConfirmOpen(false);
+      setClassToDelete(null);
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete class:', error);
+      alert(error.response?.data?.message || 'Failed to delete class. Please try again.');
+    },
+  });
+
   const handleWizardComplete = (classId: string) => {
     setShowWizard(false);
     // Navigate to the new class dashboard
     navigate(`/teacher/classes/${classId}`);
+  };
+
+  const handleDeleteClick = (classItem: ClassWithStats, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setClassToDelete(classItem);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (classToDelete) {
+      deleteClassMutation.mutate(classToDelete.id);
+    }
   };
 
   const getColorClasses = (color: string) => {
@@ -191,9 +225,19 @@ export const TeacherClasses: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-sm opacity-90">Class Code</div>
-                            <div className="text-2xl font-bold tracking-wider">{classItem.classCode}</div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <div className="text-sm opacity-90">Class Code</div>
+                              <div className="text-2xl font-bold tracking-wider">{classItem.classCode}</div>
+                            </div>
+                            <button
+                              onClick={(e) => handleDeleteClick(classItem, e)}
+                              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
+                              aria-label="Delete class"
+                              title="Delete class"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -379,6 +423,22 @@ export const TeacherClasses: React.FC = () => {
         isOpen={showWizard}
         onClose={() => setShowWizard(false)}
         onComplete={handleWizardComplete}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteConfirmOpen}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setClassToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Class"
+        message={`Are you sure you want to delete "${classToDelete?.name}"? This will permanently remove the class and all associated data including assignments, grades, and enrollments. This action cannot be undone.`}
+        confirmText="Delete Class"
+        cancelText="Cancel"
+        variant="danger"
+        isLoading={deleteClassMutation.isPending}
       />
     </>
   );
