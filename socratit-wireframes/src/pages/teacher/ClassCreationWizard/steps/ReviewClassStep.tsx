@@ -37,6 +37,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
     try {
       console.log('Starting class creation flow...');
+      console.log('[DEBUG] Full wizard state:', wizardState);
 
       // Step 1: Upload curriculum file if provided
       let curriculumMaterialId: string | undefined;
@@ -68,13 +69,26 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       }
 
       // Add curriculum schedule data if available
+      console.log('[DEBUG] Curriculum condition check:', {
+        hasCurriculumMaterialId: !!curriculumMaterialId,
+        hasSchoolYearStart: !!wizardState.schoolYearStart,
+        hasSchoolYearEnd: !!wizardState.schoolYearEnd,
+        curriculumMaterialId,
+        schoolYearStart: wizardState.schoolYearStart,
+        schoolYearEnd: wizardState.schoolYearEnd,
+        skipCurriculum: wizardState.skipCurriculum,
+      });
+
       if (curriculumMaterialId && wizardState.schoolYearStart && wizardState.schoolYearEnd) {
+        console.log('[DEBUG] Adding curriculum fields to classData');
         classData.curriculumMaterialId = curriculumMaterialId;
         classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
         classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
         classData.meetingPattern = wizardState.meetingPattern;
         classData.generateWithAI = !wizardState.skipCurriculum;
         classData.aiPreferences = wizardState.aiPreferences;
+      } else {
+        console.log('[DEBUG] Skipping curriculum fields - condition not met');
       }
 
       console.log('Creating class with data:', classData);
