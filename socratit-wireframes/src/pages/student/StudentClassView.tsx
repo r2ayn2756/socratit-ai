@@ -20,6 +20,7 @@ import { GlassCard, GlassPanel } from '../../components/curriculum/GlassCard';
 import { ProgressBar, CircularProgress } from '../../components/curriculum/ProgressBar';
 import { Timeline } from '../../components/curriculum/Timeline';
 import { Button } from '../../components/curriculum/Button';
+import { LessonsSection } from '../../components/class/LessonsSection';
 import type { CurriculumUnit } from '../../types/curriculum.types';
 import { format } from 'date-fns';
 import { classCurriculumService } from '../../services/classCurriculum.service';
@@ -392,6 +393,19 @@ export const StudentClassView: React.FC = () => {
               </ul>
             </GlassCard>
           </div>
+        </motion.div>
+
+        {/* Lessons Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <LessonsSection
+            classId={classData.classId}
+            userRole="student"
+            showRecorder={false}
+          />
         </motion.div>
       </div>
     </DashboardLayout>

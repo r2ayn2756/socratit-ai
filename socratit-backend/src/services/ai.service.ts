@@ -1292,3 +1292,164 @@ Respond ONLY with valid JSON array:`;
     return [];
   }
 }
+
+// ============================================================================
+// LESSON RECORDING & TRANSCRIPTION
+// ============================================================================
+
+interface AILessonNotesResult {
+  summary: string;
+  keyConcepts: string[];
+  actionItems: string[];
+  homework: string | null;
+  fullTranscript: string;
+}
+
+/**
+ * Process audio recording and generate structured lesson notes
+ * @param audioBuffer - Audio file buffer
+ * @param lessonContext - Context about the lesson (class name, subject, grade level)
+ * @returns Structured lesson notes with summary, key concepts, action items, and homework
+ */
+export async function generateLessonNotes(
+  audioBuffer: Buffer,
+  lessonContext: {
+    className: string;
+    subject: string;
+    gradeLevel: string;
+    lessonTitle?: string;
+  }
+): Promise<AILessonNotesResult> {
+  const startTime = Date.now();
+
+  try {
+    console.log('🎤 Processing audio for lesson notes generation...');
+    console.log('   Context:', lessonContext);
+
+    // Step 1: Transcribe audio using Gemini
+    const transcription = await transcribeAudio(audioBuffer);
+
+    if (!transcription || transcription.length === 0) {
+      throw new Error('Failed to transcribe audio - empty result');
+    }
+
+    console.log(`✅ Transcription complete (${transcription.length} chars)`);
+
+    // Step 2: Generate structured notes from transcription
+    const notes = await generateNotesFromTranscript(transcription, lessonContext);
+
+    const processingTime = Date.now() - startTime;
+    console.log(`✅ Lesson notes generated in ${processingTime}ms`);
+
+    return {
+      ...notes,
+      fullTranscript: transcription,
+    };
+  } catch (error: any) {
+    console.error('❌ Error generating lesson notes:', error);
+    throw new Error(`Failed to generate lesson notes: ${error.message}`);
+  }
+}
+
+/**
+ * Transcribe audio using Gemini's audio understanding capabilities
+ */
+async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
+  try {
+    const client = getGeminiClient();
+    const model = client.getGenerativeModel({
+      model: 'gemini-2.0-flash-exp', // Supports audio input
+    });
+
+    // Convert audio buffer to base64
+    const audioBase64 = audioBuffer.toString('base64');
+
+    // Determine mime type based on audio format (default to webm)
+    const mimeType = 'audio/webm';
+
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          mimeType,
+          data: audioBase64,
+        },
+      },
+      'Please provide a complete, accurate transcription of this audio recording. Include all spoken content, capturing the natural flow of the classroom discussion.',
+    ]);
+
+    const response = result.response;
+    return response.text();
+  } catch (error: any) {
+    console.error('Error transcribing audio:', error);
+    throw new Error(`Audio transcription failed: ${error.message}`);
+  }
+}
+
+/**
+ * Generate structured notes from transcription
+ */
+async function generateNotesFromTranscript(
+  transcript: string,
+  context: {
+    className: string;
+    subject: string;
+    gradeLevel: string;
+    lessonTitle?: string;
+  }
+): Promise<Omit<AILessonNotesResult, 'fullTranscript'>> {
+  const systemPrompt = `You are an expert educational assistant helping teachers by analyzing classroom recordings and generating structured lesson notes.
+
+Your task is to analyze the transcription of a class session and extract:
+1. A concise summary of what was taught
+2. Key concepts that were covered
+3. Action items for the teacher (follow-ups, things to review, student questions to address)
+4. Any homework assignments that were mentioned
+
+Focus on pedagogically important content. Ignore administrative announcements unless they're action items.`;
+
+  const userPrompt = `**CLASS CONTEXT:**
+- Class: ${context.className}
+- Subject: ${context.subject}
+- Grade Level: ${context.gradeLevel}
+${context.lessonTitle ? `- Lesson Title: ${context.lessonTitle}` : ''}
+
+**TRANSCRIPTION:**
+${transcript}
+
+**INSTRUCTIONS:**
+Analyze this class transcription and generate structured notes in the following JSON format:
+
+{
+  "summary": "A 2-3 sentence summary of what was taught in this lesson",
+  "keyConcepts": ["concept 1", "concept 2", "concept 3"],
+  "actionItems": ["action item 1", "action item 2"],
+  "homework": "Description of homework assignment, or null if none mentioned"
+}
+
+**GUIDELINES:**
+- Summary: Focus on the main teaching points and learning objectives
+- Key Concepts: List 3-8 specific concepts, topics, or skills covered (e.g., "quadratic equations", "photosynthesis", "characterization in literature")
+- Action Items: Things the teacher should follow up on (e.g., "Review Sarah's question about negative exponents", "Prepare additional practice problems for next class", "Grade lab reports by Friday")
+- Homework: Only include if explicitly mentioned. Be specific about what students need to do.
+
+Respond ONLY with valid JSON:`;
+
+  try {
+    const result = await callAI(systemPrompt, userPrompt, 1500);
+
+    // Validate the result
+    if (!result.summary || !Array.isArray(result.keyConcepts) || !Array.isArray(result.actionItems)) {
+      throw new Error('Invalid response structure from AI');
+    }
+
+    return {
+      summary: result.summary,
+      keyConcepts: result.keyConcepts,
+      actionItems: result.actionItems,
+      homework: result.homework || null,
+    };
+  } catch (error: any) {
+    console.error('Error generating notes from transcript:', error);
+    throw new Error(`Failed to generate notes: ${error.message}`);
+  }
+}

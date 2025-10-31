@@ -26,6 +26,7 @@ import curriculumScheduleRoutes from './routes/curriculumSchedule.routes';
 import curriculumUnitRoutes from './routes/curriculumUnit.routes';
 import uploadRoutes from './routes/upload.routes';
 import aiTARoutes from './routes/aiTA.routes';
+import lessonRoutes from './routes/lesson.routes';
 import seedRoutes from './routes/seed.routes';
 
 // Create Express application
@@ -179,6 +180,7 @@ app.use(`${API_PREFIX}/curriculum-schedules`, curriculumScheduleRoutes);
 app.use(`${API_PREFIX}/curriculum-units`, curriculumUnitRoutes);
 app.use(`${API_PREFIX}/upload`, uploadRoutes);
 app.use(`${API_PREFIX}/ai-ta`, aiTARoutes);
+app.use(`${API_PREFIX}`, lessonRoutes); // Lesson routes (includes /classes/:classId/lessons and /lessons/:lessonId)
 app.use(`${API_PREFIX}/seed`, seedRoutes); // One-time database seed endpoint
 
 // ============================================================================

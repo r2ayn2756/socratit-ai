@@ -8,3 +8,7 @@ export { CurriculumSection } from './CurriculumSection';
 export { RosterSection } from './RosterSection';
 export { AssignmentsSection } from './AssignmentsSection';
 export { ProgressSection } from './ProgressSection';
+export { LessonsSection } from './LessonsSection';
+export { AudioRecorder } from './AudioRecorder';
+export { LessonCard } from './LessonCard';
+export { LessonDetailsModal } from './LessonDetailsModal';

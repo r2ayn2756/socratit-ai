@@ -14,6 +14,7 @@ import {
   AssignmentsSection,
   ProgressSection,
 } from '../../components/class';
+import { LessonsSection } from '../../components/class/LessonsSection';
 import { CurriculumManagementModal } from '../../components/class/CurriculumManagementModal';
 import { UnitDetailsModal } from '../../components/curriculum/UnitDetailsModal';
 import { classCurriculumService } from '../../services/classCurriculum.service';
@@ -317,6 +318,19 @@ export const ClassDashboard: React.FC = () => {
             progressData={classData.progressData}
             onViewAnalytics={handleViewAnalytics}
             onStudentClick={(studentId) => console.log('Student clicked:', studentId)}
+          />
+        </motion.div>
+
+        {/* Lessons Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <LessonsSection
+            classId={classId!}
+            userRole="teacher"
+            showRecorder={true}
           />
         </motion.div>
       </div>
