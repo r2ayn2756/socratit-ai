@@ -394,7 +394,7 @@ export const StudentClassView: React.FC = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

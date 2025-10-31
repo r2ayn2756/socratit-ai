@@ -157,6 +157,9 @@ model School {
   unitProgress         UnitProgress[]
   curriculumMilestones CurriculumMilestone[]
 
+  // Lesson Recording Relations
+  lessons ClassLesson[]
+
   @@index([schoolCode])
   @@index([districtName])
   @@map("schools")
@@ -234,6 +237,9 @@ model User {
   // Curriculum Scheduling Relations
   curriculumSchedules CurriculumSchedule[] @relation("TeacherSchedules")
   unitProgress        UnitProgress[]
+
+  // Lesson Recording Relations
+  recordedLessons ClassLesson[] @relation("TeacherLessons")
 
   @@index([email])
   @@index([schoolId])
@@ -352,6 +358,9 @@ model Class {
   curriculumSchedules CurriculumSchedule[]
   unitProgress        UnitProgress[]
 
+  // Lesson Recording Relations
+  lessons ClassLesson[]
+
   @@index([schoolId])
   @@index([classCode])
   @@index([academicYear])
@@ -416,6 +425,56 @@ model ClassEnrollment {
   @@index([studentId])
   @@index([status])
   @@map("class_enrollments")
+}
+
+// ============================================================================
+// CLASS LESSON MODEL
+// Stores AI-generated notes from recorded class sessions
+// Audio is processed and discarded, only notes are retained
+// ============================================================================
+
+model ClassLesson {
+  id       String @id @default(uuid())
+  classId  String @map("class_id")
+  schoolId String @map("school_id") // For multi-tenancy
+  teacherId String @map("teacher_id") // Teacher who recorded the lesson
+
+  // Lesson Metadata
+  title       String
+  lessonDate  DateTime @map("lesson_date") // When the class session occurred
+  durationSeconds Int?  @map("duration_seconds") // Duration of original recording
+
+  // AI-Generated Content
+  summary         String  @db.Text // Brief summary of the lesson
+  keyConcepts     String[] @default([]) @map("key_concepts") // Array of key concepts covered
+  actionItems     String[] @default([]) @map("action_items") // Array of action items for teacher
+  homework        String?  @db.Text // Homework assignments mentioned
+
+  // Full Context (for teachers)
+  fullTranscript  String?  @db.Text @map("full_transcript") // Full transcription (optional)
+  teacherNotes    String?  @db.Text @map("teacher_notes") // Additional notes teacher can add
+
+  // AI Processing Metadata
+  aiModel         String?  @map("ai_model") // e.g., "gemini-pro", "gpt-4"
+  processingTime  Int?     @map("processing_time") // Milliseconds to process
+  confidenceScore Float?   @map("confidence_score") // AI confidence 0-1
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at") // Soft delete
+
+  // Relations
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  school  School @relation(fields: [schoolId], references: [id])
+  teacher User   @relation("TeacherLessons", fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@index([classId])
+  @@index([schoolId])
+  @@index([teacherId])
+  @@index([lessonDate])
+  @@index([createdAt])
+  @@map("class_lessons")
 }
 
 // ============================================================================
