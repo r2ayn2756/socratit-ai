@@ -277,11 +277,24 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Roster Section */}
+        {/* Lessons Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
+        >
+          <LessonsSection
+            classId={classId!}
+            userRole="teacher"
+            showRecorder={true}
+          />
+        </motion.div>
+
+        {/* Roster Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
         >
           <RosterSection
             students={classData.students}
@@ -296,7 +309,7 @@ export const ClassDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
         >
           <AssignmentsSection
             assignments={classData.assignments}
@@ -312,25 +325,12 @@ export const ClassDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.5 }}
         >
           <ProgressSection
             progressData={classData.progressData}
             onViewAnalytics={handleViewAnalytics}
             onStudentClick={(studentId) => console.log('Student clicked:', studentId)}
-          />
-        </motion.div>
-
-        {/* Lessons Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <LessonsSection
-            classId={classId!}
-            userRole="teacher"
-            showRecorder={true}
           />
         </motion.div>
       </div>

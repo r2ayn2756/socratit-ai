@@ -296,12 +296,25 @@ export const StudentClassView: React.FC = () => {
           </motion.div>
         )}
 
+        {/* Lessons Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <LessonsSection
+            classId={classData.classId}
+            userRole="student"
+            showRecorder={false}
+          />
+        </motion.div>
+
         {/* Upcoming Assignments */}
         {classData.upcomingAssignments.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.3 }}
           >
             <GlassPanel title="Upcoming Assignments">
               <div className="space-y-2">
@@ -336,7 +349,7 @@ export const StudentClassView: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
         >
           <div className="grid grid-cols-3 gap-4">
             {/* Strengths */}
@@ -393,19 +406,6 @@ export const StudentClassView: React.FC = () => {
               </ul>
             </GlassCard>
           </div>
-        </motion.div>
-
-        {/* Lessons Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <LessonsSection
-            classId={classData.classId}
-            userRole="student"
-            showRecorder={false}
-          />
         </motion.div>
       </div>
     </DashboardLayout>
