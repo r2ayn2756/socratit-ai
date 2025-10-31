@@ -5,7 +5,7 @@
 
 import { Request, Response } from 'express';
 import * as lessonService from '../services/lesson.service';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../types';
 
 // ============================================================================
 // LESSON ENDPOINTS
