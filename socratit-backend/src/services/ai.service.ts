@@ -804,10 +804,54 @@ export async function streamChatCompletion(
     model,
   } = options;
 
-  const provider = env.AI_PROVIDER || 'claude';
+  const provider = env.AI_PROVIDER || 'gemini';
 
   try {
-    if (provider === 'claude') {
+    if (provider === 'gemini') {
+      // Use Gemini streaming
+      const client = getGeminiClient();
+      const geminiModel = client.getGenerativeModel({
+        model: model || env.GEMINI_MODEL || 'gemini-2.0-flash-exp'
+      });
+
+      // Convert messages to Gemini format
+      const systemMessage = messages.find((m) => m.role === 'system');
+      const chatMessages = messages.filter((m) => m.role !== 'system');
+
+      // Build the prompt with system message
+      let fullPrompt = '';
+      if (systemMessage) {
+        fullPrompt = `${systemMessage.content}\n\n`;
+      }
+
+      // Add conversation history
+      for (const msg of chatMessages) {
+        fullPrompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n\n`;
+      }
+
+      const result = await geminiModel.generateContentStream(fullPrompt);
+
+      let fullResponse = '';
+      let totalTokens = 0;
+
+      for await (const chunk of result.stream) {
+        const text = chunk.text();
+        if (text) {
+          fullResponse += text;
+          totalTokens += estimateTokens(text);
+          callback.onToken(text);
+        }
+      }
+
+      const promptTokens = estimateTokens(fullPrompt);
+      const completionTokens = estimateTokens(fullResponse);
+
+      callback.onComplete(fullResponse, {
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+      });
+    } else if (provider === 'claude') {
       // Convert messages format for Claude
       const systemMessage = messages.find((m) => m.role === 'system');
       const userMessages = messages.filter((m) => m.role !== 'system');
