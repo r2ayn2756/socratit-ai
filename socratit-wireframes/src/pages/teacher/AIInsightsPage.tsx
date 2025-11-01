@@ -1,6 +1,14 @@
 // ============================================================================
 // AI INSIGHTS PAGE - Teacher View
 // Analytics dashboard for AI usage and student struggles
+//
+// ⚠️ DEPRECATION NOTICE:
+// This standalone AI Insights page has been REMOVED from the sidebar navigation.
+// AI Insights features should be integrated into individual ClassDashboard pages
+// (see: pages/teacher/ClassDashboard.tsx) to provide better class-specific context.
+//
+// This file is kept for reference and for the reusable components it contains.
+// The components in this file can be imported and used within ClassDashboard.
 // ============================================================================
 
 import React, { useState } from 'react';

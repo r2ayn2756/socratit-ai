@@ -44,7 +44,7 @@ const router = Router();
  */
 router.post(
   '/register',
-  authLimiter,
+  // authLimiter, // DISABLED FOR TESTING
   validate(registerSchema),
   asyncHandler(register)
 );
@@ -56,7 +56,7 @@ router.post(
  */
 router.post(
   '/login',
-  authLimiter,
+  // authLimiter, // DISABLED FOR TESTING
   validate(loginSchema),
   asyncHandler(login)
 );

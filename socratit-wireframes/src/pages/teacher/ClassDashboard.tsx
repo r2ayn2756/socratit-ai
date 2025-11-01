@@ -1,6 +1,14 @@
 // ============================================================================
 // CLASS DASHBOARD
 // Main dashboard view for a single class with curriculum integration
+//
+// IMPORTANT: This is the central hub for ALL class-specific features, including:
+// - ANALYTICS: Performance tracking, concept mastery, engagement metrics
+// - AI INSIGHTS: Student AI usage monitoring, common questions, struggling concepts
+//
+// Analytics and AI Insights have been REMOVED from the global sidebar navigation
+// and should be implemented as sections/tabs within this ClassDashboard component
+// to provide better class-specific context and user experience.
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';

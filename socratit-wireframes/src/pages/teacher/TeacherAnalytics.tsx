@@ -1,6 +1,14 @@
 // ============================================================================
 // TEACHER ANALYTICS PAGE - BATCH 7 COMPLETE
 // Comprehensive analytics dashboard with all Batch 7 features
+//
+// ⚠️ DEPRECATION NOTICE:
+// This standalone analytics page has been REMOVED from the sidebar navigation.
+// Analytics features should be integrated into individual ClassDashboard pages
+// (see: pages/teacher/ClassDashboard.tsx) to provide better class-specific context.
+//
+// This file is kept for reference and for the reusable components it contains.
+// The components in this file can be imported and used within ClassDashboard.
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';

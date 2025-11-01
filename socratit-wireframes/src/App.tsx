@@ -59,6 +59,10 @@ function App() {
             <Route path="/teacher/assignments/:assignmentId/edit" element={<CreateAssignment />} />
             <Route path="/teacher/assignments/:assignmentId/submissions" element={<ViewSubmissions />} />
             <Route path="/teacher/messages" element={<TeacherMessages />} />
+
+            {/* DEPRECATED ROUTES - Analytics and AI Insights removed from sidebar */}
+            {/* These routes are kept for backwards compatibility but are no longer linked from navigation */}
+            {/* TODO: Integrate these features into ClassDashboard as tabs/sections */}
             <Route path="/teacher/analytics" element={<TeacherAnalytics />} />
             <Route path="/teacher/classes/:classId/analytics" element={<TeacherAnalytics />} />
             <Route path="/teacher/ai-insights" element={<AIInsightsPage />} />

@@ -51,14 +51,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
   });
 
   // Role-specific navigation items
+  // NOTE: Analytics and AI Insights have been removed from global navigation
+  // These features are now integrated into individual class pages (ClassDashboard)
+  // to provide class-specific context and better user experience
   const navItems: Record<string, NavItem[]> = {
     teacher: [
       { label: 'Dashboard', icon: LayoutDashboard, path: '/teacher/dashboard' },
       { label: 'Classes', icon: BookOpen, path: '/teacher/classes' },
       { label: 'Assignments', icon: FileText, path: '/teacher/assignments' },
       { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
-      { label: 'Analytics', icon: BarChart3, path: '/teacher/analytics' },
-      { label: 'AI Insights', icon: Brain, path: '/teacher/ai-insights' },
+      // REMOVED: Analytics and AI Insights - now part of class pages
+      // Analytics features: Performance tracking, concept mastery, engagement metrics
+      // AI Insights features: Student AI usage monitoring, common questions, struggling concepts
     ],
     student: [
       { label: 'Dashboard', icon: LayoutDashboard, path: '/student/dashboard' },

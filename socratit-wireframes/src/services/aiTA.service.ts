@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+// Get the API URL and ensure we don't double up the /api/v1 prefix
+const rawApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 const API_PREFIX = '/api/v1';
+
+// Remove trailing /api/v1 if it exists in the environment variable
+const API_URL = rawApiUrl.endsWith('/api/v1')
+  ? rawApiUrl.slice(0, -7)  // Remove the last 7 characters ("/api/v1")
+  : rawApiUrl;
 
 // Get auth token from your auth context/store
 const getAuthToken = () => {
@@ -58,9 +64,10 @@ export interface ConversationWithMessages extends AIConversation {
 export const aiTAService = {
   // Create a new conversation
   createConversation: async (data: CreateConversationRequest): Promise<AIConversation> => {
-    console.log('🔍 DEBUG - API_URL:', API_URL);
+    console.log('🔍 DEBUG - Raw API URL from env:', rawApiUrl);
+    console.log('🔍 DEBUG - Cleaned API_URL:', API_URL);
     console.log('🔍 DEBUG - API_PREFIX:', API_PREFIX);
-    console.log('🔍 DEBUG - baseURL:', apiClient.defaults.baseURL);
+    console.log('🔍 DEBUG - Final baseURL:', apiClient.defaults.baseURL);
     console.log('🔍 DEBUG - Full URL will be:', apiClient.defaults.baseURL + '/ai-ta/conversations');
     const response = await apiClient.post('/ai-ta/conversations', data);
     return response.data.data;
