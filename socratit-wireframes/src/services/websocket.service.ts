@@ -1,6 +1,10 @@
 import io, { Socket } from 'socket.io-client';
 
-const WS_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Get the API URL and ensure we don't include /api/v1 for WebSocket
+const rawApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const WS_URL = rawApiUrl.endsWith('/api/v1')
+  ? rawApiUrl.slice(0, -7)  // Remove the /api/v1 suffix for WebSocket
+  : rawApiUrl;
 
 let socket: Socket | null = null;
 
@@ -13,7 +17,13 @@ export interface StreamCallbacks {
 
 export const websocketService = {
   connect: (authToken: string) => {
-    if (socket?.connected) return socket;
+    if (socket?.connected) {
+      console.log('WebSocket already connected');
+      return socket;
+    }
+
+    console.log('🔌 DEBUG - Connecting to WebSocket:', WS_URL);
+    console.log('🔌 DEBUG - Auth token present:', !!authToken);
 
     socket = io(WS_URL, {
       auth: { token: authToken },
@@ -21,15 +31,16 @@ export const websocketService = {
     });
 
     socket.on('connect', () => {
-      console.log('WebSocket connected');
+      console.log('✅ WebSocket connected successfully');
     });
 
     socket.on('disconnect', () => {
-      console.log('WebSocket disconnected');
+      console.log('❌ WebSocket disconnected');
     });
 
     socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error);
+      console.error('❌ WebSocket connection error:', error.message);
+      console.error('Full error:', error);
     });
 
     return socket;
