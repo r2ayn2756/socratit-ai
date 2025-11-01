@@ -64,21 +64,42 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
   // Fetch performance analytics data with error handling
   const { data: overview, isLoading: overviewLoading, error: overviewError } = useQuery({
     queryKey: ['class-overview', classId],
-    queryFn: () => getClassOverview(classId),
+    queryFn: async () => {
+      try {
+        return await getClassOverview(classId);
+      } catch (error) {
+        console.warn('Analytics overview not available:', error);
+        return undefined;
+      }
+    },
     retry: false,
     enabled: !!classId,
   });
 
   const { data: strugglingStudents = [], isLoading: strugglingLoading, error: strugglingError } = useQuery({
     queryKey: ['struggling-students', classId],
-    queryFn: () => getStrugglingStudents(classId),
+    queryFn: async () => {
+      try {
+        return await getStrugglingStudents(classId);
+      } catch (error) {
+        console.warn('Struggling students data not available:', error);
+        return [];
+      }
+    },
     retry: false,
     enabled: !!classId,
   });
 
   const { data: engagementMetrics, isLoading: engagementLoading, error: engagementError } = useQuery({
     queryKey: ['engagement-metrics', classId],
-    queryFn: () => getEngagementMetrics(classId),
+    queryFn: async () => {
+      try {
+        return await getEngagementMetrics(classId);
+      } catch (error) {
+        console.warn('Engagement metrics not available:', error);
+        return undefined;
+      }
+    },
     retry: false,
     enabled: !!classId,
   });
@@ -86,7 +107,14 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
   // Fetch AI insights data with error handling
   const { data: aiInsights, isLoading: aiInsightsLoading } = useQuery({
     queryKey: ['ai-insights', classId, periodStart, periodEnd],
-    queryFn: () => aiTAService.getClassInsights(classId, periodStart, periodEnd),
+    queryFn: async () => {
+      try {
+        return await aiTAService.getClassInsights(classId, periodStart, periodEnd);
+      } catch (error) {
+        console.warn('AI insights not available:', error);
+        return undefined;
+      }
+    },
     retry: false,
     enabled: !!classId,
   });
@@ -104,7 +132,14 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
 
   const isLoading = overviewLoading || strugglingLoading || engagementLoading;
   const hasErrors = overviewError || strugglingError || engagementError;
-  const hasAnyData = overview || strugglingStudents.length > 0 || engagementMetrics;
+
+  // Validate that overview has all required fields
+  const isValidOverview = overview &&
+    typeof overview.averageGrade === 'number' &&
+    typeof overview.passingRate === 'number' &&
+    typeof overview.averageCompletionRate === 'number';
+
+  const hasAnyData = isValidOverview || strugglingStudents.length > 0 || engagementMetrics;
 
   return (
     <>
@@ -182,7 +217,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                 ) : (
                   <>
                     {/* Class Overview */}
-                    {overview && <ClassOverview overview={overview} title="Performance Overview" />}
+                    {isValidOverview && <ClassOverview overview={overview!} title="Performance Overview" />}
 
                     {/* Two-column layout for engagement and struggling students */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
