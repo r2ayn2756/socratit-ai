@@ -12,3 +12,4 @@ export { LessonsSection } from './LessonsSection';
 export { AudioRecorder } from './AudioRecorder';
 export { LessonCard } from './LessonCard';
 export { LessonDetailsModal } from './LessonDetailsModal';
+export { ClassAnalyticsSection } from './ClassAnalyticsSection';

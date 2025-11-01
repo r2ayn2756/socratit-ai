@@ -21,6 +21,7 @@ import {
   RosterSection,
   AssignmentsSection,
   ProgressSection,
+  ClassAnalyticsSection,
 } from '../../components/class';
 import { LessonsSection } from '../../components/class/LessonsSection';
 import { CurriculumManagementModal } from '../../components/class/CurriculumManagementModal';
@@ -270,11 +271,23 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Curriculum Section */}
+        {/* Analytics Section - Performance & AI Insights */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+        >
+          <ClassAnalyticsSection
+            classId={classId!}
+            onContactStudent={(studentId) => console.log('Contact student:', studentId)}
+          />
+        </motion.div>
+
+        {/* Curriculum Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
           <CurriculumSection
             schedule={classData.schedule}
@@ -289,7 +302,7 @@ export const ClassDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3 }}
         >
           <LessonsSection
             classId={classId!}
@@ -302,7 +315,7 @@ export const ClassDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
         >
           <RosterSection
             students={classData.students}
@@ -317,7 +330,7 @@ export const ClassDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.5 }}
         >
           <AssignmentsSection
             assignments={classData.assignments}
@@ -333,7 +346,7 @@ export const ClassDashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.6 }}
         >
           <ProgressSection
             progressData={classData.progressData}
