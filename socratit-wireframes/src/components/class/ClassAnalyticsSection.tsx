@@ -8,15 +8,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import {
-  TrendingUp,
-  TrendingDown,
   Users,
-  Award,
   AlertTriangle,
   Brain,
   MessageSquare,
-  ChevronDown,
-  ChevronUp,
   Eye,
   BarChart3,
   Lightbulb,
@@ -66,26 +61,34 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
 
   const { periodStart, periodEnd } = getDateRange();
 
-  // Fetch performance analytics data
-  const { data: overview, isLoading: overviewLoading } = useQuery({
+  // Fetch performance analytics data with error handling
+  const { data: overview, isLoading: overviewLoading, error: overviewError } = useQuery({
     queryKey: ['class-overview', classId],
     queryFn: () => getClassOverview(classId),
+    retry: false,
+    enabled: !!classId,
   });
 
-  const { data: strugglingStudents = [], isLoading: strugglingLoading } = useQuery({
+  const { data: strugglingStudents = [], isLoading: strugglingLoading, error: strugglingError } = useQuery({
     queryKey: ['struggling-students', classId],
     queryFn: () => getStrugglingStudents(classId),
+    retry: false,
+    enabled: !!classId,
   });
 
-  const { data: engagementMetrics, isLoading: engagementLoading } = useQuery({
+  const { data: engagementMetrics, isLoading: engagementLoading, error: engagementError } = useQuery({
     queryKey: ['engagement-metrics', classId],
     queryFn: () => getEngagementMetrics(classId),
+    retry: false,
+    enabled: !!classId,
   });
 
-  // Fetch AI insights data
+  // Fetch AI insights data with error handling
   const { data: aiInsights, isLoading: aiInsightsLoading } = useQuery({
     queryKey: ['ai-insights', classId, periodStart, periodEnd],
     queryFn: () => aiTAService.getClassInsights(classId, periodStart, periodEnd),
+    retry: false,
+    enabled: !!classId,
   });
 
   const handleViewConversations = (studentId: string, studentName: string) => {
@@ -100,6 +103,8 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
   };
 
   const isLoading = overviewLoading || strugglingLoading || engagementLoading;
+  const hasErrors = overviewError || strugglingError || engagementError;
+  const hasAnyData = overview || strugglingStudents.length > 0 || engagementMetrics;
 
   return (
     <>
@@ -162,6 +167,17 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                       <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                       <p className="text-slate-600">Loading analytics...</p>
                     </div>
+                  </div>
+                ) : !hasAnyData || hasErrors ? (
+                  <div className="text-center py-12 bg-slate-50 rounded-xl">
+                    <BarChart3 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <h4 className="text-lg font-semibold text-slate-700 mb-2">
+                      Analytics Not Available Yet
+                    </h4>
+                    <p className="text-slate-600 max-w-md mx-auto">
+                      Performance analytics will appear here once students start submitting assignments
+                      and engaging with course materials. Check back soon!
+                    </p>
                   </div>
                 ) : (
                   <>
