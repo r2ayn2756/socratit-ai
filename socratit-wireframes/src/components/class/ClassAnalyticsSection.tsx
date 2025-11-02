@@ -187,18 +187,19 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
           </div>
         </CardHeader>
 
-        <CardContent>
-          <AnimatePresence mode="wait">
-            {/* Performance Tab */}
-            {activeTab === 'overview' && (
-              <motion.div
-                key="overview"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
+        <CardContent className="p-4">
+          <div className="max-h-[600px] overflow-y-auto">
+            <AnimatePresence mode="wait">
+              {/* Performance Tab */}
+              {activeTab === 'overview' && (
+                <motion.div
+                  key="overview"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
                 {isLoading ? (
                   <div className="py-12">
                     <LoadingSpinner size="lg" message="Loading analytics..." />
@@ -216,7 +217,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                     {isValidOverview && <ClassOverview overview={overview!} title="Performance Overview" />}
 
                     {/* Two-column layout for engagement and struggling students */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
                       {/* Engagement Metrics */}
                       {engagementMetrics && (
                         <div className="lg:col-span-2">
@@ -239,16 +240,16 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
               </motion.div>
             )}
 
-            {/* AI Insights Tab */}
-            {activeTab === 'ai-insights' && (
-              <motion.div
-                key="ai-insights"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
+              {/* AI Insights Tab */}
+              {activeTab === 'ai-insights' && (
+                <motion.div
+                  key="ai-insights"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
                 {/* Time Range Filter */}
                 <div className="flex items-center justify-between">
                   <h4 className="text-sm font-semibold text-neutral-700">
@@ -320,7 +321,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.5 }}
-                          className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border-2 border-orange-200"
+                          className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border-2 border-orange-200"
                         >
                           <div className="flex items-start gap-4">
                             <AlertTriangle className="w-6 h-6 text-orange-600 flex-shrink-0 mt-1" />
@@ -371,7 +372,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6 }}
-                        className="bg-white rounded-xl p-6 border-2 border-neutral-200"
+                        className="bg-white rounded-xl p-4 border-2 border-neutral-200"
                       >
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
@@ -427,7 +428,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
-                        className="bg-white rounded-xl p-6 border-2 border-neutral-200"
+                        className="bg-white rounded-xl p-4 border-2 border-neutral-200"
                       >
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 bg-gradient-to-br from-warning-500 to-warning-600 rounded-lg flex items-center justify-center">
@@ -490,7 +491,8 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                 )}
               </motion.div>
             )}
-          </AnimatePresence>
+            </AnimatePresence>
+          </div>
         </CardContent>
       </Card>
 

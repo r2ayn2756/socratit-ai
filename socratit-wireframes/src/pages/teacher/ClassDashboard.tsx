@@ -21,7 +21,6 @@ import {
   CurriculumSection,
   RosterSection,
   AssignmentsSection,
-  ProgressSection,
   ClassAnalyticsSection,
 } from '../../components/class';
 import { LessonsSection } from '../../components/class/LessonsSection';
@@ -249,7 +248,7 @@ export const ClassDashboard: React.FC = () => {
   return (
     <DashboardLayout userRole="teacher">
       <div className="space-y-6">
-        {/* Header */}
+        {/* Header - Full Width */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -266,7 +265,7 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Analytics Section - Performance & AI Insights */}
+        {/* Analytics Section - Full Width */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -278,77 +277,73 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Curriculum Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <CurriculumSection
-            schedule={classData.schedule}
-            currentUnit={classData.currentUnit}
-            upcomingUnits={classData.upcomingUnits}
-            onManageClick={handleManageCurriculum}
-            onUnitClick={handleUnitClick}
-          />
-        </motion.div>
+        {/* 2-Column Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - 60% width (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Curriculum Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <CurriculumSection
+                schedule={classData.schedule}
+                currentUnit={classData.currentUnit}
+                upcomingUnits={classData.upcomingUnits}
+                onManageClick={handleManageCurriculum}
+                onUnitClick={handleUnitClick}
+              />
+            </motion.div>
 
-        {/* Lessons Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <LessonsSection
-            classId={classId!}
-            userRole="teacher"
-            showRecorder={true}
-          />
-        </motion.div>
+            {/* Assignments Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <AssignmentsSection
+                assignments={classData.assignments}
+                onViewAll={() => navigate('/teacher/assignments', { state: { classId } })}
+                onCreateAssignment={handleCreateAssignment}
+                onAssignmentClick={(assignment) =>
+                  navigate(`/teacher/assignments/${assignment.id}/submissions`)
+                }
+              />
+            </motion.div>
+          </div>
 
-        {/* Roster Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <RosterSection
-            students={classData.students}
-            pendingEnrollments={classData.pendingEnrollments}
-            onViewFull={() => navigate(`/teacher/classes/${classId}/roster`)}
-            onAddStudent={handleAddStudent}
-            onStudentClick={(student) => console.log('Student clicked:', student)}
-          />
-        </motion.div>
+          {/* Right Column - 40% width (1/3) */}
+          <div className="space-y-6">
+            {/* Roster Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <RosterSection
+                students={classData.students}
+                pendingEnrollments={classData.pendingEnrollments}
+                onViewFull={() => navigate(`/teacher/classes/${classId}/roster`)}
+                onAddStudent={handleAddStudent}
+                onStudentClick={(student) => console.log('Student clicked:', student)}
+              />
+            </motion.div>
 
-        {/* Assignments Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <AssignmentsSection
-            assignments={classData.assignments}
-            onViewAll={() => navigate('/teacher/assignments', { state: { classId } })}
-            onCreateAssignment={handleCreateAssignment}
-            onAssignmentClick={(assignment) =>
-              navigate(`/teacher/assignments/${assignment.id}/submissions`)
-            }
-          />
-        </motion.div>
-
-        {/* Progress Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <ProgressSection
-            progressData={classData.progressData}
-            onViewAnalytics={handleViewAnalytics}
-            onStudentClick={(studentId) => console.log('Student clicked:', studentId)}
-          />
-        </motion.div>
+            {/* Lessons Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <LessonsSection
+                classId={classId!}
+                userRole="teacher"
+                showRecorder={true}
+              />
+            </motion.div>
+          </div>
+        </div>
       </div>
 
       {/* Curriculum Management Modal */}

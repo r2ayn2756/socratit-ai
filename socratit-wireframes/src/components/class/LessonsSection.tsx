@@ -5,7 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
+import { Card, CardHeader, CardContent } from '../common/Card';
 import { AudioRecorder } from './AudioRecorder';
 import { LessonCard } from './LessonCard';
 import { LessonDetailsModal } from './LessonDetailsModal';
@@ -29,7 +30,6 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState<ClassLesson | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -71,46 +71,33 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-4"
-    >
-      {/* Section Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-600 flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-white" />
+    <>
+      <Card variant="elevated">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/30">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900">Lesson Notes</h3>
+              <p className="text-sm text-neutral-600">
+                {lessons.length} {lessons.length === 1 ? 'lesson' : 'lessons'} recorded
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-neutral-900">Lesson Notes</h2>
-            <p className="text-sm text-neutral-600">
-              {lessons.length} {lessons.length === 1 ? 'lesson' : 'lessons'} recorded
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="p-2 rounded-lg hover:bg-neutral-100 transition-colors"
-        >
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-neutral-500" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-neutral-500" />
-          )}
-        </button>
-      </div>
+        </CardHeader>
 
-      {isExpanded && (
-        <div className="space-y-4">
+        <CardContent>
           {/* Audio Recorder (Teachers Only) */}
           {showRecorder && userRole === 'teacher' && (
-            <AudioRecorder classId={classId} onLessonCreated={handleLessonCreated} />
+            <div className="mb-6">
+              <AudioRecorder classId={classId} onLessonCreated={handleLessonCreated} />
+            </div>
           )}
 
           {/* Error State */}
           {error && (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+            <div className="p-4 rounded-xl bg-error-50 border border-error-200 text-error-700">
               {error}
             </div>
           )}
@@ -132,12 +119,13 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
                   ? 'Start recording your class sessions to automatically generate structured lesson notes.'
                   : 'Your teacher will record lessons and share notes here.'
               }
+              variant="subtle"
             />
           )}
 
           {/* Lessons Grid */}
           {!isLoading && !error && lessons.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {lessons.map((lesson) => (
                 <LessonCard
                   key={lesson.id}
@@ -147,8 +135,8 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
               ))}
             </div>
           )}
-        </div>
-      )}
+        </CardContent>
+      </Card>
 
       {/* Lesson Details Modal */}
       <LessonDetailsModal
@@ -158,6 +146,6 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
         userRole={userRole}
         onLessonUpdated={handleLessonUpdated}
       />
-    </motion.div>
+    </>
   );
 };
