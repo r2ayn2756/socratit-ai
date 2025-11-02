@@ -304,7 +304,7 @@ export const Messages: React.FC = () => {
                         <Button
                           onClick={handleSendMessage}
                           disabled={!messageInput.trim() || sendMessageMutation.isPending}
-                          leftIcon={
+                          icon={
                             sendMessageMutation.isPending ? (
                               <Loader className="w-4 h-4 animate-spin" />
                             ) : (

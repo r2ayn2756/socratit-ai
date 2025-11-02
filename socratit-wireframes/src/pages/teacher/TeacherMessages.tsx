@@ -176,7 +176,7 @@ export const TeacherMessages: React.FC = () => {
             </div>
             <Button
               onClick={() => setShowClassMessageModal(true)}
-              leftIcon={<Users className="w-4 h-4" />}
+              icon={<Users className="w-4 h-4" />}
             >
               Message Class
             </Button>
@@ -347,7 +347,7 @@ export const TeacherMessages: React.FC = () => {
                         <Button
                           onClick={handleSendMessage}
                           disabled={!messageInput.trim() || sendMessageMutation.isPending}
-                          leftIcon={
+                          icon={
                             sendMessageMutation.isPending ? (
                               <Loader className="w-4 h-4 animate-spin" />
                             ) : (
@@ -449,7 +449,7 @@ export const TeacherMessages: React.FC = () => {
                 <Button
                   onClick={handleSendClassMessage}
                   disabled={!classMessageContent.trim() || !selectedClassId || sendClassMessageMutation.isPending}
-                  leftIcon={
+                  icon={
                     sendClassMessageMutation.isPending ? (
                       <Loader className="w-4 h-4 animate-spin" />
                     ) : (

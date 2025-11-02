@@ -269,7 +269,7 @@ export const CurriculumManagement: React.FC = () => {
             <Button
               variant="ghost"
               onClick={() => handleDownload(selectedCurriculum.id, selectedCurriculum.originalFileName)}
-              leftIcon={<Download className="w-4 h-4" />}
+              icon={<Download className="w-4 h-4" />}
             >
               Download
             </Button>
@@ -279,7 +279,7 @@ export const CurriculumManagement: React.FC = () => {
                   setShowDetailsModal(false);
                   handleGenerateAssignment(selectedCurriculum.id);
                 }}
-                leftIcon={<Sparkles className="w-4 h-4" />}
+                icon={<Sparkles className="w-4 h-4" />}
               >
                 Generate Assignment
               </Button>
@@ -305,7 +305,7 @@ export const CurriculumManagement: React.FC = () => {
               Upload and manage your curriculum files for AI-powered assignment generation
             </p>
           </div>
-          <Button onClick={() => navigate('/teacher/assignments/new')} leftIcon={<Upload className="w-4 h-4" />}>
+          <Button onClick={() => navigate('/teacher/assignments/new')} icon={<Upload className="w-4 h-4" />}>
             Upload New
           </Button>
         </div>
@@ -372,7 +372,7 @@ export const CurriculumManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(curriculum)}
-                          leftIcon={<Eye className="w-4 h-4" />}
+                          icon={<Eye className="w-4 h-4" />}
                         >
                           View
                         </Button>
@@ -381,7 +381,7 @@ export const CurriculumManagement: React.FC = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleGenerateAssignment(curriculum.id)}
-                            leftIcon={<Sparkles className="w-4 h-4" />}
+                            icon={<Sparkles className="w-4 h-4" />}
                           >
                             Generate
                           </Button>
@@ -390,7 +390,7 @@ export const CurriculumManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDownload(curriculum.id, curriculum.originalFileName)}
-                          leftIcon={<Download className="w-4 h-4" />}
+                          icon={<Download className="w-4 h-4" />}
                         >
                           <span className="sr-only">Download</span>
                         </Button>
@@ -398,7 +398,7 @@ export const CurriculumManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleArchive(curriculum.id)}
-                          leftIcon={<Archive className="w-4 h-4" />}
+                          icon={<Archive className="w-4 h-4" />}
                         >
                           <span className="sr-only">Archive</span>
                         </Button>
@@ -406,7 +406,7 @@ export const CurriculumManagement: React.FC = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(curriculum.id)}
-                          leftIcon={<Trash2 className="w-4 h-4" />}
+                          icon={<Trash2 className="w-4 h-4" />}
                           disabled={deleteMutation.isPending}
                         >
                           <span className="sr-only">Delete</span>
@@ -426,7 +426,7 @@ export const CurriculumManagement: React.FC = () => {
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
                 Upload curriculum files (PDF, DOCX, TXT) to generate AI-powered assignments automatically
               </p>
-              <Button onClick={() => navigate('/teacher/assignments/new')} leftIcon={<Upload className="w-4 h-4" />}>
+              <Button onClick={() => navigate('/teacher/assignments/new')} icon={<Upload className="w-4 h-4" />}>
                 Upload Your First File
               </Button>
             </div>

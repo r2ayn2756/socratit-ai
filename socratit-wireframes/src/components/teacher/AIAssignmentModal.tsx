@@ -205,7 +205,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
           variant="ghost"
           size="sm"
           onClick={() => setStep('upload')}
-          leftIcon={<Upload className="w-4 h-4" />}
+          icon={<Upload className="w-4 h-4" />}
         >
           Upload New
         </Button>
@@ -252,7 +252,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-600 mb-4">No curriculum materials yet</p>
-          <Button onClick={() => setStep('upload')} leftIcon={<Upload className="w-4 h-4" />}>
+          <Button onClick={() => setStep('upload')} icon={<Upload className="w-4 h-4" />}>
             Upload Your First File
           </Button>
         </div>
@@ -317,7 +317,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
           <Button
             onClick={handleUpload}
             disabled={!selectedFile || !curriculumTitle || uploadMutation.isPending}
-            leftIcon={uploadMutation.isPending ? <Loader className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            icon={uploadMutation.isPending ? <Loader className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
           >
             {uploadMutation.isPending ? 'Uploading...' : 'Upload & Process'}
           </Button>
@@ -465,7 +465,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
         <Button
           onClick={handleGenerate}
           disabled={!assignmentConfig.title || !assignmentConfig.classId || generateMutation.isPending}
-          leftIcon={<Sparkles className="w-4 h-4" />}
+          icon={<Sparkles className="w-4 h-4" />}
         >
           Generate Assignment
         </Button>
