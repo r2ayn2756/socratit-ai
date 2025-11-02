@@ -8,7 +8,9 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout';
-import { StatCard, Card, Button } from '../../components/common';
+import { Card, Button } from '../../components/common';
+import { StatCard } from '../../components/common/StatCard';
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import {
   Users,
   GraduationCap,
@@ -17,7 +19,6 @@ import {
   AlertCircle,
   BarChart3,
   ArrowRight,
-  Loader,
   FileText,
 } from 'lucide-react';
 import classService from '../../services/class.service';
@@ -86,7 +87,7 @@ export const AdminDashboard: React.FC = () => {
     return (
       <DashboardLayout userRole="admin">
         <div className="flex items-center justify-center h-screen">
-          <Loader className="w-12 h-12 animate-spin text-blue-500" />
+          <LoadingSpinner size="xl" message="Loading dashboard..." />
         </div>
       </DashboardLayout>
     );
@@ -103,10 +104,10 @@ export const AdminDashboard: React.FC = () => {
         {/* Header */}
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">
               School Administration Dashboard
             </h1>
-            <p className="text-slate-600">
+            <p className="text-neutral-600">
               Overview of school performance and metrics
             </p>
           </div>
@@ -114,7 +115,8 @@ export const AdminDashboard: React.FC = () => {
           <Button
             variant="primary"
             size="lg"
-            rightIcon={<ArrowRight className="w-5 h-5" />}
+            icon={<ArrowRight className="w-5 h-5" />}
+            iconPosition="right"
           >
             View Full Reports
           </Button>
@@ -127,42 +129,38 @@ export const AdminDashboard: React.FC = () => {
         >
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Total Students"
-              value={totalStudents.toString()}
-              icon={<Users className="w-6 h-6" />}
-              color="blue"
-              subtitle="Enrolled across all classes"
+              icon={Users}
+              label="Total Students"
+              value={totalStudents}
+              color="primary"
             />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Total Teachers"
-              value={totalTeachers.toString()}
-              icon={<GraduationCap className="w-6 h-6" />}
-              color="purple"
-              subtitle={`Managing ${totalClasses} classes`}
+              icon={GraduationCap}
+              label="Total Teachers"
+              value={totalTeachers}
+              color="secondary"
             />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="School Avg Performance"
+              icon={TrendingUp}
+              label="School Avg Performance"
               value={`${avgSchoolPerformance}%`}
-              icon={<TrendingUp className="w-6 h-6" />}
-              color="green"
-              trend={avgSchoolPerformance > 75 ? { value: 5, isPositive: true } : undefined}
-              subtitle="Across all classes"
+              color="success"
+              trend={avgSchoolPerformance > 75 ? { direction: 'up', value: '+5%' } : undefined}
             />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Active Assignments"
-              value={activeAssignments.toString()}
-              icon={<FileText className="w-6 h-6" />}
-              color="orange"
-              subtitle={`${totalAssignments} total assignments`}
+              icon={FileText}
+              label="Active Assignments"
+              value={activeAssignments}
+              color="warning"
             />
           </motion.div>
         </motion.div>

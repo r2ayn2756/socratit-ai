@@ -21,6 +21,9 @@ import {
 import { Card, CardHeader, CardContent } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
+import { StatCard } from '../common/StatCard';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import { EmptyState } from '../common/EmptyState';
 import { ClassOverview } from '../analytics/ClassOverview';
 import { StrugglingStudents } from '../analytics/StrugglingStudents';
 import { EngagementMetricsDisplay } from '../analytics/EngagementMetricsDisplay';
@@ -147,23 +150,23 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/30">
                 <BarChart3 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Class Analytics & Insights</h3>
-                <p className="text-sm text-slate-600">Performance metrics and AI-powered insights</p>
+                <h3 className="text-lg font-semibold text-neutral-900">Class Analytics & Insights</h3>
+                <p className="text-sm text-neutral-600">Performance metrics and AI-powered insights</p>
               </div>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
+            <div className="flex items-center gap-2 bg-neutral-100 rounded-lg p-1">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   activeTab === 'overview'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
                 <BarChart3 className="w-4 h-4 inline mr-2" />
@@ -173,8 +176,8 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                 onClick={() => setActiveTab('ai-insights')}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   activeTab === 'ai-insights'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
                 <Brain className="w-4 h-4 inline mr-2" />
@@ -197,23 +200,16 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                 className="space-y-6"
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                      <p className="text-slate-600">Loading analytics...</p>
-                    </div>
+                  <div className="py-12">
+                    <LoadingSpinner size="lg" message="Loading analytics..." />
                   </div>
                 ) : !hasAnyData || hasErrors ? (
-                  <div className="text-center py-12 bg-slate-50 rounded-xl">
-                    <BarChart3 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-slate-700 mb-2">
-                      Analytics Not Available Yet
-                    </h4>
-                    <p className="text-slate-600 max-w-md mx-auto">
-                      Performance analytics will appear here once students start submitting assignments
-                      and engaging with course materials. Check back soon!
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={BarChart3}
+                    title="Analytics Not Available Yet"
+                    message="Performance analytics will appear here once students start submitting assignments and engaging with course materials. Check back soon!"
+                    variant="subtle"
+                  />
                 ) : (
                   <>
                     {/* Class Overview */}
@@ -255,7 +251,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
               >
                 {/* Time Range Filter */}
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-slate-700">
+                  <h4 className="text-sm font-semibold text-neutral-700">
                     Student AI Usage Insights
                   </h4>
                   <div className="flex items-center gap-2">
@@ -284,77 +280,37 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                 </div>
 
                 {aiInsightsLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                      <p className="text-slate-600">Loading AI insights...</p>
-                    </div>
+                  <div className="py-12">
+                    <LoadingSpinner size="lg" message="Loading AI insights..." />
                   </div>
                 ) : aiInsights ? (
                   <>
                     {/* Overview Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border-2 border-blue-200"
-                      >
-                        <div className="flex items-center gap-2 text-xs text-blue-700 font-medium mb-2">
-                          <Users className="w-4 h-4" />
-                          Students Using AI
-                        </div>
-                        <div className="text-3xl font-bold text-blue-900">
-                          {aiInsights.totalUniqueStudents || 0}
-                        </div>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border-2 border-purple-200"
-                      >
-                        <div className="flex items-center gap-2 text-xs text-purple-700 font-medium mb-2">
-                          <MessageSquare className="w-4 h-4" />
-                          AI Conversations
-                        </div>
-                        <div className="text-3xl font-bold text-purple-900">
-                          {aiInsights.totalConversations || 0}
-                        </div>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border-2 border-green-200"
-                      >
-                        <div className="flex items-center gap-2 text-xs text-green-700 font-medium mb-2">
-                          <CheckCircle className="w-4 h-4" />
-                          Helpfulness Rating
-                        </div>
-                        <div className="text-3xl font-bold text-green-900">
-                          {aiInsights.helpfulnessRating
-                            ? `${Math.round(aiInsights.helpfulnessRating * 100)}%`
-                            : 'N/A'}
-                        </div>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-5 border-2 border-orange-200"
-                      >
-                        <div className="flex items-center gap-2 text-xs text-orange-700 font-medium mb-2">
-                          <AlertTriangle className="w-4 h-4" />
-                          Need Intervention
-                        </div>
-                        <div className="text-3xl font-bold text-orange-900">
-                          {aiInsights.studentsNeedingIntervention?.length || 0}
-                        </div>
-                      </motion.div>
+                      <StatCard
+                        icon={Users}
+                        label="Students Using AI"
+                        value={aiInsights.totalUniqueStudents || 0}
+                        color="primary"
+                      />
+                      <StatCard
+                        icon={MessageSquare}
+                        label="AI Conversations"
+                        value={aiInsights.totalConversations || 0}
+                        color="secondary"
+                      />
+                      <StatCard
+                        icon={CheckCircle}
+                        label="Helpfulness Rating"
+                        value={aiInsights.helpfulnessRating ? `${Math.round(aiInsights.helpfulnessRating * 100)}%` : 'N/A'}
+                        color="success"
+                      />
+                      <StatCard
+                        icon={AlertTriangle}
+                        label="Need Intervention"
+                        value={aiInsights.studentsNeedingIntervention?.length || 0}
+                        color="warning"
+                      />
                     </div>
 
                     {/* Students Needing Intervention */}
@@ -383,10 +339,10 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                                     className="flex items-center justify-between p-3 bg-white rounded-lg"
                                   >
                                     <div>
-                                      <p className="font-medium text-slate-900">
+                                      <p className="font-medium text-neutral-900">
                                         {student.studentName}
                                       </p>
-                                      <p className="text-sm text-slate-600">{student.reason}</p>
+                                      <p className="text-sm text-neutral-600">{student.reason}</p>
                                     </div>
                                     <Button
                                       variant="secondary"
@@ -415,17 +371,17 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6 }}
-                        className="bg-white rounded-xl p-6 border-2 border-slate-200"
+                        className="bg-white rounded-xl p-6 border-2 border-neutral-200"
                       >
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
                             <Lightbulb className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <h4 className="text-lg font-semibold text-slate-900">
+                            <h4 className="text-lg font-semibold text-neutral-900">
                               Common Questions Asked
                             </h4>
-                            <p className="text-sm text-slate-600">
+                            <p className="text-sm text-neutral-600">
                               These topics came up frequently in student AI conversations
                             </p>
                           </div>
@@ -434,16 +390,16 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                           {aiInsights.commonQuestions.map((item: any, index: number) => (
                             <div
                               key={index}
-                              className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                              className="flex items-start gap-4 p-4 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors"
                             >
-                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <span className="text-blue-600 font-semibold text-sm">
+                              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span className="text-primary-600 font-semibold text-sm">
                                   {index + 1}
                                 </span>
                               </div>
                               <div className="flex-1">
-                                <p className="text-slate-900 font-medium mb-1">{item.question}</p>
-                                <div className="flex items-center gap-3 text-sm text-slate-500">
+                                <p className="text-neutral-900 font-medium mb-1">{item.question}</p>
+                                <div className="flex items-center gap-3 text-sm text-neutral-500">
                                   <span>{item.count} students asked</span>
                                   {item.concepts && item.concepts.length > 0 && (
                                     <>
@@ -471,33 +427,33 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
-                        className="bg-white rounded-xl p-6 border-2 border-slate-200"
+                        className="bg-white rounded-xl p-6 border-2 border-neutral-200"
                       >
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                          <div className="w-10 h-10 bg-gradient-to-br from-warning-500 to-warning-600 rounded-lg flex items-center justify-center">
                             <Target className="w-5 h-5 text-white" />
                           </div>
                           <div>
-                            <h4 className="text-lg font-semibold text-slate-900">
+                            <h4 className="text-lg font-semibold text-neutral-900">
                               Struggling Concepts
                             </h4>
-                            <p className="text-sm text-slate-600">
+                            <p className="text-sm text-neutral-600">
                               Students are having difficulty with these topics
                             </p>
                           </div>
                         </div>
                         <div className="space-y-3">
                           {aiInsights.strugglingConcepts.map((concept: any, index: number) => (
-                            <div key={index} className="p-4 bg-slate-50 rounded-lg">
+                            <div key={index} className="p-4 bg-neutral-50 rounded-lg">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="font-medium text-slate-900">{concept.concept}</span>
-                                <span className="text-sm text-slate-600">
+                                <span className="font-medium text-neutral-900">{concept.concept}</span>
+                                <span className="text-sm text-neutral-600">
                                   {concept.studentCount} students
                                 </span>
                               </div>
-                              <div className="w-full bg-slate-200 rounded-full h-2">
+                              <div className="w-full bg-neutral-200 rounded-full h-2">
                                 <div
-                                  className="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full transition-all"
+                                  className="bg-gradient-to-r from-warning-500 to-warning-600 h-2 rounded-full transition-all"
                                   style={{
                                     width: `${
                                       (concept.questionCount / aiInsights.totalMessages) * 100
@@ -505,7 +461,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                                   }}
                                 ></div>
                               </div>
-                              <p className="text-sm text-slate-500 mt-1">
+                              <p className="text-sm text-neutral-500 mt-1">
                                 {concept.questionCount} questions asked
                               </p>
                             </div>
@@ -516,28 +472,21 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
 
                     {/* No Data State */}
                     {aiInsights.totalConversations === 0 && (
-                      <div className="text-center py-12 bg-slate-50 rounded-xl">
-                        <Brain className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                        <h4 className="text-lg font-semibold text-slate-700 mb-2">
-                          No AI Usage Data Yet
-                        </h4>
-                        <p className="text-slate-600">
-                          Students haven't started using the AI assistant for this class yet. Data
-                          will appear here once they begin asking questions.
-                        </p>
-                      </div>
+                      <EmptyState
+                        icon={Brain}
+                        title="No AI Usage Data Yet"
+                        message="Students haven't started using the AI assistant for this class yet. Data will appear here once they begin asking questions."
+                        variant="subtle"
+                      />
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-12 bg-slate-50 rounded-xl">
-                    <Brain className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-slate-700 mb-2">
-                      Unable to Load AI Insights
-                    </h4>
-                    <p className="text-slate-600">
-                      There was an error loading AI insights data. Please try again later.
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={Brain}
+                    title="Unable to Load AI Insights"
+                    message="There was an error loading AI insights data. Please try again later."
+                    variant="subtle"
+                  />
                 )}
               </motion.div>
             )}

@@ -7,7 +7,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Plus, Calendar, CheckCircle, Clock } from 'lucide-react';
 import { CollapsibleSection } from './CollapsibleSection';
-import { Button } from '../curriculum/Button';
+import { Button } from '../common/Button';
+import { EmptyState } from '../common/EmptyState';
 import { format } from 'date-fns';
 
 interface Assignment {
@@ -55,7 +56,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
             variant="ghost"
             size="sm"
             onClick={onCreateAssignment}
-            icon={<Plus className="w-4 h-4" />}
+            icon={<Plus />}
           >
             Create Assignment
           </Button>
@@ -64,23 +65,20 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
     >
       <div className="space-y-3">
         {assignments.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-8 h-8 text-gray-400" />
-            </div>
-            <p className="text-gray-600 mb-4">
-              No assignments created yet
-            </p>
-            {onCreateAssignment && (
-              <Button
-                variant="primary"
-                onClick={onCreateAssignment}
-                icon={<Plus className="w-4 h-4" />}
-              >
-                Create First Assignment
-              </Button>
-            )}
-          </div>
+          <EmptyState
+            icon={FileText}
+            title="No Assignments Created Yet"
+            message="Create your first assignment to engage students with interactive learning."
+            action={
+              onCreateAssignment
+                ? {
+                    label: 'Create First Assignment',
+                    onClick: onCreateAssignment,
+                    icon: Plus,
+                  }
+                : undefined
+            }
+          />
         ) : (
           <>
             {/* Assignment List */}
@@ -97,15 +95,15 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
                     transition={{ delay: index * 0.05 }}
                     whileHover={{ x: 4 }}
                     onClick={() => onAssignmentClick?.(assignment)}
-                    className="p-4 rounded-lg bg-white/70 border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors"
+                    className="p-4 rounded-lg bg-white/70 border border-neutral-200 hover:border-primary-300 cursor-pointer transition-colors"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 mb-1">
+                        <h4 className="font-medium text-neutral-900 mb-1">
                           {assignment.title}
                         </h4>
                         {assignment.unitTitle && (
-                          <p className="text-xs text-gray-600">
+                          <p className="text-xs text-neutral-600">
                             {assignment.unitTitle}
                           </p>
                         )}
@@ -119,7 +117,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
 
                     <div className="flex items-center justify-between text-sm">
                       {/* Due Date */}
-                      <div className="flex items-center gap-1 text-gray-600">
+                      <div className="flex items-center gap-1 text-neutral-600">
                         <Calendar className="w-4 h-4" />
                         <span>Due {format(new Date(assignment.dueDate), 'MMM d')}</span>
                       </div>
@@ -146,12 +144,13 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
             {/* View All Link */}
             {assignments.length > 5 && (
               <div className="text-center pt-2">
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={onViewAll}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
                   View all {assignments.length} assignments →
-                </button>
+                </Button>
               </div>
             )}
           </>

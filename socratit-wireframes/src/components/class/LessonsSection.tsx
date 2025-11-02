@@ -9,6 +9,8 @@ import { BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { AudioRecorder } from './AudioRecorder';
 import { LessonCard } from './LessonCard';
 import { LessonDetailsModal } from './LessonDetailsModal';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import { EmptyState } from '../common/EmptyState';
 import { lessonService } from '../../services/lesson.service';
 import type { ClassLesson } from '../../types/lesson.types';
 
@@ -77,24 +79,24 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-600 flex items-center justify-center">
             <BookOpen className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Lesson Notes</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-2xl font-bold text-neutral-900">Lesson Notes</h2>
+            <p className="text-sm text-neutral-600">
               {lessons.length} {lessons.length === 1 ? 'lesson' : 'lessons'} recorded
             </p>
           </div>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg hover:bg-neutral-100 transition-colors"
         >
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
+            <ChevronUp className="w-5 h-5 text-neutral-500" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
+            <ChevronDown className="w-5 h-5 text-neutral-500" />
           )}
         </button>
       </div>
@@ -115,24 +117,22 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="py-12">
+              <LoadingSpinner size="lg" message="Loading lessons..." />
             </div>
           )}
 
           {/* Empty State */}
           {!isLoading && !error && lessons.length === 0 && (
-            <div className="bg-white/90 backdrop-blur-2xl border border-gray-200/50 rounded-2xl p-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No Lessons Yet</h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                {userRole === 'teacher'
+            <EmptyState
+              icon={BookOpen}
+              title="No Lessons Yet"
+              message={
+                userRole === 'teacher'
                   ? 'Start recording your class sessions to automatically generate structured lesson notes.'
-                  : 'Your teacher will record lessons and share notes here.'}
-              </p>
-            </div>
+                  : 'Your teacher will record lessons and share notes here.'
+              }
+            />
           )}
 
           {/* Lessons Grid */}

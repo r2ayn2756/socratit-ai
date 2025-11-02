@@ -1,87 +1,126 @@
 // ============================================================================
 // STAT CARD COMPONENT
-// Colorful statistics card with icon and metrics
+// Consistent stat/metric cards with icons and trend indicators
 // ============================================================================
 
-import React, { ReactNode } from 'react';
+import React from 'react';
+import { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '../../utils/cn';
+
+export type StatCardColor = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'neutral';
 
 export interface StatCardProps {
-  title: string;
+  icon: LucideIcon;
+  label: string;
   value: string | number;
-  icon: ReactNode;
+  color?: StatCardColor;
   trend?: {
-    value: number;
-    isPositive: boolean;
+    direction: 'up' | 'down' | 'stable';
+    value: string;
   };
-  color?: 'blue' | 'purple' | 'orange' | 'green' | 'cyan' | 'pink' | 'red';
-  subtitle?: string;
   onClick?: () => void;
+  className?: string;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
-  title,
+  icon: Icon,
+  label,
   value,
-  icon,
+  color = 'primary',
   trend,
-  color = 'blue',
-  subtitle,
   onClick,
+  className,
 }) => {
-  const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
-    orange: 'from-orange-500 to-orange-600',
-    green: 'from-green-500 to-green-600',
-    cyan: 'from-cyan-400 to-cyan-500',
-    pink: 'from-pink-500 to-pink-600',
-    red: 'from-red-500 to-red-600',
+  const colorClasses: Record<
+    StatCardColor,
+    { bg: string; border: string; icon: string; text: string; label: string }
+  > = {
+    primary: {
+      bg: 'from-primary-50 to-primary-100',
+      border: 'border-primary-200',
+      icon: 'bg-primary-500',
+      text: 'text-primary-900',
+      label: 'text-primary-700',
+    },
+    secondary: {
+      bg: 'from-secondary-50 to-secondary-100',
+      border: 'border-secondary-200',
+      icon: 'bg-secondary-500',
+      text: 'text-secondary-900',
+      label: 'text-secondary-700',
+    },
+    success: {
+      bg: 'from-green-50 to-green-100',
+      border: 'border-green-200',
+      icon: 'bg-success',
+      text: 'text-green-900',
+      label: 'text-green-700',
+    },
+    warning: {
+      bg: 'from-yellow-50 to-yellow-100',
+      border: 'border-yellow-200',
+      icon: 'bg-warning',
+      text: 'text-yellow-900',
+      label: 'text-yellow-700',
+    },
+    error: {
+      bg: 'from-red-50 to-red-100',
+      border: 'border-red-200',
+      icon: 'bg-error',
+      text: 'text-red-900',
+      label: 'text-red-700',
+    },
+    neutral: {
+      bg: 'from-neutral-50 to-neutral-100',
+      border: 'border-neutral-200',
+      icon: 'bg-neutral-500',
+      text: 'text-neutral-900',
+      label: 'text-neutral-700',
+    },
   };
 
-  return (
-    <motion.div
-      whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
-      onClick={onClick}
-      className={`
-        relative overflow-hidden rounded-2xl p-6
-        bg-gradient-to-br ${colorClasses[color]}
-        text-white shadow-lg
-        ${onClick ? 'cursor-pointer' : ''}
-        transition-shadow duration-300
-      `}
+  const colors = colorClasses[color];
+
+  const CardContent = (
+    <div
+      className={cn(
+        'p-6 rounded-xl border-2',
+        `bg-gradient-to-br ${colors.bg} ${colors.border}`,
+        onClick && 'cursor-pointer transition-all duration-200 hover:shadow-md',
+        className
+      )}
     >
-      {/* Background Pattern */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-12 -mb-12"></div>
-
-      {/* Content */}
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-4">
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-            {icon}
-          </div>
-
-          {trend && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
-              trend.isPositive ? 'bg-white/20' : 'bg-black/20'
-            }`}>
-              {trend.isPositive ? (
-                <TrendingUp className="w-4 h-4" />
-              ) : (
-                <TrendingDown className="w-4 h-4" />
-              )}
-              <span className="text-sm font-semibold">{Math.abs(trend.value)}%</span>
-            </div>
-          )}
+      {/* Icon + Label */}
+      <div className="flex items-center gap-3 mb-3">
+        <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', colors.icon)}>
+          <Icon className="w-5 h-5 text-white" />
         </div>
-
-        <div className="text-3xl font-bold mb-1">{value}</div>
-        <div className="text-white/80 text-sm font-medium">{title}</div>
-        {subtitle && (
-          <div className="text-white/60 text-xs mt-1">{subtitle}</div>
-        )}
+        <p className={cn('text-sm font-medium', colors.label)}>{label}</p>
       </div>
-    </motion.div>
+
+      {/* Value */}
+      <div className={cn('text-3xl font-bold', colors.text)}>{value}</div>
+
+      {/* Trend (optional) */}
+      {trend && (
+        <div className={cn('text-xs mt-2 flex items-center gap-1', colors.label)}>
+          {trend.direction === 'up' && <span>↑</span>}
+          {trend.direction === 'down' && <span>↓</span>}
+          {trend.direction === 'stable' && <span>→</span>}
+          <span>{trend.value}</span>
+        </div>
+      )}
+    </div>
   );
+
+  if (onClick) {
+    return (
+      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={onClick}>
+        {CardContent}
+      </motion.div>
+    );
+  }
+
+  return CardContent;
 };

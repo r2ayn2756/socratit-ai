@@ -7,7 +7,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, AlertTriangle, Award } from 'lucide-react';
 import { CollapsibleSection } from './CollapsibleSection';
-import { Button } from '../curriculum/Button';
+import { Button } from '../common/Button';
 import { CircularProgress } from '../curriculum/ProgressBar';
 
 interface ProgressData {
@@ -48,7 +48,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
   const getTrendColor = () => {
     if (progressData.averageTrend === 'up') return 'text-green-600';
     if (progressData.averageTrend === 'down') return 'text-red-600';
-    return 'text-gray-600';
+    return 'text-neutral-600';
   };
 
   return (
@@ -82,7 +82,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
 
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-lg font-semibold text-neutral-900">
                 Class Average
               </h4>
               {getTrendIcon()}
@@ -100,13 +100,13 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
           <div className="p-4 rounded-xl bg-orange-50 border border-orange-200">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-5 h-5 text-orange-600" />
-              <h4 className="font-semibold text-gray-900">
+              <h4 className="font-semibold text-neutral-900">
                 Needs Support
               </h4>
             </div>
 
             {progressData.strugglingStudents.length === 0 ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-neutral-600">
                 All students on track
               </p>
             ) : (
@@ -119,7 +119,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                     className="w-full text-left p-2 rounded-lg bg-white hover:bg-orange-100 transition-colors"
                   >
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-neutral-900 truncate">
                         {student.name}
                       </p>
                       <span className="text-sm font-semibold text-orange-600">
@@ -129,7 +129,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                   </motion.button>
                 ))}
                 {progressData.strugglingStudents.length > 3 && (
-                  <p className="text-xs text-gray-600 text-center pt-1">
+                  <p className="text-xs text-neutral-600 text-center pt-1">
                     + {progressData.strugglingStudents.length - 3} more
                   </p>
                 )}
@@ -141,13 +141,13 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
           <div className="p-4 rounded-xl bg-green-50 border border-green-200">
             <div className="flex items-center gap-2 mb-3">
               <Award className="w-5 h-5 text-green-600" />
-              <h4 className="font-semibold text-gray-900">
+              <h4 className="font-semibold text-neutral-900">
                 Top Performers
               </h4>
             </div>
 
             {progressData.topPerformers.length === 0 ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-neutral-600">
                 No data yet
               </p>
             ) : (
@@ -166,7 +166,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                             #{index + 1}
                           </span>
                         )}
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-neutral-900 truncate">
                           {student.name}
                         </p>
                       </div>
@@ -177,7 +177,7 @@ export const ProgressSection: React.FC<ProgressSectionProps> = ({
                   </motion.button>
                 ))}
                 {progressData.topPerformers.length > 3 && (
-                  <p className="text-xs text-gray-600 text-center pt-1">
+                  <p className="text-xs text-neutral-600 text-center pt-1">
                     + {progressData.topPerformers.length - 3} more
                   </p>
                 )}

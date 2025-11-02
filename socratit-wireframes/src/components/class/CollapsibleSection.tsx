@@ -35,13 +35,13 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const contentId = `${sectionId}-content`;
 
   return (
-    <div className={`bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl overflow-hidden ${className}`}>
+    <div className={`bg-white/80 backdrop-blur-xl border border-neutral-200/50 rounded-2xl overflow-hidden ${className}`}>
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`
           w-full px-6 py-4 flex items-center gap-4
-          hover:bg-gray-50/50 transition-colors duration-200
+          hover:bg-neutral-50/50 transition-colors duration-200
           ${headerClassName}
         `}
         aria-expanded={isExpanded}
@@ -50,16 +50,16 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       >
         {/* Icon */}
         {icon && (
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 flex items-center justify-center flex-shrink-0">
             {icon}
           </div>
         )}
 
         {/* Title & Subtitle */}
         <div className="flex-1 text-left">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-neutral-900">{title}</h3>
           {subtitle && (
-            <p className="text-sm text-gray-600 mt-0.5">{subtitle}</p>
+            <p className="text-sm text-neutral-600 mt-0.5">{subtitle}</p>
           )}
         </div>
 
@@ -74,7 +74,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         <motion.div
           animate={{ rotate: isExpanded ? 0 : -90 }}
           transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-          className="text-gray-400"
+          className="text-neutral-400"
         >
           <ChevronDown className="w-5 h-5" />
         </motion.div>
@@ -94,7 +94,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
               id={contentId}
               role="region"
               aria-labelledby={sectionId}
-              className={`px-6 pb-6 border-t border-gray-200/50 ${contentClassName}`}
+              className={`px-6 pb-6 border-t border-neutral-200/50 ${contentClassName}`}
             >
               <div className="pt-4">
                 {children}

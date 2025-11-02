@@ -105,7 +105,7 @@ export const LoginPage: React.FC = () => {
           <p className="text-slate-600">Sign in to your account to continue</p>
         </div>
 
-        <Card variant="glass" padding="lg">
+        <Card variant="elevated" padding="lg">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
             {/* Error Alert */}
@@ -179,7 +179,7 @@ export const LoginPage: React.FC = () => {
               variant="primary"
               size="lg"
               fullWidth
-              isLoading={isLoading}
+              loading={isLoading}
             >
               Sign In
             </Button>

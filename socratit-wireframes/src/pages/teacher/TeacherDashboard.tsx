@@ -8,7 +8,9 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout';
-import { StatCard, Card, Button, Badge } from '../../components/common';
+import { Card, Button, Badge } from '../../components/common';
+import { StatCard } from '../../components/common/StatCard';
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import {
   Users,
   FileText,
@@ -17,7 +19,6 @@ import {
   MessageSquare,
   AlertCircle,
   Plus,
-  Loader,
 } from 'lucide-react';
 import classService from '../../services/class.service';
 import { assignmentService } from '../../services/assignment.service';
@@ -134,7 +135,7 @@ export const TeacherDashboard: React.FC = () => {
     return (
       <DashboardLayout userRole="teacher">
         <div className="flex items-center justify-center h-screen">
-          <Loader className="w-12 h-12 animate-spin text-blue-500" />
+          <LoadingSpinner size="xl" message="Loading dashboard..." />
         </div>
       </DashboardLayout>
     );
@@ -151,10 +152,10 @@ export const TeacherDashboard: React.FC = () => {
         {/* Header */}
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">
               Good morning, {user?.firstName || 'Teacher'} 👋
             </h1>
-            <p className="text-slate-600">
+            <p className="text-neutral-600">
               You have {classes.length} classes and {pendingReviews} assignments to review
             </p>
           </div>
@@ -162,7 +163,8 @@ export const TeacherDashboard: React.FC = () => {
           <Button
             variant="primary"
             size="lg"
-            leftIcon={<Plus className="w-5 h-5" />}
+            icon={<Plus className="w-5 h-5" />}
+            iconPosition="left"
             onClick={() => navigate('/teacher/assignments/new')}
           >
             Create Assignment
@@ -176,41 +178,37 @@ export const TeacherDashboard: React.FC = () => {
         >
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Total Students"
-              value={totalStudents.toString()}
-              icon={<Users className="w-6 h-6" />}
-              color="blue"
-              subtitle={`Across ${classes.length} classes`}
+              icon={Users}
+              label="Total Students"
+              value={totalStudents}
+              color="primary"
             />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Pending Reviews"
-              value={pendingReviews.toString()}
-              icon={<FileText className="w-6 h-6" />}
-              color="orange"
-              subtitle="Needs grading"
+              icon={FileText}
+              label="Pending Reviews"
+              value={pendingReviews}
+              color="warning"
             />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Avg. Class Performance"
+              icon={TrendingUp}
+              label="Avg. Class Performance"
               value={`${avgPerformance}%`}
-              icon={<TrendingUp className="w-6 h-6" />}
-              color="green"
-              subtitle="Current average"
+              color="success"
             />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
             <StatCard
-              title="Active Classes"
-              value={classes.length.toString()}
-              icon={<Clock className="w-6 h-6" />}
-              color="purple"
-              subtitle="This semester"
+              icon={Clock}
+              label="Active Classes"
+              value={classes.length}
+              color="secondary"
             />
           </motion.div>
         </motion.div>
@@ -220,18 +218,19 @@ export const TeacherDashboard: React.FC = () => {
           {/* My Classes - Takes 2 columns */}
           <motion.div variants={fadeInUp} className="lg:col-span-2">
             <Card padding="none" className="overflow-hidden h-full">
-              <div className="p-6 border-b border-slate-200">
+              <div className="p-6 border-b border-neutral-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900 mb-1">
+                    <h2 className="text-xl font-bold text-neutral-900 mb-1">
                       My Classes
                     </h2>
-                    <p className="text-sm text-slate-600">Active classes</p>
+                    <p className="text-sm text-neutral-600">Active classes</p>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    rightIcon={<Plus className="w-4 h-4" />}
+                    icon={<Plus className="w-4 h-4" />}
+                    iconPosition="right"
                     onClick={() => navigate('/teacher/classes/new')}
                   >
                     Add Class
@@ -242,7 +241,7 @@ export const TeacherDashboard: React.FC = () => {
               <div className="p-6">
                 {upcomingClasses.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-slate-500 mb-4">No classes yet</p>
+                    <p className="text-neutral-500 mb-4">No classes yet</p>
                     <Button onClick={() => navigate('/teacher/classes/new')}>
                       Create Your First Class
                     </Button>
@@ -255,19 +254,19 @@ export const TeacherDashboard: React.FC = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100 hover:shadow-lg transition-all cursor-pointer"
+                        className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-neutral-50 to-neutral-100 hover:shadow-lg transition-all cursor-pointer"
                         onClick={() => navigate(`/teacher/classes/${cls.id}/roster`)}
                       >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${getClassColor(index)}-400 to-${getClassColor(index)}-600 flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
                           {cls.name?.charAt(0) || 'C'}
                         </div>
 
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-slate-900">{cls.name}</h3>
+                            <h3 className="font-semibold text-neutral-900">{cls.name}</h3>
                             <Badge variant="primary">{cls.subject || 'General'}</Badge>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-slate-600">
+                          <div className="flex items-center gap-4 text-sm text-neutral-600">
                             <span className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
                               {cls.studentCount || 0} students

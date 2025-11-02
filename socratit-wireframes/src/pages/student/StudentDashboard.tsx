@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { DashboardLayout } from '../../components/layout';
-import { StatCard, Card, Button, Badge } from '../../components/common';
+import { Card, Button, Badge } from '../../components/common';
+import { StatCard } from '../../components/common/StatCard';
 import {
   FileText,
   Clock,
@@ -201,28 +202,28 @@ export const StudentDashboard: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-4 gap-6"
         >
           <StatCard
-            icon={<FileText />}
-            title="Total Assignments"
+            icon={FileText}
+            label="Total Assignments"
             value={assignments.length}
-            color="blue"
+            color="primary"
           />
           <StatCard
-            icon={<Clock />}
-            title="In Progress"
+            icon={Clock}
+            label="In Progress"
             value={inProgress.length}
-            color="orange"
+            color="warning"
           />
           <StatCard
-            icon={<CheckCircle />}
-            title="Completed"
+            icon={CheckCircle}
+            label="Completed"
             value={completed.length}
-            color="green"
+            color="success"
           />
           <StatCard
-            icon={<TrendingUp />}
-            title="Average Grade"
+            icon={TrendingUp}
+            label="Average Grade"
             value={avgGrade ? `${avgGrade}%` : 'N/A'}
-            color="purple"
+            color="secondary"
           />
         </motion.div>
 

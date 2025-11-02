@@ -7,7 +7,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, UserPlus, Mail, BarChart, Clock, AlertCircle } from 'lucide-react';
 import { CollapsibleSection } from './CollapsibleSection';
-import { Button } from '../curriculum/Button';
+import { Button } from '../common/Button';
+import { EmptyState } from '../common/EmptyState';
 
 interface Student {
   id: string;
@@ -60,7 +61,7 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
             variant="ghost"
             size="sm"
             onClick={onAddStudent}
-            icon={<UserPlus className="w-4 h-4" />}
+            icon={<UserPlus />}
           >
             Add Student
           </Button>
@@ -117,23 +118,20 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
 
         {/* Enrolled Students Section */}
         {students.length === 0 && totalPending === 0 ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-gray-400" />
-            </div>
-            <p className="text-gray-600 mb-4">
-              No students enrolled yet
-            </p>
-            {onAddStudent && (
-              <Button
-                variant="primary"
-                onClick={onAddStudent}
-                icon={<UserPlus className="w-4 h-4" />}
-              >
-                Add First Student
-              </Button>
-            )}
-          </div>
+          <EmptyState
+            icon={Users}
+            title="No Students Enrolled Yet"
+            message="Get started by adding students to your class. They'll receive an invitation to join."
+            action={
+              onAddStudent
+                ? {
+                    label: 'Add First Student',
+                    onClick: onAddStudent,
+                    icon: UserPlus,
+                  }
+                : undefined
+            }
+          />
         ) : students.length > 0 ? (
           <>
             {totalPending > 0 && (
@@ -154,11 +152,11 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ x: 4 }}
                   onClick={() => onStudentClick?.(student)}
-                  className="p-3 rounded-lg bg-white/70 border border-gray-200 hover:border-blue-300 cursor-pointer transition-colors"
+                  className="p-3 rounded-lg bg-white/70 border border-neutral-200 hover:border-primary-300 cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     {/* Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-secondary-600 flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-semibold text-sm">
                         {student.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                       </span>
@@ -166,12 +164,12 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
+                      <p className="font-medium text-neutral-900 truncate">
                         {student.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <Mail className="w-3 h-3 text-gray-400" />
-                        <p className="text-xs text-gray-600 truncate">
+                        <Mail className="w-3 h-3 text-neutral-400" />
+                        <p className="text-xs text-neutral-600 truncate">
                           {student.email}
                         </p>
                       </div>
@@ -180,8 +178,8 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
                     {/* Score */}
                     {student.averageScore !== undefined && (
                       <div className="flex items-center gap-1 text-sm">
-                        <BarChart className="w-4 h-4 text-gray-400" />
-                        <span className="font-semibold text-gray-900">
+                        <BarChart className="w-4 h-4 text-neutral-400" />
+                        <span className="font-semibold text-neutral-900">
                           {student.averageScore}%
                         </span>
                       </div>
@@ -194,12 +192,13 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
             {/* View All Link */}
             {(students.length > 5 || totalPending > 3) && (
               <div className="text-center pt-2">
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={onViewFull}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
                   View full roster ({totalEnrolled} enrolled{totalPending > 0 ? `, ${totalPending} pending` : ''}) →
-                </button>
+                </Button>
               </div>
             )}
           </>

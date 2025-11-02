@@ -133,7 +133,8 @@ export const LandingPage: React.FC = () => {
                   variant="primary"
                   size="lg"
                   onClick={() => navigate('/signup')}
-                  rightIcon={<Sparkles className="w-5 h-5" />}
+                  icon={<Sparkles className="w-5 h-5" />}
+                  iconPosition="right"
                 >
                   Try It Now
                 </Button>
@@ -308,7 +309,7 @@ export const LandingPage: React.FC = () => {
               { icon: Users, title: '30+ students', desc: 'Need individual attention' },
             ].map((item, idx) => (
               <motion.div key={idx} variants={fadeInUp}>
-                <Card variant="neumorphism" padding="lg" className="text-center">
+                <Card variant="elevated" padding="lg" className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-brand-blue to-brand-purple rounded-2xl flex items-center justify-center">
                     <item.icon className="w-8 h-8 text-white" />
                   </div>
@@ -367,7 +368,7 @@ export const LandingPage: React.FC = () => {
               },
             ].map((item, idx) => (
               <motion.div key={idx} variants={fadeInUp}>
-                <Card variant="glass" padding="lg" className="h-full">
+                <Card variant="ghost" padding="lg" className="h-full">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-blue to-brand-purple text-white font-bold text-xl flex items-center justify-center flex-shrink-0">
                       {item.step}
@@ -517,7 +518,8 @@ export const LandingPage: React.FC = () => {
                 variant="primary"
                 size="lg"
                 onClick={() => window.open('https://calendly.com/cc283-rice/30min?month=2025-10', '_blank')}
-                rightIcon={<Calendar className="w-5 h-5" />}
+                icon={<Calendar className="w-5 h-5" />}
+                iconPosition="right"
               >
                 Book a Demo - Let's Solve These Together
               </Button>
