@@ -4,12 +4,23 @@
 // ============================================================================
 
 import { PrismaClient, MasteryLevel, TrendDirection, AlertSeverity } from '@prisma/client';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const prisma = new PrismaClient();
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+
+// Lazy initialization to prevent module-load errors
+let geminiClient: GoogleGenerativeAI | null = null;
+
+function getGeminiClient(): GoogleGenerativeAI {
+  if (!geminiClient) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey.length === 0) {
+      throw new Error('GEMINI_API_KEY environment variable is required for AI recommendations');
+    }
+    geminiClient = new GoogleGenerativeAI(apiKey);
+  }
+  return geminiClient;
+}
 
 // ============================================================================
 // INTERFACES
@@ -1157,30 +1168,40 @@ Make recommendations:
 4. Include both academic and engagement recommendations
 5. Prioritize based on intervention level`;
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert educational consultant providing personalized student intervention recommendations. Always respond with valid JSON.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 1000,
-      response_format: { type: 'json_object' },
+    // Call Gemini API
+    const client = getGeminiClient();
+    const model = client.getGenerativeModel({
+      model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.7,
+      },
     });
 
-    const response = completion.choices[0].message.content;
+    const systemPrompt = 'You are an expert educational consultant providing personalized student intervention recommendations. Always respond with valid JSON.';
+    const fullPrompt = `${systemPrompt}\n\n${prompt}`;
+
+    const result = await model.generateContent(fullPrompt);
+    const response = result.response.text();
+
     if (!response) {
-      throw new Error('No response from OpenAI');
+      throw new Error('No response from Gemini');
     }
 
-    const recommendations: RecommendationData = JSON.parse(response);
+    // Parse JSON from response (Gemini sometimes wraps in code blocks)
+    let jsonText = response.trim();
+    if (jsonText.startsWith('```json')) {
+      jsonText = jsonText.slice(7);
+    }
+    if (jsonText.startsWith('```')) {
+      jsonText = jsonText.slice(3);
+    }
+    if (jsonText.endsWith('```')) {
+      jsonText = jsonText.slice(0, -3);
+    }
+    jsonText = jsonText.trim();
+
+    const recommendations: RecommendationData = JSON.parse(jsonText);
 
     // Store recommendations in student insight
     await prisma.studentInsight.update({
