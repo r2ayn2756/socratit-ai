@@ -6,8 +6,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Clock, CheckCircle, Users, UserCheck, UserX, Flame, TrendingUp } from 'lucide-react';
-import { Card, CardHeader, CardContent } from '../common/Card';
-import { Badge } from '../common/Badge';
 import { EngagementMetrics, formatTimeSpent } from '../../types/analytics.types';
 
 interface EngagementMetricsDisplayProps {
@@ -55,38 +53,7 @@ export const EngagementMetricsDisplay: React.FC<EngagementMetricsDisplayProps> =
   };
 
   return (
-    <Card variant="elevated">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
-              <Activity className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-              <p className="text-sm text-slate-600">
-                {totalStudents} student{totalStudents !== 1 ? 's' : ''} total
-              </p>
-            </div>
-          </div>
-
-          <Badge
-            variant={
-              health.color === 'green' ? 'success' :
-              health.color === 'blue' ? 'primary' :
-              health.color === 'yellow' ? 'warning' :
-              'error'
-            }
-            size="sm"
-          >
-            <health.icon className="w-3 h-3 mr-1" />
-            {health.status}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <div className="space-y-6">
+    <div className="space-y-6">
           {/* Main Metrics Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {/* Average Time Spent */}
@@ -351,8 +318,6 @@ export const EngagementMetricsDisplay: React.FC<EngagementMetricsDisplayProps> =
               </div>
             </motion.div>
           )}
-        </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 };
