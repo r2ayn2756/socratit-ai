@@ -109,9 +109,9 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed inset-4 md:inset-8 lg:inset-16 z-50 flex items-center justify-center pointer-events-none"
           >
-            <div className="w-full max-w-4xl max-h-full overflow-hidden rounded-2xl shadow-2xl pointer-events-auto">
+            <div className="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl pointer-events-auto flex flex-col">
               {/* Glass Effect Container */}
-              <div className="bg-white/95 backdrop-blur-xl border border-white/20 shadow-lg h-full flex flex-col">
+              <div className="bg-white/95 backdrop-blur-xl border border-white/20 shadow-lg flex-1 flex flex-col min-h-0">
                 {/* Header */}
                 <div className="relative p-6 border-b border-gray-200/50">
                   <button
