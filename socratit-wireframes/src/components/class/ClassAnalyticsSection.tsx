@@ -219,25 +219,22 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                     {/* Class Overview */}
                     {isValidOverview && <ClassOverview overview={overview!} title="Performance Overview" />}
 
-                    {/* Two-column layout for engagement and struggling students */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-                      {/* Engagement Metrics */}
-                      {engagementMetrics && (
-                        <div className="lg:col-span-2">
-                          <EngagementMetricsDisplay data={engagementMetrics} />
-                        </div>
-                      )}
+                    {/* Engagement Metrics - Full Width */}
+                    {engagementMetrics && (
+                      <div className="mt-4">
+                        <EngagementMetricsDisplay data={engagementMetrics} />
+                      </div>
+                    )}
 
-                      {/* Struggling Students */}
-                      {strugglingStudents.length > 0 && (
-                        <div className="lg:col-span-1">
-                          <StrugglingStudents
-                            students={strugglingStudents}
-                            onContactStudent={handleContactStudent}
-                          />
-                        </div>
-                      )}
-                    </div>
+                    {/* Struggling Students */}
+                    {strugglingStudents.length > 0 && (
+                      <div className="mt-4">
+                        <StrugglingStudents
+                          students={strugglingStudents}
+                          onContactStudent={handleContactStudent}
+                        />
+                      </div>
+                    )}
                   </>
                 )}
               </motion.div>
