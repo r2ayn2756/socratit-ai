@@ -17,15 +17,18 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  Plus,
+  Sparkles,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { CurriculumUnit } from '../../types/curriculum.types';
+import type { CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
 
 interface UnitDetailsModalProps {
   unit: CurriculumUnit | null;
   isOpen: boolean;
   onClose: () => void;
   userRole: 'teacher' | 'student';
+  onGenerateAssignment?: (subUnit: CurriculumSubUnit) => void;
 }
 
 export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
@@ -33,9 +36,10 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
   isOpen,
   onClose,
   userRole,
+  onGenerateAssignment,
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['topics', 'objectives'])
+    new Set(['subunits', 'objectives'])
   );
 
   if (!unit) return null;
@@ -222,37 +226,102 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                     )}
                   </div>
 
-                  {/* Topics Section */}
-                  {unit.topics && unit.topics.length > 0 && (
+                  {/* Sub-Units Section - Clickable with Generate Assignment */}
+                  {unit.subUnits && unit.subUnits.length > 0 && (
                     <CollapsibleSection
-                      title="Topics Covered"
+                      title="Sub-Units & Topics"
                       icon={<BookOpen className="w-5 h-5" />}
-                      isExpanded={expandedSections.has('topics')}
-                      onToggle={() => toggleSection('topics')}
+                      isExpanded={expandedSections.has('subunits')}
+                      onToggle={() => toggleSection('subunits')}
                     >
-                      <div className="space-y-4">
-                        {(unit.topics as any[]).map((topic, idx) => (
-                          <div
-                            key={idx}
-                            className="p-4 rounded-xl bg-white/70 border border-gray-200/50"
+                      <div className="space-y-3">
+                        {unit.subUnits.map((subUnit, idx) => (
+                          <motion.div
+                            key={subUnit.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="p-4 rounded-xl bg-gradient-to-br from-white/90 to-white/70 border border-gray-200/50 hover:border-primary-300 hover:shadow-md transition-all group"
                           >
-                            <h4 className="font-semibold text-gray-900 mb-2">
-                              {topic.name}
-                            </h4>
-                            {topic.subtopics && topic.subtopics.length > 0 && (
-                              <ul className="space-y-1">
-                                {topic.subtopics.map((subtopic: string, subIdx: number) => (
-                                  <li
-                                    key={subIdx}
-                                    className="text-sm text-gray-700 flex items-start gap-2"
-                                  >
-                                    <span className="text-blue-500 mt-1">•</span>
-                                    <span>{subtopic}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="px-2 py-0.5 rounded-md bg-primary-100 text-primary-700 text-xs font-semibold">
+                                    {idx + 1}
+                                  </span>
+                                  <h4 className="font-semibold text-gray-900 text-sm">
+                                    {subUnit.name}
+                                  </h4>
+                                </div>
+                                {subUnit.description && (
+                                  <p className="text-sm text-gray-600 mt-2">
+                                    {subUnit.description}
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Generate Assignment Button - Only for Teachers */}
+                              {userRole === 'teacher' && onGenerateAssignment && (
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => onGenerateAssignment(subUnit)}
+                                  className="ml-3 px-3 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-secondary-600 text-white text-sm font-medium hover:shadow-lg transition-all flex items-center gap-2 opacity-0 group-hover:opacity-100"
+                                >
+                                  <Sparkles className="w-4 h-4" />
+                                  Generate Assignment
+                                </motion.button>
+                              )}
+                            </div>
+
+                            {/* Sub-unit Details */}
+                            <div className="mt-3 space-y-2">
+                              {/* Learning Objectives */}
+                              {subUnit.learningObjectives && subUnit.learningObjectives.length > 0 && (
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                                    Objectives
+                                  </p>
+                                  <ul className="space-y-1">
+                                    {subUnit.learningObjectives.map((obj, objIdx) => (
+                                      <li
+                                        key={objIdx}
+                                        className="text-sm text-gray-700 flex items-start gap-2"
+                                      >
+                                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                                        <span>{obj}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {/* Concepts */}
+                              {subUnit.concepts && subUnit.concepts.length > 0 && (
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                                    Key Concepts
+                                  </p>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {subUnit.concepts.map((concept, conceptIdx) => (
+                                      <span
+                                        key={conceptIdx}
+                                        className="px-2 py-1 rounded-md bg-purple-100 text-purple-700 text-xs font-medium"
+                                      >
+                                        {concept}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Estimated Hours */}
+                              <div className="flex items-center gap-1 text-xs text-gray-500 mt-2">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span>{subUnit.estimatedHours}h estimated</span>
+                              </div>
+                            </div>
+                          </motion.div>
                         ))}
                       </div>
                     </CollapsibleSection>

@@ -32,7 +32,7 @@ import { Button } from '../../components/common/Button';
 import { classCurriculumService } from '../../services/classCurriculum.service';
 import { curriculumApi } from '../../services/curriculumApi.service';
 import { classService } from '../../services/class.service';
-import type { CurriculumUnit } from '../../types/curriculum.types';
+import type { CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
 
 interface ClassData {
   id: string;
@@ -215,6 +215,20 @@ export const ClassDashboard: React.FC = () => {
     console.log('Add student');
   };
 
+  const handleGenerateAssignment = (subUnit: CurriculumSubUnit) => {
+    // Navigate to assignment creation with sub-unit context
+    navigate('/teacher/assignments/new', {
+      state: {
+        classId,
+        curriculumSubUnitId: subUnit.id,
+        subUnitName: subUnit.name,
+        subUnitDescription: subUnit.description,
+        concepts: subUnit.concepts,
+        learningObjectives: subUnit.learningObjectives,
+      },
+    });
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout userRole="teacher">
@@ -364,6 +378,7 @@ export const ClassDashboard: React.FC = () => {
           setSelectedUnit(null);
         }}
         userRole="teacher"
+        onGenerateAssignment={handleGenerateAssignment}
       />
     </DashboardLayout>
   );

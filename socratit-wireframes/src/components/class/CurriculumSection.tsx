@@ -52,6 +52,8 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
     );
   }
 
+  const allUnits = schedule.units || [];
+
   return (
     <CollapsibleSection
       title="Curriculum Schedule"
@@ -86,120 +88,99 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
           />
         </div>
 
-        {/* Current Unit Card */}
-        {currentUnit && (
-          <Card
-            hover
-            padding="md"
-            onClick={() => onUnitClick?.(currentUnit)}
-            className="border-2 border-primary-300 bg-gradient-to-br from-primary-50 to-secondary-50"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="px-2 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold">
-                  CURRENT
-                </div>
-                <h4 className="font-semibold text-neutral-900">
-                  Unit {currentUnit.unitNumber}: {currentUnit.title}
-                </h4>
-              </div>
+        {/* Condensed Unit List - All Units At a Glance */}
+        {allUnits.length > 0 && (
+          <div className="p-4 rounded-xl bg-gradient-to-br from-neutral-50 to-neutral-100/50 border border-neutral-200">
+            <h4 className="text-sm font-semibold text-neutral-700 mb-3">
+              Units Overview ({allUnits.length} total)
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {allUnits.map((unit) => {
+                const isCurrent = currentUnit?.id === unit.id;
+                return (
+                  <motion.button
+                    key={unit.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onUnitClick?.(unit)}
+                    className={`
+                      px-3 py-2 rounded-lg text-sm font-medium transition-all
+                      ${
+                        isCurrent
+                          ? 'bg-primary-500 text-white shadow-md'
+                          : 'bg-white/80 text-neutral-700 hover:bg-white hover:shadow-sm border border-neutral-200'
+                      }
+                    `}
+                  >
+                    Unit {unit.unitNumber}
+                  </motion.button>
+                );
+              })}
             </div>
-
-            <p className="text-sm text-neutral-700 mb-3 line-clamp-2">
-              {currentUnit.description}
-            </p>
-
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 text-neutral-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {format(new Date(currentUnit.startDate), 'MMM d')} -{' '}
-                    {format(new Date(currentUnit.endDate), 'MMM d')}
-                  </span>
-                </div>
-                <div className="px-2 py-1 rounded-md bg-white/70 text-neutral-700 font-medium">
-                  {currentUnit.estimatedWeeks} weeks
-                </div>
-              </div>
-
-              {currentUnit.percentComplete !== undefined && (
-                <div className="text-primary-600 font-semibold">
-                  {currentUnit.percentComplete}% complete
-                </div>
-              )}
-            </div>
-          </Card>
+          </div>
         )}
 
-        {/* Upcoming Units Preview */}
-        {upcomingUnits.length > 0 && (
+        {/* All Units - Single Column Display */}
+        {allUnits.length > 0 && (
           <div>
             <h4 className="text-sm font-semibold text-neutral-700 mb-3">
-              Upcoming Units
+              All Units
             </h4>
-            <div className="space-y-2">
-              {upcomingUnits.slice(0, 3).map((unit) => (
-                <motion.div
-                  key={unit.id}
-                  whileHover={{ x: 4 }}
-                  onClick={() => onUnitClick?.(unit)}
-                  className="p-3 rounded-lg bg-white/70 border border-neutral-200 hover:border-primary-300 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-neutral-900 text-sm">
-                        Unit {unit.unitNumber}: {unit.title}
-                      </p>
-                      <p className="text-xs text-neutral-600 mt-1">
-                        {format(new Date(unit.startDate), 'MMM d')} •{' '}
-                        {unit.estimatedWeeks} weeks
-                      </p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-neutral-400" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <div className="space-y-3">
+              {allUnits.map((unit) => {
+                const isCurrent = currentUnit?.id === unit.id;
+                const subUnitCount = unit.subUnits?.length || unit.topics?.length || 0;
 
-            {upcomingUnits.length > 3 && (
-              <p className="text-sm text-neutral-500 text-center mt-3">
-                + {upcomingUnits.length - 3} more units
-              </p>
-            )}
+                return (
+                  <Card
+                    key={unit.id}
+                    hover
+                    padding="md"
+                    onClick={() => onUnitClick?.(unit)}
+                    className={`
+                      ${isCurrent ? 'border-2 border-primary-300 bg-gradient-to-br from-primary-50 to-secondary-50' : ''}
+                    `}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {isCurrent && (
+                          <div className="px-2 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold">
+                            CURRENT
+                          </div>
+                        )}
+                        <h4 className="font-semibold text-neutral-900">
+                          Unit {unit.unitNumber}: {unit.title}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-neutral-600 mb-3 line-clamp-1">
+                      {subUnitCount} topics to cover
+                    </p>
+
+                    <div className="flex items-center gap-4 text-sm text-neutral-600">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                          {format(new Date(unit.startDate), 'MMM d')} -{' '}
+                          {format(new Date(unit.endDate), 'MMM d')}
+                        </span>
+                      </div>
+                      <div className="px-2 py-1 rounded-md bg-neutral-100 text-neutral-700 font-medium">
+                        {unit.estimatedWeeks} weeks
+                      </div>
+                      {unit.percentComplete !== undefined && (
+                        <div className="text-primary-600 font-semibold ml-auto">
+                          {unit.percentComplete}% complete
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         )}
-
-        {/* Mini Timeline Placeholder */}
-        <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-semibold text-neutral-700">
-              Year Timeline
-            </h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onManageClick}
-            >
-              View Full Timeline →
-            </Button>
-          </div>
-
-          {/* Simple visual timeline */}
-          <div className="relative h-2 bg-neutral-200 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${schedule.percentComplete}%` }}
-              transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute h-full bg-gradient-to-r from-primary-500 to-secondary-600"
-            />
-          </div>
-
-          <div className="flex justify-between mt-2 text-xs text-neutral-600">
-            <span>{format(new Date(schedule.schoolYearStart), 'MMM yyyy')}</span>
-            <span>{format(new Date(schedule.schoolYearEnd), 'MMM yyyy')}</span>
-          </div>
-        </div>
       </div>
     </CollapsibleSection>
   );
