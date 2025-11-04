@@ -64,6 +64,8 @@ export const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
   });
 
   const handleCreateAssignment = () => {
+    if (!lesson) return;
+
     if (!lesson.fullTranscript) {
       alert('This lesson does not have a transcript to generate an assignment from.');
       return;
