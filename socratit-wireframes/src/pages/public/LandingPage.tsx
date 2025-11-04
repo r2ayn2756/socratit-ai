@@ -138,13 +138,6 @@ export const LandingPage: React.FC = () => {
                 >
                   Try It Now
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  onClick={() => {}}
-                >
-                  Watch Demo
-                </Button>
               </motion.div>
             </motion.div>
 
