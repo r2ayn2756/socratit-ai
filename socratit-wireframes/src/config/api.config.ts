@@ -57,7 +57,8 @@ export const API_ENDPOINTS = {
 };
 
 // HTTP Request timeout (in milliseconds)
-export const REQUEST_TIMEOUT = 30000; // 30 seconds
+export const REQUEST_TIMEOUT = 30000; // 30 seconds - default for most requests
+export const AI_REQUEST_TIMEOUT = 120000; // 120 seconds (2 minutes) - for AI generation operations
 
 // Mock mode - NOW USING REAL BACKEND!
 export const MOCK_MODE = false;

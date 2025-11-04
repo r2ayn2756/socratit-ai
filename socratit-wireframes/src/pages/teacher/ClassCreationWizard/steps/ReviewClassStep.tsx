@@ -29,6 +29,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
   onComplete,
 }) => {
   const [isCreating, setIsCreating] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
   const handleCreate = async () => {
@@ -113,6 +114,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       let aiGenerationFailed = false;
       if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialId) {
         console.log('Starting AI schedule generation for schedule:', newClass.scheduleId);
+        setLoadingMessage('Analyzing curriculum and generating units with AI... This may take up to 2 minutes.');
+
         try {
           const aiResult = await curriculumApi.schedules.generateScheduleFromAI(
             newClass.scheduleId,
@@ -130,8 +133,16 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           console.error('AI generation failed:', aiError);
           aiGenerationFailed = true;
           const aiErrorMessage = aiError.response?.data?.message || aiError.message;
-          setError(`Class created successfully, but AI generation failed: ${aiErrorMessage || 'Unknown error'}. You can generate the curriculum later from the class dashboard. Click "Continue" to proceed to your class.`);
+
+          // Provide more helpful error message for timeout
+          if (aiErrorMessage.includes('timeout')) {
+            setError(`Class created successfully, but AI generation timed out. This usually happens with large curriculum files. You can generate the curriculum later from the class dashboard (it will work there). Click "Continue" to proceed to your class.`);
+          } else {
+            setError(`Class created successfully, but AI generation failed: ${aiErrorMessage || 'Unknown error'}. You can generate the curriculum later from the class dashboard. Click "Continue" to proceed to your class.`);
+          }
           // Don't throw - teacher can generate later
+        } finally {
+          setLoadingMessage('');
         }
       }
 
@@ -309,7 +320,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           disabled={isCreating}
           icon={!isCreating ? <Check className="w-5 h-5" /> : undefined}
         >
-          {isCreating ? 'Creating Class...' : wizardState.classId ? 'Continue to Class' : 'Create Class'}
+          {isCreating ? (loadingMessage || 'Creating Class...') : wizardState.classId ? 'Continue to Class' : 'Create Class'}
         </Button>
       </div>
     </div>
