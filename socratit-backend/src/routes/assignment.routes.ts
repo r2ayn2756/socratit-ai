@@ -15,6 +15,7 @@ import {
 import {
   createAssignment,
   generateQuiz,
+  generateAssignmentFromLesson,
   getAssignments,
   getAssignment,
   updateAssignment,
@@ -66,6 +67,14 @@ router.post(
   requireClassTeacherForAssignment,
   validateRequest(generateQuizValidator, 'body'),
   generateQuiz
+);
+
+// Generate assignment from lesson transcript
+router.post(
+  '/generate-from-lesson',
+  requireAuth,
+  aiLimiter,
+  generateAssignmentFromLesson
 );
 
 // Get all assignments (filtered by role)

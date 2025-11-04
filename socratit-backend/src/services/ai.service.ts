@@ -196,6 +196,10 @@ async function callGemini(systemPrompt: string, userPrompt: string, maxTokens: n
     const response = result.response;
     const text = response.text();
 
+    console.log('[Gemini] Response length:', text.length);
+    console.log('[Gemini] First 200 chars:', text.substring(0, 200));
+    console.log('[Gemini] Last 200 chars:', text.substring(text.length - 200));
+
     // Try to parse JSON from the response
     // Gemini sometimes wraps JSON in markdown code blocks
     let jsonText = text.trim();
@@ -210,7 +214,18 @@ async function callGemini(systemPrompt: string, userPrompt: string, maxTokens: n
     }
     jsonText = jsonText.trim();
 
-    return JSON.parse(jsonText);
+    // Check if JSON looks truncated
+    if (!jsonText.endsWith('}') && !jsonText.endsWith(']')) {
+      console.error('[Gemini] Response appears truncated. Last 500 chars:', jsonText.substring(jsonText.length - 500));
+      throw new Error('AI response was truncated. Try reducing the curriculum size or requesting fewer units.');
+    }
+
+    try {
+      return JSON.parse(jsonText);
+    } catch (parseError: any) {
+      console.error('[Gemini] JSON parse failed. Response:', jsonText);
+      throw new Error(`Invalid JSON from AI: ${parseError.message}`);
+    }
   } catch (error: any) {
     console.error('Error calling Gemini API:', error);
 
@@ -1065,11 +1080,11 @@ ${pacingPreference ? `- Pacing: ${pacingPreference}` : '- Pacing: standard'}
 ${curriculumText}
 
 **TASK:**
-Break this curriculum into logical teaching units that span the entire school year. Each unit should represent a major instructional block. Within each unit, create 3-6 sub-units that represent specific topics or lessons that will be taught sequentially.
+Break this curriculum into logical teaching units that span the entire school year. Each unit should represent a major instructional block. Within each unit, create 3-5 sub-units that represent specific topics or lessons that will be taught sequentially.
 
 **REQUIREMENTS:**
 1. **Unit Structure**: Identify ${targetUnits || '6-12'} major units that follow a logical progression
-2. **Sub-Unit Structure**: For EACH unit, break it down into 3-6 sub-units. Each sub-unit should be a teachable chunk (1-3 class periods) covering a specific concept or skill. Sub-units are what teachers will use to generate individual assignments.
+2. **Sub-Unit Structure**: For EACH unit, break it down into 3-5 sub-units. Each sub-unit should be a teachable chunk (1-3 class periods) covering a specific concept or skill. Keep descriptions brief (1 sentence max). Sub-units are what teachers will use to generate individual assignments.
 3. **Time Estimation**: Estimate weeks needed for each unit based on:
    - Content depth and complexity
    - Number of subtopics to cover
@@ -1099,9 +1114,9 @@ Break this curriculum into logical teaching units that span the entire school ye
       "description": "Clear 2-3 sentence description of what students will learn",
       "subUnits": [
         {
-          "name": "Sub-unit Name (specific topic within the unit)",
-          "description": "1-2 sentence description of this specific sub-unit",
-          "concepts": ["specific concept 1", "specific concept 2"],
+          "name": "Sub-unit Name",
+          "description": "Brief 1-sentence description",
+          "concepts": ["concept1", "concept2"],
           "learningObjectives": ["Students will be able to...", "Students will understand..."],
           "estimatedHours": 2.5,
           "orderIndex": 1
@@ -1139,12 +1154,15 @@ Break this curriculum into logical teaching units that span the entire school ye
 - Total estimated weeks should be close to ${totalWeeks} (leave 2-4 weeks buffer for review/testing)
 - Difficulty progression should feel natural
 - Each unit should be substantial enough to warrant the time allocated
+- KEEP ALL DESCRIPTIONS CONCISE - 1 sentence max for sub-units, 2-3 sentences for units
+- Limit learning objectives to 2-3 per sub-unit to stay within token limits
 - Respond ONLY with valid JSON, no other text
 
 Generate the schedule now:`;
 
   try {
-    const result = await callAI(systemPrompt, userPrompt, 4000) as AIScheduleGenerationResult;
+    // Increased to 8000 tokens to accommodate sub-units structure (3-6 sub-units per unit with details)
+    const result = await callAI(systemPrompt, userPrompt, 8000) as AIScheduleGenerationResult;
 
     // Validate the response
     if (!result.units || !Array.isArray(result.units) || result.units.length === 0) {

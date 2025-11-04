@@ -198,6 +198,19 @@ class AssignmentService {
     return response.data.data;
   }
 
+  async generateAssignmentFromLesson(data: {
+    lessonId: string;
+    numQuestions?: number;
+    difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
+    assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+  }): Promise<Assignment> {
+    const response = await apiService.post<{ success: boolean; data: Assignment }>(
+      '/assignments/generate-from-lesson',
+      data
+    );
+    return response.data.data;
+  }
+
   async getAssignments(params?: {
     classId?: string;
     status?: string;

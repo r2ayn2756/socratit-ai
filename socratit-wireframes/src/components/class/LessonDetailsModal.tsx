@@ -5,6 +5,8 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import {
   X,
   Calendar,
@@ -14,10 +16,13 @@ import {
   FileText,
   Edit2,
   Save,
+  Sparkles,
+  Loader,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { ClassLesson } from '../../types/lesson.types';
 import { lessonService } from '../../services/lesson.service';
+import { assignmentService } from '../../services/assignment.service';
 
 interface LessonDetailsModalProps {
   lesson: ClassLesson | null;
@@ -34,9 +39,40 @@ export const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
   userRole,
   onLessonUpdated,
 }) => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [teacherNotes, setTeacherNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Mutation for generating assignment from lesson
+  const generateAssignmentMutation = useMutation({
+    mutationFn: (lessonId: string) =>
+      assignmentService.generateAssignmentFromLesson({
+        lessonId,
+        numQuestions: 10,
+        difficulty: 'mixed',
+        assignmentType: 'QUIZ',
+      }),
+    onSuccess: (assignment) => {
+      // Navigate to the edit page for the generated assignment
+      navigate(`/teacher/assignments/${assignment.id}/edit`);
+    },
+    onError: (error: any) => {
+      console.error('Failed to generate assignment:', error);
+      alert(error.response?.data?.message || 'Failed to generate assignment from lesson. Please try again.');
+    },
+  });
+
+  const handleCreateAssignment = () => {
+    if (!lesson.fullTranscript) {
+      alert('This lesson does not have a transcript to generate an assignment from.');
+      return;
+    }
+
+    if (window.confirm('Generate an assignment from this lesson? This will create a quiz with multiple choice questions based on the lesson content.')) {
+      generateAssignmentMutation.mutate(lesson.id);
+    }
+  };
 
   if (!lesson) return null;
 
@@ -245,10 +281,33 @@ export const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+              <div className="flex items-center justify-between p-6 border-t border-gray-200">
+                {/* Create Assignment Button (Teachers Only) */}
+                {userRole === 'teacher' && lesson.fullTranscript && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleCreateAssignment}
+                    disabled={generateAssignmentMutation.isPending}
+                    className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {generateAssignmentMutation.isPending ? (
+                      <>
+                        <Loader className="w-5 h-5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5" />
+                        Create Assignment
+                      </>
+                    )}
+                  </motion.button>
+                )}
+
                 <button
                   onClick={onClose}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors ml-auto"
                 >
                   Close
                 </button>

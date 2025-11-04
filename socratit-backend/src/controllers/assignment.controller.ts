@@ -288,6 +288,172 @@ export async function generateQuiz(req: AuthenticatedRequest, res: Response): Pr
 }
 
 // ============================================================================
+// GENERATE ASSIGNMENT FROM LESSON
+// POST /api/v1/assignments/generate-from-lesson
+// ============================================================================
+
+export async function generateAssignmentFromLesson(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const user = req.user as UserPayload;
+    const {
+      lessonId,
+      numQuestions,
+      difficulty,
+      assignmentType,
+    } = req.body;
+
+    // Check if AI is configured
+    if (!isOpenAIConfigured()) {
+      res.status(503).json({
+        success: false,
+        message: 'AI quiz generation is not available. AI API key is not configured.',
+      });
+      return;
+    }
+
+    // Fetch the lesson with transcript
+    const lesson = await prisma.classLesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        class: {
+          select: {
+            id: true,
+            name: true,
+            subject: true,
+            gradeLevel: true,
+          },
+        },
+      },
+    });
+
+    if (!lesson) {
+      res.status(404).json({
+        success: false,
+        message: 'Lesson not found',
+      });
+      return;
+    }
+
+    // Verify teacher has access to this lesson/class
+    const classTeacher = await prisma.classTeacher.findFirst({
+      where: {
+        classId: lesson.classId,
+        teacherId: user.id,
+      },
+    });
+
+    if (!classTeacher) {
+      res.status(403).json({
+        success: false,
+        message: 'You do not have permission to create assignments for this class',
+      });
+      return;
+    }
+
+    // Check if lesson has a transcript
+    if (!lesson.fullTranscript) {
+      res.status(400).json({
+        success: false,
+        message: 'This lesson does not have a transcript to generate an assignment from',
+      });
+      return;
+    }
+
+    // Generate quiz using AI from the lesson transcript
+    const quizResult = await generateQuizFromCurriculum(lesson.fullTranscript, {
+      assignmentType: assignmentType || 'QUIZ',
+      numQuestions: numQuestions || 10,
+      questionTypes: ['MULTIPLE_CHOICE'],
+      difficulty: difficulty || 'mixed',
+      subject: lesson.class.subject || undefined,
+      gradeLevel: lesson.class.gradeLevel || undefined,
+    });
+
+    // Create assignment as draft with AI-generated questions
+    const assignment = await prisma.assignment.create({
+      data: {
+        classId: lesson.classId,
+        schoolId: user.schoolId,
+        createdBy: user.id,
+        title: quizResult.title,
+        description: quizResult.description || `Assignment based on lesson: ${lesson.title}`,
+        type: (assignmentType || 'QUIZ') as AssignmentType,
+        totalPoints: quizResult.totalPoints,
+        timeLimit: quizResult.estimatedTimeMinutes,
+        aiGenerated: true,
+        aiPrompt: `Lesson: ${lesson.title}`,
+        curriculumSource: lesson.summary.substring(0, 500), // Store summary as source
+        status: AssignmentStatus.DRAFT,
+        questions: {
+          create: quizResult.questions.map((q, index) => ({
+            type: q.type,
+            questionText: q.questionText,
+            questionOrder: index + 1,
+            points: q.points,
+            optionA: q.options?.[0]?.text,
+            optionB: q.options?.[1]?.text,
+            optionC: q.options?.[2]?.text,
+            optionD: q.options?.[3]?.text,
+            correctOption: q.correctOption,
+            correctAnswer: q.correctAnswer,
+            rubric: q.rubric,
+            explanation: q.explanation,
+            concept: q.concept,
+            difficulty: q.difficulty,
+            aiGenerated: true,
+          })),
+        },
+      },
+      include: {
+        questions: {
+          orderBy: {
+            questionOrder: 'asc',
+          },
+        },
+        class: {
+          select: {
+            id: true,
+            name: true,
+            subject: true,
+            color: true,
+          },
+        },
+      },
+    });
+
+    // Create audit log
+    await createAuditLog({
+      userId: user.id,
+      schoolId: user.schoolId,
+      action: 'AI_GENERATE_ASSIGNMENT_FROM_LESSON',
+      resourceType: 'assignment',
+      resourceId: assignment.id,
+      ipAddress: req.ip || 'unknown',
+      userAgent: req.get('user-agent'),
+      metadata: {
+        lessonId,
+        classId: lesson.classId,
+        numQuestions,
+        assignmentType,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: assignment,
+      message: 'Assignment generated successfully from lesson',
+    });
+  } catch (error: any) {
+    console.error('Error generating assignment from lesson:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate assignment from lesson',
+      errors: [error.message],
+    });
+  }
+}
+
+// ============================================================================
 // GET ASSIGNMENTS
 // GET /api/v1/assignments
 // ============================================================================
