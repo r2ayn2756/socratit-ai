@@ -107,11 +107,11 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-4 md:inset-8 lg:inset-16 z-50 flex items-center justify-center pointer-events-none"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 lg:p-16 pointer-events-none"
           >
-            <div className="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl pointer-events-auto flex flex-col">
+            <div className="w-full max-w-4xl max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-8rem)] overflow-hidden rounded-2xl shadow-2xl pointer-events-auto flex flex-col">
               {/* Glass Effect Container */}
-              <div className="bg-white/95 backdrop-blur-xl border border-white/20 shadow-lg flex-1 flex flex-col min-h-0">
+              <div className="bg-white/95 backdrop-blur-xl border border-white/20 shadow-lg flex-1 flex flex-col min-h-0 overflow-hidden">
                 {/* Header */}
                 <div className="relative p-6 border-b border-gray-200/50">
                   <button
