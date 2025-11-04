@@ -45,6 +45,13 @@ const aiLimiter = createRateLimiter({
   message: 'Too many AI generation requests. Please try again later.',
 });
 
+// More lenient limiter for lesson-based generation (teachers testing the feature)
+const lessonAILimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Allow more requests for lesson-based generation
+  message: 'Too many lesson-based assignment generation requests. Please try again in a few minutes.',
+});
+
 // ============================================================================
 // ASSIGNMENT CRUD ROUTES
 // ============================================================================
@@ -73,7 +80,7 @@ router.post(
 router.post(
   '/generate-from-lesson',
   requireAuth,
-  aiLimiter,
+  lessonAILimiter,
   generateAssignmentFromLesson
 );
 

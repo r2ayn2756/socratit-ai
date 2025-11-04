@@ -59,7 +59,21 @@ export const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
     },
     onError: (error: any) => {
       console.error('Failed to generate assignment:', error);
-      alert(error.response?.data?.message || 'Failed to generate assignment from lesson. Please try again.');
+
+      // Extract error message from response
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to generate assignment from lesson. Please try again.';
+      const statusCode = error.response?.status;
+
+      // Show user-friendly error message
+      if (statusCode === 429) {
+        alert('⏳ Rate limit reached. Please wait a few minutes before generating another assignment.\n\nThis helps ensure fair usage of AI resources.');
+      } else if (statusCode === 503) {
+        alert('⚠️ AI service is temporarily unavailable. Please try again later or contact support if the issue persists.');
+      } else if (statusCode === 400) {
+        alert(`❌ ${errorMessage}`);
+      } else {
+        alert(`❌ ${errorMessage}\n\nIf this problem continues, please contact support.`);
+      }
     },
   });
 

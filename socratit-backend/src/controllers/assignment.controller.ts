@@ -445,9 +445,25 @@ export async function generateAssignmentFromLesson(req: AuthenticatedRequest, re
     });
   } catch (error: any) {
     console.error('Error generating assignment from lesson:', error);
-    res.status(500).json({
+
+    // Check for specific error types
+    let statusCode = 500;
+    let message = 'Failed to generate assignment from lesson';
+
+    if (error.message?.includes('rate limit') || error.message?.includes('quota')) {
+      statusCode = 429;
+      message = 'AI service rate limit exceeded. Please wait a moment and try again.';
+    } else if (error.message?.includes('API key')) {
+      statusCode = 503;
+      message = 'AI service is not properly configured. Please contact support.';
+    } else if (error.message?.includes('transcript')) {
+      statusCode = 400;
+      message = error.message;
+    }
+
+    res.status(statusCode).json({
       success: false,
-      message: 'Failed to generate assignment from lesson',
+      message,
       errors: [error.message],
     });
   }
