@@ -149,7 +149,7 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 modal-scroll">
                   {/* Quick Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {/* Duration */}
