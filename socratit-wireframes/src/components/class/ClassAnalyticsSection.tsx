@@ -192,8 +192,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
         </CardHeader>
 
         <CardContent className="p-4">
-          <div className="max-h-[600px] overflow-y-auto">
-            <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait">
               {/* Performance Tab */}
               {activeTab === 'overview' && (
                 <motion.div
@@ -495,8 +494,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
                 )}
               </motion.div>
             )}
-            </AnimatePresence>
-          </div>
+          </AnimatePresence>
         </CardContent>
       </Card>
 
