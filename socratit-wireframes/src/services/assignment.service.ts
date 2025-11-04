@@ -194,7 +194,11 @@ class AssignmentService {
   }
 
   async generateQuiz(data: GenerateQuizDTO): Promise<Assignment> {
-    const response = await apiService.post<{ success: boolean; data: Assignment }>('/assignments/generate', data);
+    const response = await apiService.post<{ success: boolean; data: Assignment }>(
+      '/assignments/generate',
+      data,
+      { timeout: 180000 } // 3 minutes for AI quiz generation
+    );
     return response.data.data;
   }
 
@@ -206,7 +210,8 @@ class AssignmentService {
   }): Promise<Assignment> {
     const response = await apiService.post<{ success: boolean; data: Assignment }>(
       '/assignments/generate-from-lesson',
-      data
+      data,
+      { timeout: 180000 } // 3 minutes for AI assignment generation from lesson transcript
     );
     return response.data.data;
   }

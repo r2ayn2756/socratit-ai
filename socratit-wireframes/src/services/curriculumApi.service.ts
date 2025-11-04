@@ -104,7 +104,7 @@ export const scheduleApi = {
 
   /**
    * Generate schedule from AI
-   * Uses extended timeout (2 minutes) because AI generation takes longer
+   * Uses extended timeout (5 minutes) because AI generation takes longer
    */
   async generateScheduleFromAI(
     scheduleId: string,
@@ -114,7 +114,7 @@ export const scheduleApi = {
       `/curriculum-schedules/${scheduleId}/generate-ai`,
       data,
       {
-        timeout: 120000, // 2 minutes for AI generation (includes Gemini API call + database operations)
+        timeout: 300000, // 5 minutes for AI generation (includes Gemini API call + database operations + sub-units processing)
       }
     );
     return response.data.data!;
