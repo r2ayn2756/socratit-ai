@@ -65,15 +65,19 @@ interface AICurriculumAnalysisResult {
 }
 
 // Enhanced curriculum scheduling interfaces
+interface AISchedulingSubUnit {
+  name: string;
+  description: string;
+  concepts: string[];
+  learningObjectives: string[];
+  estimatedHours: number;
+  orderIndex: number;
+}
+
 interface AISchedulingUnit {
   title: string;
   description: string;
-  topics: Array<{
-    name: string;
-    subtopics: string[];
-    concepts: string[];
-    learningObjectives: string[];
-  }>;
+  subUnits: AISchedulingSubUnit[]; // Changed from topics to subUnits
   estimatedWeeks: number;
   estimatedHours: number;
   confidenceScore: number;
@@ -1061,11 +1065,12 @@ ${pacingPreference ? `- Pacing: ${pacingPreference}` : '- Pacing: standard'}
 ${curriculumText}
 
 **TASK:**
-Break this curriculum into logical teaching units that span the entire school year. Each unit should represent a major instructional block.
+Break this curriculum into logical teaching units that span the entire school year. Each unit should represent a major instructional block. Within each unit, create 3-6 sub-units that represent specific topics or lessons that will be taught sequentially.
 
 **REQUIREMENTS:**
 1. **Unit Structure**: Identify ${targetUnits || '6-12'} major units that follow a logical progression
-2. **Time Estimation**: Estimate weeks needed for each unit based on:
+2. **Sub-Unit Structure**: For EACH unit, break it down into 3-6 sub-units. Each sub-unit should be a teachable chunk (1-3 class periods) covering a specific concept or skill. Sub-units are what teachers will use to generate individual assignments.
+3. **Time Estimation**: Estimate weeks needed for each unit based on:
    - Content depth and complexity
    - Number of subtopics to cover
    - Typical ${gradeLevel} pacing for ${subject}
@@ -1092,12 +1097,14 @@ Break this curriculum into logical teaching units that span the entire school ye
     {
       "title": "Unit 1: Introduction to [Topic]",
       "description": "Clear 2-3 sentence description of what students will learn",
-      "topics": [
+      "subUnits": [
         {
-          "name": "Topic Name",
-          "subtopics": ["Subtopic 1", "Subtopic 2", "Subtopic 3"],
+          "name": "Sub-unit Name (specific topic within the unit)",
+          "description": "1-2 sentence description of this specific sub-unit",
           "concepts": ["specific concept 1", "specific concept 2"],
-          "learningObjectives": ["Students will be able to...", "Students will understand..."]
+          "learningObjectives": ["Students will be able to...", "Students will understand..."],
+          "estimatedHours": 2.5,
+          "orderIndex": 1
         }
       ],
       "estimatedWeeks": 2.5,
@@ -1150,8 +1157,11 @@ Generate the schedule now:`;
 
     // Validate each unit has required fields
     for (const unit of result.units) {
-      if (!unit.title || !unit.description || !unit.topics || unit.estimatedWeeks === undefined || unit.difficultyLevel === undefined) {
+      if (!unit.title || !unit.description || !unit.subUnits || unit.estimatedWeeks === undefined || unit.difficultyLevel === undefined) {
         throw new Error('AI generated incomplete unit structure');
+      }
+      if (!Array.isArray(unit.subUnits) || unit.subUnits.length === 0) {
+        throw new Error(`Unit "${unit.title}" has no sub-units`);
       }
     }
 

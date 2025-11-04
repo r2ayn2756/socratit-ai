@@ -154,6 +154,7 @@ model School {
   // Curriculum Scheduling Relations
   curriculumSchedules  CurriculumSchedule[]
   curriculumUnits      CurriculumUnit[]
+  curriculumSubUnits   CurriculumSubUnit[]
   unitProgress         UnitProgress[]
   curriculumMilestones CurriculumMilestone[]
 
@@ -536,8 +537,10 @@ model Assignment {
   aiConversations AIConversation[]
 
   // Curriculum Scheduling Relations
-  curriculumUnitId String?         @map("curriculum_unit_id")
-  curriculumUnit   CurriculumUnit? @relation("UnitAssignments", fields: [curriculumUnitId], references: [id], onDelete: SetNull)
+  curriculumUnitId    String?            @map("curriculum_unit_id")
+  curriculumUnit      CurriculumUnit?    @relation("UnitAssignments", fields: [curriculumUnitId], references: [id], onDelete: SetNull)
+  curriculumSubUnitId String?            @map("curriculum_sub_unit_id")
+  curriculumSubUnit   CurriculumSubUnit? @relation("SubUnitAssignments", fields: [curriculumSubUnitId], references: [id], onDelete: SetNull)
 
   @@index([classId])
   @@index([schoolId])
@@ -547,6 +550,7 @@ model Assignment {
   @@index([dueDate])
   @@index([publishedAt])
   @@index([curriculumUnitId])
+  @@index([curriculumSubUnitId])
   @@map("assignments")
 }
 
@@ -1951,6 +1955,7 @@ model CurriculumUnit {
 
   // Relationships
   assignments     Assignment[]          @relation("UnitAssignments")
+  subUnits        CurriculumSubUnit[]   @relation("UnitSubUnits")
   studentProgress UnitProgress[]
   currentSchedule CurriculumSchedule[]  @relation("CurrentUnit")
   milestones      CurriculumMilestone[]
@@ -1969,6 +1974,52 @@ model CurriculumUnit {
   @@index([orderIndex])
   @@index([unitType])
   @@map("curriculum_units")
+}
+
+// ============================================================================
+// CURRICULUM SUB-UNIT
+// Specific topics within a unit that can be taught independently
+// ============================================================================
+
+model CurriculumSubUnit {
+  id String @id @default(uuid())
+
+  // Relationships
+  unitId String         @map("unit_id")
+  unit   CurriculumUnit @relation("UnitSubUnits", fields: [unitId], references: [id], onDelete: Cascade)
+
+  schoolId String @map("school_id")
+  school   School @relation(fields: [schoolId], references: [id])
+
+  // Sub-unit identification
+  name        String
+  description String? @db.Text
+  orderIndex  Int     @map("order_index") // Order within the unit
+
+  // Content
+  concepts           String[] // Key concepts covered in this sub-unit
+  learningObjectives String[] @map("learning_objectives") // Specific objectives for this sub-unit
+
+  // Time estimation
+  estimatedHours Float @map("estimated_hours") // Hours to teach this sub-unit
+
+  // AI metadata
+  aiGenerated     Boolean @default(false) @map("ai_generated")
+  teacherModified Boolean @default(false) @map("teacher_modified")
+
+  // Relationships
+  assignments Assignment[] @relation("SubUnitAssignments")
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([unitId, orderIndex])
+  @@index([unitId])
+  @@index([schoolId])
+  @@index([orderIndex])
+  @@map("curriculum_sub_units")
 }
 
 // ============================================================================

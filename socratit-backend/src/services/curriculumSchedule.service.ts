@@ -206,6 +206,9 @@ export async function getScheduleById(
         orderBy: { orderIndex: 'asc' },
         include: {
           assignments: options.includeAssignments,
+          subUnits: {
+            orderBy: { orderIndex: 'asc' },
+          },
         },
       },
     },
@@ -408,9 +411,9 @@ export async function generateScheduleFromAI(
         difficultyLevel: aiUnit.difficultyLevel,
         difficultyReasoning: aiUnit.difficultyReasoning,
         unitType: 'CORE',
-        topics: aiUnit.topics as any,
-        learningObjectives: aiUnit.topics.flatMap(t => t.learningObjectives),
-        concepts: aiUnit.topics.flatMap(t => t.concepts),
+        topics: aiUnit.subUnits as any, // Store sub-units in topics field for now (backwards compat)
+        learningObjectives: aiUnit.subUnits.flatMap((su: any) => su.learningObjectives),
+        concepts: aiUnit.subUnits.flatMap((su: any) => su.concepts),
         prerequisiteUnits: [],
         buildUponTopics: aiUnit.buildUponTopics,
         suggestedAssessments: aiUnit.suggestedAssessments as any,
@@ -419,6 +422,23 @@ export async function generateScheduleFromAI(
         status: 'SCHEDULED',
       },
     });
+
+    // Create sub-units for this unit
+    for (const subUnit of aiUnit.subUnits) {
+      await prisma.curriculumSubUnit.create({
+        data: {
+          unitId: unit.id,
+          schoolId: schedule.schoolId,
+          name: subUnit.name,
+          description: subUnit.description,
+          orderIndex: subUnit.orderIndex,
+          concepts: subUnit.concepts,
+          learningObjectives: subUnit.learningObjectives,
+          estimatedHours: subUnit.estimatedHours,
+          aiGenerated: true,
+        },
+      });
+    }
 
     units.push(unit);
 
@@ -657,6 +677,7 @@ function formatUnitForResponse(unit: any): any {
     difficultyLevel: unit.difficultyLevel,
     unitType: unit.unitType,
     topics: unit.topics,
+    subUnits: unit.subUnits || [], // Include sub-units in response
     learningObjectives: unit.learningObjectives,
     concepts: unit.concepts,
     percentComplete: unit.percentComplete,

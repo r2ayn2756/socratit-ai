@@ -29,6 +29,21 @@ export interface UnitTopic {
   learningObjectives: string[];
 }
 
+export interface CurriculumSubUnit {
+  id: string;
+  unitId: string;
+  name: string;
+  description?: string;
+  orderIndex: number;
+  concepts: string[];
+  learningObjectives: string[];
+  estimatedHours: number;
+  aiGenerated: boolean;
+  teacherModified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CurriculumSchedule {
   id: string;
   classId: string;
@@ -70,6 +85,7 @@ export interface CurriculumUnit {
   unitType: UnitType;
   status: UnitStatus;
   topics: UnitTopic[];
+  subUnits?: CurriculumSubUnit[]; // New: Sub-units within this unit
   learningObjectives: string[];
   concepts: string[];
   suggestedAssessments?: any[];
