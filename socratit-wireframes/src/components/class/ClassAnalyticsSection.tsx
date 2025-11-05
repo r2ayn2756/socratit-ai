@@ -46,7 +46,8 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
   const [timeRange, setTimeRange] = useState<'7' | '30' | 'all'>('30');
 
   // Calculate date range for AI insights
-  const getDateRange = () => {
+  // Use useMemo to prevent recalculating on every render (which causes infinite queries)
+  const { periodStart, periodEnd } = React.useMemo(() => {
     const now = new Date();
     const periodEnd = now.toISOString();
     let periodStart: string | undefined;
@@ -60,9 +61,7 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
     }
 
     return { periodStart, periodEnd };
-  };
-
-  const { periodStart, periodEnd } = getDateRange();
+  }, [timeRange]); // Only recalculate when timeRange changes
 
   // Fetch performance analytics data with error handling
   const { data: overview, isLoading: overviewLoading, error: overviewError } = useQuery({
@@ -113,15 +112,27 @@ export const ClassAnalyticsSection: React.FC<ClassAnalyticsSectionProps> = ({
     queryFn: async () => {
       try {
         return await aiTAService.getClassInsights(classId, periodStart, periodEnd);
-      } catch (error) {
-        console.warn('AI insights not available:', error);
+      } catch (error: any) {
+        // Don't spam the console with rate limit errors
+        if (error?.response?.status === 429) {
+          console.warn('AI insights rate limit reached. Will retry later.');
+        } else {
+          console.warn('AI insights not available:', error);
+        }
         return undefined;
       }
     },
-    retry: false,
+    retry: (failureCount, error: any) => {
+      // Don't retry on rate limit errors (429) or other client errors (4xx)
+      if (error?.response?.status >= 400 && error?.response?.status < 500) {
+        return false;
+      }
+      return failureCount < 1; // Only retry once for other errors
+    },
     enabled: !!classId && activeTab === 'ai-insights',
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchInterval: false, // Disable automatic refetching
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });

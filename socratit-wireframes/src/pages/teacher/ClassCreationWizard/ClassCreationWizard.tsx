@@ -222,65 +222,67 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
       closeOnEscape={false}
       closeOnOverlayClick={false}
     >
-      <div className="space-y-8">
-        {/* Progress Steps */}
-        <div className="flex items-center justify-between">
-          {STEPS.map((step, index) => {
-            const isCompleted = wizardState.completedSteps.has(step.id);
-            const isCurrent = wizardState.currentStep === step.id;
-            const isClickable = isCompleted || isCurrent;
-            const isSkipped = step.id === 4 && wizardState.skipCurriculum;
+      <div className="flex flex-col h-full max-h-[calc(90vh-4rem)]">
+        {/* Progress Steps - Fixed at top */}
+        <div className="flex-shrink-0 pb-6">
+          <div className="flex items-center justify-between">
+            {STEPS.map((step, index) => {
+              const isCompleted = wizardState.completedSteps.has(step.id);
+              const isCurrent = wizardState.currentStep === step.id;
+              const isClickable = isCompleted || isCurrent;
+              const isSkipped = step.id === 4 && wizardState.skipCurriculum;
 
-            return (
-              <React.Fragment key={step.id}>
-                {/* Step Circle */}
-                <div className="flex flex-col items-center flex-1">
-                  <button
-                    onClick={() => isClickable && handleStepClick(step.id)}
-                    disabled={!isClickable || isSkipped}
-                    className={`
-                      w-12 h-12 rounded-full flex items-center justify-center
-                      transition-all duration-300 mb-2
-                      ${isCompleted
-                        ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30'
-                        : isCurrent
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-110'
-                          : isSkipped
-                            ? 'bg-gray-200 text-gray-400'
-                            : 'bg-gray-100 text-gray-400'
-                      }
-                      ${isClickable && !isSkipped ? 'cursor-pointer hover:scale-105' : 'cursor-default'}
-                    `}
-                  >
-                    {isCompleted ? (
-                      <Check className="w-6 h-6" />
-                    ) : (
-                      <span className="text-lg font-semibold">{step.id}</span>
-                    )}
-                  </button>
+              return (
+                <React.Fragment key={step.id}>
+                  {/* Step Circle */}
+                  <div className="flex flex-col items-center flex-1">
+                    <button
+                      onClick={() => isClickable && handleStepClick(step.id)}
+                      disabled={!isClickable || isSkipped}
+                      className={`
+                        w-12 h-12 rounded-full flex items-center justify-center
+                        transition-all duration-300 mb-2
+                        ${isCompleted
+                          ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30'
+                          : isCurrent
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-110'
+                            : isSkipped
+                              ? 'bg-gray-200 text-gray-400'
+                              : 'bg-gray-100 text-gray-400'
+                        }
+                        ${isClickable && !isSkipped ? 'cursor-pointer hover:scale-105' : 'cursor-default'}
+                      `}
+                    >
+                      {isCompleted ? (
+                        <Check className="w-6 h-6" />
+                      ) : (
+                        <span className="text-lg font-semibold">{step.id}</span>
+                      )}
+                    </button>
 
-                  <p className={`
-                    text-xs font-medium text-center
-                    ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}
-                  `}>
-                    {step.title}
-                  </p>
-                </div>
+                    <p className={`
+                      text-xs font-medium text-center
+                      ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}
+                    `}>
+                      {step.title}
+                    </p>
+                  </div>
 
-                {/* Connector Line */}
-                {index < STEPS.length - 1 && (
-                  <div className={`
-                    h-0.5 flex-1 mx-2 transition-colors duration-300
-                    ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
-                  `} />
-                )}
-              </React.Fragment>
-            );
-          })}
+                  {/* Connector Line */}
+                  {index < STEPS.length - 1 && (
+                    <div className={`
+                      h-0.5 flex-1 mx-2 transition-colors duration-300
+                      ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
+                    `} />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Step Title */}
-        <div className="text-center">
+        {/* Step Title - Fixed at top */}
+        <div className="flex-shrink-0 text-center pb-6">
           <h3 className="text-2xl font-bold text-gray-900 mb-1">
             {currentStepConfig.title}
           </h3>
@@ -289,8 +291,8 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
           </p>
         </div>
 
-        {/* Step Content */}
-        <div className="min-h-[400px]">
+        {/* Step Content - Scrollable area */}
+        <div className="flex-1 overflow-y-auto modal-scroll pb-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={wizardState.currentStep}
@@ -310,8 +312,8 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
           </AnimatePresence>
         </div>
 
-        {/* Footer Navigation */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+        {/* Footer Navigation - Fixed at bottom */}
+        <div className="flex-shrink-0 flex items-center justify-between pt-6 border-t border-gray-200">
           <Button
             variant="ghost"
             onClick={wizardState.currentStep === 1 ? handleCancel : handleBack}
