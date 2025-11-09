@@ -393,7 +393,7 @@ export const CreateClass: React.FC = () => {
                 onFileRemove={handleFileRemove}
                 label="Curriculum File"
                 acceptedTypes={['.pdf', '.docx', '.doc', '.txt']}
-                maxSizeMB={10}
+                maxSizeMB={100}
                 error={errors.curriculumFile}
               />
             </div>

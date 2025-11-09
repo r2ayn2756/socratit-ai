@@ -30,7 +30,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   onFileSelect,
   onFileRemove,
   acceptedTypes = ['.pdf', '.docx', '.doc', '.txt', '.jpg', '.jpeg', '.png'],
-  maxSizeMB = 10,
+  maxSizeMB = 100, // 100MB default (increased from 10MB to support larger curriculum files)
   label = 'Upload curriculum file',
   error,
   currentFileName,

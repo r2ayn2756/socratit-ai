@@ -56,7 +56,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
         <FileUpload
           label="Curriculum Materials"
           accept=".pdf,.doc,.docx"
-          maxSize={10}
+          maxSize={100}
           onFileSelect={handleFileSelect}
           onFileRemove={handleFileRemove}
           currentFile={wizardState.curriculumFile}

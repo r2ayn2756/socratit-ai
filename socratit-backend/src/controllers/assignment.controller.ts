@@ -217,7 +217,7 @@ export async function generateQuiz(req: AuthenticatedRequest, res: Response): Pr
         timeLimit: quizResult.estimatedTimeMinutes,
         aiGenerated: true,
         aiPrompt: curriculumText,
-        curriculumSource: curriculumText.substring(0, 500), // Store first 500 chars
+        curriculumSource: curriculumText, // Store full curriculum text for reference
         status: AssignmentStatus.DRAFT,
         questions: {
           create: quizResult.questions.map((q, index) => ({
@@ -382,7 +382,7 @@ export async function generateAssignmentFromLesson(req: AuthenticatedRequest, re
         timeLimit: quizResult.estimatedTimeMinutes,
         aiGenerated: true,
         aiPrompt: `Lesson: ${lesson.title}`,
-        curriculumSource: lesson.summary.substring(0, 500), // Store summary as source
+        curriculumSource: lesson.summary, // Store full summary as source
         status: AssignmentStatus.DRAFT,
         questions: {
           create: quizResult.questions.map((q, index) => ({

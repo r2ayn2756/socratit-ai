@@ -25,7 +25,7 @@ interface FileUploadProps {
 export const FileUpload: React.FC<FileUploadProps> = ({
   label,
   accept = '.pdf,.doc,.docx',
-  maxSize = 10, // 10MB default
+  maxSize = 100, // 100MB default (increased from 10MB to support larger curriculum files)
   onFileSelect,
   onFileRemove,
   currentFile,
@@ -305,7 +305,7 @@ interface MultiFileUploadProps {
 export const MultiFileUpload: React.FC<MultiFileUploadProps> = ({
   label,
   accept = '.pdf,.doc,.docx',
-  maxSize = 10,
+  maxSize = 100, // 100MB default (increased from 10MB)
   maxFiles = 5,
   onFilesSelect,
   currentFiles = [],

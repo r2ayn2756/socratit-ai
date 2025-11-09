@@ -139,7 +139,7 @@ export const env: EnvConfig = {
   OPENAI_MODEL: getEnv('OPENAI_MODEL', 'gpt-3.5-turbo'),
 
   // File Upload
-  MAX_FILE_SIZE: getEnvNumber('MAX_FILE_SIZE', 10485760),
+  MAX_FILE_SIZE: getEnvNumber('MAX_FILE_SIZE', 104857600), // 100MB default (increased from 10MB)
   UPLOAD_DIR: getEnv('UPLOAD_DIR', './uploads'),
   AWS_S3_BUCKET: getEnv('AWS_S3_BUCKET', ''),
 
