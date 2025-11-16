@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Upload, Sparkles, ArrowRight } from 'lucide-react';
-import { FileUpload } from '../../../../components/shared/FileUpload';
+import { MultiFileUpload } from '../../../../components/shared/FileUpload';
 import { Button } from '../../../../components/curriculum/Button';
 import { GlassCard } from '../../../../components/curriculum/GlassCard';
 import type { ClassCreationState } from '../ClassCreationWizard';
@@ -25,22 +25,18 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileSelect = async (file: File) => {
+  const handleFilesSelect = async (files: File[]) => {
     setIsUploading(true);
 
     // Simulate upload (in real implementation, upload to backend)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    onUpdate({ curriculumFile: file, skipCurriculum: false });
+    onUpdate({ curriculumFiles: files, skipCurriculum: false });
     setIsUploading(false);
   };
 
-  const handleFileRemove = () => {
-    onUpdate({ curriculumFile: null });
-  };
-
   const handleSkip = () => {
-    onUpdate({ skipCurriculum: true, curriculumFile: null });
+    onUpdate({ skipCurriculum: true, curriculumFiles: [] });
     onNext();
   };
 
@@ -53,7 +49,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
     <div className="space-y-8">
       {/* Navigation - Top */}
       <div className="flex justify-end pb-2">
-        {wizardState.curriculumFile ? (
+        {wizardState.curriculumFiles.length > 0 ? (
           <Button
             variant="primary"
             size="lg"
@@ -76,14 +72,14 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 
       {/* Upload Section */}
       <div>
-        <FileUpload
+        <MultiFileUpload
           label="Curriculum Materials"
           accept=".pdf,.doc,.docx"
           maxSize={100}
-          onFileSelect={handleFileSelect}
-          onFileRemove={handleFileRemove}
-          currentFile={wizardState.curriculumFile}
-          helperText="Upload your curriculum guide, syllabus, or course materials (PDF or Word)"
+          maxFiles={10}
+          onFilesSelect={handleFilesSelect}
+          currentFiles={wizardState.curriculumFiles}
+          helperText="Upload your curriculum guides, syllabi, or course materials (PDF or Word)"
           disabled={isUploading}
         />
       </div>
@@ -125,7 +121,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
       </GlassCard>
 
       {/* Skip Option */}
-      {!wizardState.curriculumFile && (
+      {wizardState.curriculumFiles.length === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

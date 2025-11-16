@@ -35,8 +35,8 @@ export interface ClassCreationState {
   schoolYearEnd: Date | null;
   meetingPattern: string;
 
-  // Curriculum Upload (Step 3)
-  curriculumFile: File | null;
+  // Curriculum Upload (Step 2)
+  curriculumFiles: File[];
   skipCurriculum: boolean;
 
   // AI Generation (Step 4)
@@ -128,7 +128,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     schoolYearStart: new Date(new Date().getFullYear(), 7, 1), // Default to August 1st of current year
     schoolYearEnd: new Date(new Date().getFullYear() + 1, 5, 30), // Default to June 30th of next year
     meetingPattern: 'daily',
-    curriculumFile: null,
+    curriculumFiles: [],
     skipCurriculum: false,
     aiGenerating: false,
     aiPreferences: {},
@@ -197,7 +197,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
       schoolYearStart: new Date(new Date().getFullYear(), 7, 1),
       schoolYearEnd: new Date(new Date().getFullYear() + 1, 5, 30),
       meetingPattern: 'daily',
-      curriculumFile: null,
+      curriculumFiles: [],
       skipCurriculum: false,
       aiGenerating: false,
       aiPreferences: {},

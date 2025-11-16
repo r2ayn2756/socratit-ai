@@ -40,19 +40,21 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       console.log('Starting class creation flow...');
       console.log('[DEBUG] Full wizard state:', wizardState);
 
-      // Step 1: Upload curriculum file if provided
-      let curriculumMaterialId: string | undefined;
-      if (wizardState.curriculumFile) {
-        console.log('Uploading curriculum file:', wizardState.curriculumFile.name);
+      // Step 1: Upload curriculum files if provided
+      let curriculumMaterialIds: string[] = [];
+      if (wizardState.curriculumFiles.length > 0) {
+        console.log('Uploading curriculum files:', wizardState.curriculumFiles.map(f => f.name).join(', '));
+        setLoadingMessage(`Uploading ${wizardState.curriculumFiles.length} file(s)...`);
         try {
-          const uploadedFile = await uploadService.uploadCurriculumFile(
-            wizardState.curriculumFile
-          );
-          curriculumMaterialId = uploadedFile.id;
-          console.log('Curriculum file uploaded successfully:', curriculumMaterialId);
+          for (const file of wizardState.curriculumFiles) {
+            const uploadedFile = await uploadService.uploadCurriculumFile(file);
+            curriculumMaterialIds.push(uploadedFile.id);
+            console.log('Curriculum file uploaded successfully:', uploadedFile.id);
+          }
+          setLoadingMessage('Creating class...');
         } catch (uploadError: any) {
           console.error('Upload error:', uploadError);
-          throw new Error(`Failed to upload curriculum file: ${uploadError.message}`);
+          throw new Error(`Failed to upload curriculum files: ${uploadError.message}`);
         }
       }
 
@@ -71,19 +73,22 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
       // Add curriculum schedule data if available
       console.log('[DEBUG] Curriculum condition check:', {
-        hasCurriculumMaterialId: !!curriculumMaterialId,
+        hasCurriculumMaterialIds: curriculumMaterialIds.length > 0,
         hasSchoolYearStart: !!wizardState.schoolYearStart,
         hasSchoolYearEnd: !!wizardState.schoolYearEnd,
-        curriculumMaterialId,
+        curriculumMaterialIds,
         schoolYearStart: wizardState.schoolYearStart,
         schoolYearEnd: wizardState.schoolYearEnd,
         skipCurriculum: wizardState.skipCurriculum,
       });
 
-      if (curriculumMaterialId && wizardState.schoolYearStart && wizardState.schoolYearEnd) {
+      if (curriculumMaterialIds.length > 0 && wizardState.schoolYearStart && wizardState.schoolYearEnd) {
         console.log('[DEBUG] Adding curriculum fields to classData');
         try {
-          classData.curriculumMaterialId = curriculumMaterialId;
+          // Use the first file as primary curriculum material for now
+          // In the future, the backend could support multiple files
+          classData.curriculumMaterialId = curriculumMaterialIds[0];
+          classData.curriculumMaterialIds = curriculumMaterialIds; // Pass all IDs for future use
           classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
           classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
           classData.meetingPattern = wizardState.meetingPattern;

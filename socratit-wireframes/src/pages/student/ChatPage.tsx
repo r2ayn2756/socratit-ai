@@ -262,15 +262,15 @@ export const ChatPage: React.FC = () => {
               animate={{ width: 280, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="bg-slate-900 border-r border-slate-800 flex flex-col overflow-hidden"
+              className="bg-slate-50 border-r border-slate-200 flex flex-col overflow-hidden"
             >
               {/* Sidebar Header */}
-              <div className="p-4 border-b border-slate-800">
+              <div className="p-4 border-b border-slate-200">
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={handleNewConversation}
-                  className="w-full justify-start gap-2 bg-white text-slate-900 hover:bg-slate-100"
+                  className="w-full justify-start gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   New Conversation
@@ -280,9 +280,9 @@ export const ChatPage: React.FC = () => {
               {/* Conversations List */}
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {isLoading ? (
-                  <div className="text-slate-400 text-sm text-center py-8">Loading...</div>
+                  <div className="text-slate-500 text-sm text-center py-8">Loading...</div>
                 ) : conversations.length === 0 ? (
-                  <div className="text-slate-400 text-sm text-center py-8">
+                  <div className="text-slate-500 text-sm text-center py-8">
                     No conversations yet
                   </div>
                 ) : (
@@ -299,8 +299,8 @@ export const ChatPage: React.FC = () => {
                       }}
                       className={`w-full text-left px-3 py-3 rounded-lg transition-all group ${
                         selectedConversation === conv.id
-                          ? 'bg-slate-800 text-white'
-                          : 'text-slate-300 hover:bg-slate-800/50'
+                          ? 'bg-purple-100 border border-purple-200 text-slate-900'
+                          : 'text-slate-700 hover:bg-slate-100 border border-transparent'
                       }`}
                     >
                       <div className="flex items-start gap-2">
@@ -337,17 +337,11 @@ export const ChatPage: React.FC = () => {
                   <Menu className="w-5 h-5 text-slate-600" />
                 )}
               </button>
-              <div className="flex items-center gap-3">
-                <img
-                  src="/logo512.png"
-                  alt="SocratIt Logo"
-                  className="w-10 h-10 object-contain"
-                />
-                <div>
-                  <h1 className="text-lg font-bold text-slate-900">Hi, I'm SocratIt</h1>
-                  <p className="text-xs text-slate-500">Your 24/7 Learning Assistant</p>
-                </div>
-              </div>
+              <img
+                src="/logo512.png"
+                alt="SocratIt"
+                className="h-10 w-auto object-contain"
+              />
             </div>
 
             {selectedConversation && (
