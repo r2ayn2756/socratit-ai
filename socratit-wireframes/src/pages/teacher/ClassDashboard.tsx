@@ -267,8 +267,6 @@ export const ClassDashboard: React.FC = () => {
             subject={classData.subject}
             gradeLevel={classData.gradeLevel}
             studentCount={classData.studentCount}
-            unitCount={classData.schedule?.totalUnits || 0}
-            progressPercentage={classData.schedule?.percentComplete || 0}
             classCode={classData.classCode}
           />
         </motion.div>
