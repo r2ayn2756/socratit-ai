@@ -14,7 +14,6 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
-  Plus,
   Sparkles,
 } from 'lucide-react';
 import type { CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
@@ -50,28 +49,6 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
       }
       return next;
     });
-  };
-
-  const getDifficultyColor = (level: number) => {
-    const colors = {
-      1: 'from-green-500 to-emerald-600',
-      2: 'from-blue-500 to-cyan-600',
-      3: 'from-yellow-500 to-orange-600',
-      4: 'from-orange-500 to-red-600',
-      5: 'from-red-500 to-rose-600',
-    };
-    return colors[level as keyof typeof colors] || colors[3];
-  };
-
-  const getDifficultyLabel = (level: number) => {
-    const labels = {
-      1: 'Introductory',
-      2: 'Basic',
-      3: 'Intermediate',
-      4: 'Advanced',
-      5: 'Expert',
-    };
-    return labels[level as keyof typeof labels] || 'Intermediate';
   };
 
   const getStatusColor = (status: string) => {
@@ -234,12 +211,6 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                                   </div>
                                 </div>
                               )}
-
-                              {/* Estimated Hours */}
-                              <div className="flex items-center gap-1 text-xs text-gray-500 mt-2">
-                                <Clock className="w-3.5 h-3.5" />
-                                <span>{subUnit.estimatedHours}h estimated</span>
-                              </div>
                             </div>
                           </motion.div>
                         ))}
