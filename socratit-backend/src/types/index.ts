@@ -223,6 +223,7 @@ export interface CreateClassRequestBody {
     pacingPreference?: 'slow' | 'standard' | 'fast';
     focusAreas?: string[];
   };
+  preGeneratedUnits?: any[]; // Units generated during wizard with AI
 }
 
 export interface UpdateClassRequestBody {

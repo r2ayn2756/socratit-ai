@@ -275,12 +275,12 @@ export const ClassDashboard: React.FC = () => {
 
         {/* Analytics & Assignments Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Analytics Section - Left Third */}
+          {/* Analytics Section - Left Two Thirds */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="lg:col-span-1"
+            className="lg:col-span-2"
           >
             <ClassAnalyticsSection
               classId={classId!}
@@ -288,12 +288,12 @@ export const ClassDashboard: React.FC = () => {
             />
           </motion.div>
 
-          {/* Assignments Section - Right Two Thirds */}
+          {/* Assignments Section - Right Third */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2"
+            className="lg:col-span-1"
           >
             <AssignmentsSection
               assignments={classData.assignments}

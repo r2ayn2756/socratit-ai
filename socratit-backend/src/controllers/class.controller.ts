@@ -120,13 +120,48 @@ export const createClass = async (
 
         scheduleId = schedule.id;
         console.log('[DEBUG] Curriculum schedule created successfully:', scheduleId);
+
+        // If pre-generated units are provided, create them immediately
+        if (body.preGeneratedUnits && body.preGeneratedUnits.length > 0) {
+          console.log('[DEBUG] Creating pre-generated units:', body.preGeneratedUnits.length);
+
+          for (let i = 0; i < body.preGeneratedUnits.length; i++) {
+            const unit = body.preGeneratedUnits[i];
+
+            await prisma.curriculumUnit.create({
+              data: {
+                scheduleId: schedule.id,
+                title: unit.title || `Unit ${i + 1}`,
+                description: unit.description,
+                order: i + 1,
+                estimatedWeeks: unit.estimatedWeeks || 1,
+                topics: unit.topics || [],
+                learningObjectives: unit.learningObjectives || [],
+                status: 'DRAFT',
+              },
+            });
+          }
+
+          // Update schedule to PUBLISHED and mark as AI-generated
+          await prisma.curriculumSchedule.update({
+            where: { id: schedule.id },
+            data: {
+              status: 'PUBLISHED',
+              aiGenerated: true,
+              totalUnits: body.preGeneratedUnits.length,
+            },
+          });
+
+          console.log('[DEBUG] Pre-generated units created and schedule published');
+        }
+
       } catch (scheduleError) {
         console.error('[ERROR] Failed to create curriculum schedule:', scheduleError);
         // Continue with class creation even if schedule fails
         // Teacher can create schedule later
       }
 
-      // Note: AI generation will be triggered by frontend calling separate endpoint
+      // Note: If no pre-generated units, AI generation will be triggered by frontend calling separate endpoint
       // POST /api/curriculum-schedules/:scheduleId/generate-ai
     } else {
       console.log('[DEBUG] Skipping curriculum schedule creation - missing required fields');
