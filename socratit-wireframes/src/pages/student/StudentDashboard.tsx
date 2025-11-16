@@ -507,37 +507,24 @@ export const StudentDashboard: React.FC = () => {
 
           {/* Right Column - Teaching Assistant */}
           <motion.div variants={fadeInUp} className="space-y-6">
-            {/* TA Card - Redesigned with transparent purple glow and neomorphism */}
+            {/* TA Card - Redesigned with transparent purple and neomorphism */}
             <motion.div
               whileHover={{ scale: 1.02 }}
               className="relative overflow-hidden rounded-2xl"
             >
-              {/* Purple glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 via-purple-600/20 to-purple-700/30 blur-xl"></div>
-
               {/* Neomorphic card */}
               <div className="relative backdrop-blur-md bg-white/40 border border-white/50 shadow-2xl rounded-2xl p-6">
                 {/* Apple-style neomorphic inner shadow */}
                 <div className="absolute inset-0 rounded-2xl shadow-inner opacity-30 pointer-events-none"></div>
 
-                {/* Header with floating icon */}
+                {/* Header with icon */}
                 <div className="relative flex items-center gap-3 mb-4">
-                  <motion.div
-                    animate={{
-                      boxShadow: [
-                        '0 0 20px rgba(168, 85, 247, 0.4)',
-                        '0 0 40px rgba(168, 85, 247, 0.6)',
-                        '0 0 20px rgba(168, 85, 247, 0.4)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg"
-                  >
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
                     <Brain className="w-7 h-7 text-white" />
-                  </motion.div>
+                  </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-xl text-slate-800">AI Teaching Assistant</h3>
+                      <h3 className="font-bold text-xl text-slate-800">SocratIt!</h3>
                       <Sparkles className="w-4 h-4 text-purple-600" />
                     </div>
                     <p className="text-sm text-purple-700 font-medium">24/7 Support • Always Ready</p>
