@@ -59,7 +59,9 @@
       "Bash(nul)",
       "Bash(git config:*)",
       "Bash(git rev-parse:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(python:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

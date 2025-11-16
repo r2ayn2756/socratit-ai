@@ -101,6 +101,13 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           classData.meetingPattern = wizardState.meetingPattern;
           classData.generateWithAI = !wizardState.skipCurriculum;
           classData.aiPreferences = wizardState.aiPreferences;
+
+          // Pass pre-generated units if available (user may have edited them)
+          if (wizardState.generatedUnits && wizardState.generatedUnits.length > 0) {
+            classData.preGeneratedUnits = wizardState.generatedUnits;
+            console.log('[DEBUG] Including pre-generated units:', wizardState.generatedUnits.length);
+          }
+
           console.log('[DEBUG] Curriculum fields added successfully');
         } catch (dateError) {
           console.error('[ERROR] Failed to convert dates to ISO string:', dateError);
@@ -123,8 +130,9 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       console.log('[DEBUG] Response includes scheduleId:', newClass.scheduleId);
 
       // Step 3: If AI generation was requested and we have a schedule, generate it
+      // SKIP if we already have pre-generated units (they were generated during wizard and possibly edited)
       let aiGenerationFailed = false;
-      if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialIds.length > 0) {
+      if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialIds.length > 0 && !classData.preGeneratedUnits) {
         console.log('Starting AI schedule generation for schedule:', newClass.scheduleId);
         setLoadingMessage('Analyzing curriculum and generating units with AI... This may take up to 2 minutes.');
 
@@ -158,6 +166,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         } finally {
           setLoadingMessage('');
         }
+      } else if (classData.preGeneratedUnits) {
+        console.log('[DEBUG] Skipping AI generation - using pre-generated units from wizard');
       }
 
       // Update wizard state with created class ID
@@ -261,67 +271,36 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
       {/* Class Details */}
       <GlassCard variant="elevated">
-        <div className="p-6 space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <BookOpen className="w-4 h-4 text-blue-600" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Class Details</h3>
+            <h3 className="text-base font-semibold text-gray-900">Class Details</h3>
           </div>
 
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-600">Class Name</p>
-              <p className="font-medium text-gray-900">{wizardState.className}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="grid grid-cols-3 gap-3">
               <div>
-                <p className="text-sm text-gray-600">Subject</p>
-                <p className="font-medium text-gray-900">{wizardState.subject}</p>
+                <p className="text-xs text-gray-600">Class Name</p>
+                <p className="text-sm font-medium text-gray-900">{wizardState.className}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Grade Level</p>
-                <p className="font-medium text-gray-900">{wizardState.gradeLevel}</p>
+                <p className="text-xs text-gray-600">Subject</p>
+                <p className="text-sm font-medium text-gray-900">{wizardState.subject}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-600">Grade Level</p>
+                <p className="text-sm font-medium text-gray-900">{wizardState.gradeLevel}</p>
               </div>
             </div>
 
             {wizardState.description && (
               <div>
-                <p className="text-sm text-gray-600">Description</p>
-                <p className="text-gray-700 text-sm">{wizardState.description}</p>
+                <p className="text-xs text-gray-600">Description</p>
+                <p className="text-gray-700 text-xs">{wizardState.description}</p>
               </div>
             )}
-          </div>
-        </div>
-      </GlassCard>
-
-      {/* School Year */}
-      <GlassCard variant="elevated">
-        <div className="p-6 space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-purple-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">School Year</h3>
-          </div>
-
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-600">Duration</p>
-              <p className="font-medium text-gray-900">
-                {wizardState.schoolYearStart &&
-                  format(wizardState.schoolYearStart, 'MMMM d, yyyy')}
-                {' - '}
-                {wizardState.schoolYearEnd &&
-                  format(wizardState.schoolYearEnd, 'MMMM d, yyyy')}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-600">Meeting Pattern</p>
-              <p className="font-medium text-gray-900">{getMeetingPatternLabel()}</p>
-            </div>
           </div>
         </div>
       </GlassCard>
@@ -329,20 +308,20 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       {/* Generated Units - Full Preview */}
       {wizardState.generatedUnits && wizardState.generatedUnits.length > 0 && (
         <GlassCard variant="elevated">
-          <div className="p-6 space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-green-600" />
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">AI-Generated Curriculum ({wizardState.generatedUnits.length} Units)</h3>
-                  <p className="text-sm text-gray-600">Extracted from {wizardState.curriculumFiles.length} file(s)</p>
+                  <h3 className="text-base font-semibold text-gray-900">AI-Generated Curriculum ({wizardState.generatedUnits.length} Units)</h3>
+                  <p className="text-xs text-gray-600">Extracted from {wizardState.curriculumFiles.length} file(s)</p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-3 max-h-96 overflow-y-auto modal-scroll">
+            <div className="space-y-2 max-h-80 overflow-y-auto modal-scroll">
               {wizardState.generatedUnits.map((unit: any, index: number) => {
                 const isEditing = editingUnitId === unit.id;
                 const displayUnit = isEditing ? editingUnit : unit;
@@ -353,7 +332,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`p-4 rounded-xl bg-white border ${isEditing ? 'border-blue-400 shadow-md' : 'border-gray-200'}`}
+                    className={`p-3 rounded-lg bg-white border ${isEditing ? 'border-blue-400 shadow-md' : 'border-gray-200'}`}
                   >
                     {isEditing ? (
                       // EDIT MODE
@@ -463,11 +442,11 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
                         {/* Topics */}
                         {displayUnit.topics && displayUnit.topics.length > 0 && (
-                          <div className="pt-3 border-t border-gray-100">
-                            <p className="text-xs font-semibold text-gray-700 mb-2">Topics ({displayUnit.topics.length}):</p>
-                            <div className="flex flex-wrap gap-2">
+                          <div className="pt-2 border-t border-gray-100">
+                            <p className="text-xs font-semibold text-gray-700 mb-1.5">Topics ({displayUnit.topics.length}):</p>
+                            <div className="flex flex-wrap gap-1.5">
                               {displayUnit.topics.map((topic: any, i: number) => (
-                                <span key={i} className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-lg">
+                                <span key={i} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
                                   {typeof topic === 'string' ? topic : topic.name || topic.title}
                                 </span>
                               ))}
@@ -477,18 +456,18 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
                         {/* Learning Objectives */}
                         {displayUnit.learningObjectives && displayUnit.learningObjectives.length > 0 && (
-                          <div className="pt-3 border-t border-gray-100">
-                            <p className="text-xs font-semibold text-gray-700 mb-2">Learning Objectives:</p>
-                            <ul className="space-y-1">
-                              {displayUnit.learningObjectives.slice(0, 3).map((obj: string, i: number) => (
-                                <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
-                                  <span className="w-1 h-1 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                          <div className="pt-2 border-t border-gray-100">
+                            <p className="text-xs font-semibold text-gray-700 mb-1.5">Learning Objectives:</p>
+                            <ul className="space-y-0.5">
+                              {displayUnit.learningObjectives.slice(0, 2).map((obj: string, i: number) => (
+                                <li key={i} className="text-xs text-gray-700 flex items-start gap-1.5">
+                                  <span className="w-1 h-1 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
                                   <span>{obj}</span>
                                 </li>
                               ))}
-                              {displayUnit.learningObjectives.length > 3 && (
-                                <li className="text-sm text-gray-500 pl-3">
-                                  +{displayUnit.learningObjectives.length - 3} more objectives
+                              {displayUnit.learningObjectives.length > 2 && (
+                                <li className="text-xs text-gray-500 pl-2.5">
+                                  +{displayUnit.learningObjectives.length - 2} more
                                 </li>
                               )}
                             </ul>

@@ -12,7 +12,6 @@ import { Button } from '../../../components/curriculum/Button';
 // Step Components
 import { ClassDetailsStep } from './steps/ClassDetailsStep';
 import { CurriculumUploadStep } from './steps/CurriculumUploadStep';
-import { AIScheduleStep } from './steps/AIScheduleStep';
 import { ReviewClassStep } from './steps/ReviewClassStep';
 
 // ============================================================================
@@ -91,13 +90,6 @@ const STEPS: Step[] = [
   },
   {
     id: 3,
-    title: 'AI Schedule Generation',
-    subtitle: 'Generate year-long schedule with AI',
-    component: AIScheduleStep,
-    canSkip: true,
-  },
-  {
-    id: 4,
     title: 'Review & Finalize',
     subtitle: 'Review and create your class',
     component: ReviewClassStep,
@@ -151,11 +143,6 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     // Determine next step
     let nextStep = wizardState.currentStep + 1;
 
-    // Skip AI generation if no curriculum uploaded
-    if (wizardState.currentStep === 2 && wizardState.skipCurriculum) {
-      nextStep = 4; // Jump to review
-    }
-
     setWizardState(prev => ({
       ...prev,
       currentStep: nextStep,
@@ -164,12 +151,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
   };
 
   const handleBack = () => {
-    let previousStep = wizardState.currentStep - 1;
-
-    // Skip back over AI generation if curriculum was skipped
-    if (wizardState.currentStep === 4 && wizardState.skipCurriculum) {
-      previousStep = 2;
-    }
+    const previousStep = wizardState.currentStep - 1;
 
     setWizardState(prev => ({
       ...prev,
@@ -224,7 +206,6 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
               const isCompleted = wizardState.completedSteps.has(step.id);
               const isCurrent = wizardState.currentStep === step.id;
               const isClickable = isCompleted || isCurrent;
-              const isSkipped = step.id === 3 && wizardState.skipCurriculum;
 
               return (
                 <React.Fragment key={step.id}>
@@ -232,7 +213,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
                   <div className="flex flex-col items-center flex-1">
                     <button
                       onClick={() => isClickable && handleStepClick(step.id)}
-                      disabled={!isClickable || isSkipped}
+                      disabled={!isClickable}
                       className={`
                         w-12 h-12 rounded-full flex items-center justify-center
                         transition-all duration-300 mb-2
@@ -240,11 +221,9 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
                           ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30'
                           : isCurrent
                             ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-110'
-                            : isSkipped
-                              ? 'bg-gray-200 text-gray-400'
-                              : 'bg-gray-100 text-gray-400'
+                            : 'bg-gray-100 text-gray-400'
                         }
-                        ${isClickable && !isSkipped ? 'cursor-pointer hover:scale-105' : 'cursor-default'}
+                        ${isClickable ? 'cursor-pointer hover:scale-105' : 'cursor-default'}
                       `}
                     >
                       {isCompleted ? (
