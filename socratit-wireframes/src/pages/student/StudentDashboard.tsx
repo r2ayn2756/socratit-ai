@@ -270,8 +270,8 @@ export const StudentDashboard: React.FC = () => {
                           navigate(`/student/assignments/${assignment.id}`)
                         }
                       >
-                        <Card padding="none" className="overflow-hidden">
-                          <div className="p-4 bg-white">
+                        <Card variant="glass" padding="lg" hover glow glowColor="red" className="overflow-hidden">
+                          <div>
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
                                 <h3 className="text-lg font-bold text-slate-900 mb-1">
@@ -391,8 +391,10 @@ export const StudentDashboard: React.FC = () => {
                     return (
                       <Card
                         key={assignment.id}
-                        padding="sm"
-                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        variant="glass"
+                        padding="md"
+                        hover
+                        className="cursor-pointer"
                         onClick={() =>
                           navigate(`/student/assignments/${assignment.id}`)
                         }
@@ -413,10 +415,10 @@ export const StudentDashboard: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant="neutral" size="sm">
+                            <Badge variant="glass" size="sm">
                               {assignment.totalPoints} pts
                             </Badge>
-                            <Button variant="primary" size="sm">
+                            <Button variant="gradient" size="sm">
                               <Play className="w-4 h-4 mr-1" />
                               Start
                             </Button>
@@ -432,7 +434,7 @@ export const StudentDashboard: React.FC = () => {
             {/* All Completed Message */}
             {notStarted.length === 0 && inProgress.length === 0 && dueToday.length === 0 && assignments.length > 0 && (
               <motion.div variants={fadeInUp}>
-                <Card className="text-center py-12">
+                <Card variant="glassElevated" padding="xl" className="text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-green-500/30">
                     <CheckCircle className="w-10 h-10" />
                   </div>
@@ -442,7 +444,7 @@ export const StudentDashboard: React.FC = () => {
                   <p className="text-slate-600 mb-4">
                     {t('student.dashboard.allCaughtUpDesc')}
                   </p>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50/70 backdrop-blur-md border border-green-200/50 rounded-lg text-green-700 text-sm">
                     <TrendingUp className="w-4 h-4" />
                     <span className="font-semibold">{t('student.dashboard.keepUpWork')}</span>
                   </div>
@@ -453,7 +455,7 @@ export const StudentDashboard: React.FC = () => {
             {/* No Assignments Message */}
             {assignments.length === 0 && (
               <motion.div variants={fadeInUp}>
-                <Card className="text-center py-12">
+                <Card variant="glassElevated" padding="xl" className="text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-500/30">
                     <FileText className="w-10 h-10" />
                   </div>

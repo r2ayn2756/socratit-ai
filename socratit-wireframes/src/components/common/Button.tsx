@@ -9,7 +9,7 @@ import { motion, HTMLMotionProps } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'glass' | 'gradient' | 'gradientPurple' | 'gradientPink';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 export type IconPosition = 'left' | 'right';
 
@@ -23,6 +23,7 @@ export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'>
   iconPosition?: IconPosition;
   fullWidth?: boolean;
   className?: string;
+  glow?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -39,6 +40,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       disabled,
       type = 'button',
+      glow = true,
       ...motionProps
     },
     ref
@@ -54,13 +56,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       fullWidth && 'w-full'
     );
 
-    // Variant classes (using new design tokens)
+    // Variant classes (using premium design tokens with gradients)
     const variantClasses: Record<ButtonVariant, string> = {
       primary: cn(
         'bg-primary-600 text-white',
         'hover:bg-primary-700 active:bg-primary-800',
         'focus-visible:ring-primary-500',
-        'shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40'
+        glow && 'shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40'
       ),
       secondary: cn(
         'bg-white text-primary-700 border-2 border-primary-600',
@@ -77,13 +79,38 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         'bg-error text-white',
         'hover:bg-red-700 active:bg-red-800',
         'focus-visible:ring-red-500',
-        'shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40'
+        glow && 'shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40'
       ),
       success: cn(
         'bg-success text-white',
         'hover:bg-green-700 active:bg-green-800',
         'focus-visible:ring-green-500',
-        'shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
+        glow && 'shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40'
+      ),
+      glass: cn(
+        'bg-white/70 backdrop-blur-xl text-neutral-900',
+        'border border-white/20',
+        'hover:bg-white/90',
+        'focus-visible:ring-neutral-400',
+        'shadow-sm'
+      ),
+      gradient: cn(
+        'bg-gradient-to-r from-blue-500 to-blue-600 text-white',
+        'hover:from-blue-600 hover:to-blue-700',
+        'focus-visible:ring-blue-500',
+        glow && 'shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40'
+      ),
+      gradientPurple: cn(
+        'bg-gradient-to-r from-purple-500 to-purple-600 text-white',
+        'hover:from-purple-600 hover:to-purple-700',
+        'focus-visible:ring-purple-500',
+        glow && 'shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40'
+      ),
+      gradientPink: cn(
+        'bg-gradient-to-r from-pink-500 to-pink-600 text-white',
+        'hover:from-pink-600 hover:to-pink-700',
+        'focus-visible:ring-pink-500',
+        glow && 'shadow-lg shadow-pink-500/30 hover:shadow-xl hover:shadow-pink-500/40'
       ),
     };
 
@@ -143,7 +170,7 @@ export interface IconButtonProps extends Omit<HTMLMotionProps<'button'>, 'childr
 }
 
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ icon, variant = 'secondary', size = 'md', className, tooltip, disabled, ...motionProps }, ref) => {
+  ({ icon, variant = 'glass', size = 'md', className, tooltip, disabled, ...motionProps }, ref) => {
     const variantClasses: Record<ButtonVariant, string> = {
       primary: cn(
         'bg-primary-600 text-white',
@@ -151,9 +178,9 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         'shadow-md shadow-primary-500/30'
       ),
       secondary: cn(
-        'bg-white/70 backdrop-blur-xl text-neutral-900',
+        'bg-white text-neutral-900',
         'border border-neutral-200',
-        'hover:bg-white/90',
+        'hover:bg-neutral-50',
         'shadow-sm'
       ),
       ghost: cn('bg-transparent text-neutral-700', 'hover:bg-neutral-100'),
@@ -166,6 +193,27 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         'bg-success text-white',
         'hover:bg-green-700 active:bg-green-800',
         'shadow-md shadow-green-500/30'
+      ),
+      glass: cn(
+        'bg-white/70 backdrop-blur-xl text-neutral-900',
+        'border border-white/20',
+        'hover:bg-white/90',
+        'shadow-sm'
+      ),
+      gradient: cn(
+        'bg-gradient-to-r from-blue-500 to-blue-600 text-white',
+        'hover:from-blue-600 hover:to-blue-700',
+        'shadow-md shadow-blue-500/30'
+      ),
+      gradientPurple: cn(
+        'bg-gradient-to-r from-purple-500 to-purple-600 text-white',
+        'hover:from-purple-600 hover:to-purple-700',
+        'shadow-md shadow-purple-500/30'
+      ),
+      gradientPink: cn(
+        'bg-gradient-to-r from-pink-500 to-pink-600 text-white',
+        'hover:from-pink-600 hover:to-pink-700',
+        'shadow-md shadow-pink-500/30'
       ),
     };
 
