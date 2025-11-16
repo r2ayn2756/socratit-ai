@@ -846,7 +846,7 @@ export const CreateAssignment: React.FC = () => {
               {availableConcepts.length > 0 ? (
                 <ConceptMapper
                   questions={formData.questions.map((q, idx) => ({
-                    id: q.id || `temp-${idx}`,
+                    id: `temp-${idx}`,
                     questionText: q.questionText,
                     questionOrder: q.questionOrder || idx + 1,
                   }))}
