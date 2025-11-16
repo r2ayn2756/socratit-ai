@@ -23,6 +23,7 @@ import {
   RosterSection,
   AssignmentsSection,
   ClassAnalyticsSection,
+  ClassMessagingSection,
 } from '../../components/class';
 import { LessonsSection } from '../../components/class/LessonsSection';
 import { CurriculumManagementModal } from '../../components/class/CurriculumManagementModal';
@@ -343,11 +344,23 @@ export const ClassDashboard: React.FC = () => {
               />
             </motion.div>
 
-            {/* Lessons Section */}
+            {/* Class Messaging Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
+            >
+              <ClassMessagingSection
+                classId={classId!}
+                className={classData.name}
+              />
+            </motion.div>
+
+            {/* Lessons Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
             >
               <LessonsSection
                 classId={classId!}

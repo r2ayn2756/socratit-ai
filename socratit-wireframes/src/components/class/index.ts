@@ -13,3 +13,4 @@ export { AudioRecorder } from './AudioRecorder';
 export { LessonCard } from './LessonCard';
 export { LessonDetailsModal } from './LessonDetailsModal';
 export { ClassAnalyticsSection } from './ClassAnalyticsSection';
+export { ClassMessagingSection } from './ClassMessagingSection';

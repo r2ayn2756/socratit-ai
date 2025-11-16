@@ -78,6 +78,13 @@ router.post(
   aiTAController.rateMessage
 );
 
+// Delete AI message (both students and teachers)
+router.delete(
+  '/messages/:id',
+  authorizeRoles(['STUDENT', 'TEACHER']),
+  aiTAController.deleteMessage
+);
+
 // ============================================================================
 // TEACHER ROUTES - Insights & Analytics
 // ============================================================================

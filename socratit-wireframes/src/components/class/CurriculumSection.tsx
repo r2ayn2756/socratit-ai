@@ -88,38 +88,6 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
           />
         </div>
 
-        {/* Condensed Unit List - All Units At a Glance */}
-        {allUnits.length > 0 && (
-          <div className="p-4 rounded-xl bg-gradient-to-br from-neutral-50 to-neutral-100/50 border border-neutral-200">
-            <h4 className="text-sm font-semibold text-neutral-700 mb-3">
-              Units Overview ({allUnits.length} total)
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {allUnits.map((unit) => {
-                const isCurrent = currentUnit?.id === unit.id;
-                return (
-                  <motion.button
-                    key={unit.id}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => onUnitClick?.(unit)}
-                    className={`
-                      px-3 py-2 rounded-lg text-sm font-medium transition-all
-                      ${
-                        isCurrent
-                          ? 'bg-primary-500 text-white shadow-md'
-                          : 'bg-white/80 text-neutral-700 hover:bg-white hover:shadow-sm border border-neutral-200'
-                      }
-                    `}
-                  >
-                    Unit {unit.unitNumber}
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {/* All Units - Single Column Display */}
         {allUnits.length > 0 && (
           <div>

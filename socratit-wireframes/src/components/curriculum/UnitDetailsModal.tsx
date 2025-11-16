@@ -10,9 +10,6 @@ import {
   BookOpen,
   Target,
   Lightbulb,
-  Calendar,
-  Clock,
-  TrendingUp,
   CheckCircle,
   FileText,
   ChevronDown,
@@ -20,7 +17,6 @@ import {
   Plus,
   Sparkles,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import type { CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
 
 interface UnitDetailsModalProps {
@@ -150,82 +146,6 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
 
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-6 modal-scroll">
-                  {/* Quick Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {/* Duration */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Calendar className="w-4 h-4 text-blue-600" />
-                        <span className="text-xs font-medium text-blue-600">Duration</span>
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">
-                        {unit.estimatedWeeks} weeks
-                      </p>
-                      <p className="text-xs text-gray-600 mt-1">
-                        {format(new Date(unit.startDate), 'MMM d')} -{' '}
-                        {format(new Date(unit.endDate), 'MMM d')}
-                      </p>
-                    </div>
-
-                    {/* Difficulty */}
-                    <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200/50">
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="w-4 h-4 text-purple-600" />
-                        <span className="text-xs font-medium text-purple-600">Difficulty</span>
-                      </div>
-                      <p className="text-lg font-bold text-gray-900">
-                        {getDifficultyLabel(unit.difficultyLevel)}
-                      </p>
-                      <div className="flex gap-1 mt-1">
-                        {[1, 2, 3, 4, 5].map((level) => (
-                          <div
-                            key={level}
-                            className={`h-1.5 flex-1 rounded-full ${
-                              level <= unit.difficultyLevel
-                                ? 'bg-gradient-to-r ' + getDifficultyColor(unit.difficultyLevel)
-                                : 'bg-gray-200'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Progress */}
-                    {unit.percentComplete !== undefined && (
-                      <div className="p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200/50">
-                        <div className="flex items-center gap-2 mb-1">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          <span className="text-xs font-medium text-green-600">Progress</span>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">
-                          {unit.percentComplete}%
-                        </p>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                          <div
-                            className="bg-gradient-to-r from-green-500 to-emerald-600 h-1.5 rounded-full transition-all"
-                            style={{ width: `${unit.percentComplete}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Time Estimate */}
-                    {unit.estimatedHours && (
-                      <div className="p-4 rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200/50">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Clock className="w-4 h-4 text-orange-600" />
-                          <span className="text-xs font-medium text-orange-600">Time</span>
-                        </div>
-                        <p className="text-lg font-bold text-gray-900">
-                          {unit.estimatedHours}h
-                        </p>
-                        <p className="text-xs text-gray-600 mt-1">
-                          ~{Math.ceil(unit.estimatedHours / unit.estimatedWeeks)}h/week
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Sub-Units Section - Clickable with Generate Assignment */}
                   {unit.subUnits && unit.subUnits.length > 0 && (
                     <CollapsibleSection
