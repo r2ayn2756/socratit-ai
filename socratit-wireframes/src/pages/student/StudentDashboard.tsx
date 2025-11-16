@@ -236,37 +236,6 @@ export const StudentDashboard: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Stats Row */}
-        <motion.div
-          variants={fadeInUp}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6"
-        >
-          <StatCard
-            icon={FileText}
-            label="Total Assignments"
-            value={assignments.length}
-            color="primary"
-          />
-          <StatCard
-            icon={Clock}
-            label="In Progress"
-            value={inProgress.length}
-            color="warning"
-          />
-          <StatCard
-            icon={CheckCircle}
-            label="Completed"
-            value={completed.length}
-            color="success"
-          />
-          <StatCard
-            icon={TrendingUp}
-            label="Average Grade"
-            value={avgGrade ? `${avgGrade}%` : 'N/A'}
-            color="secondary"
-          />
-        </motion.div>
-
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Assignments */}
