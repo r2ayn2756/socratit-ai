@@ -17,7 +17,7 @@ export interface Assignment {
   title: string;
   description?: string;
   instructions?: string;
-  type: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+  type: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'ESSAY' | 'INTERACTIVE_MATH';
   status: 'DRAFT' | 'SCHEDULED' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
   totalPoints: number;
   passingScore?: number;
@@ -33,6 +33,11 @@ export interface Assignment {
   aiGenerated: boolean;
   aiPrompt?: string;
   curriculumSource?: string;
+  essayConfig?: EssayConfig;
+  // Interactive Math settings
+  enableGraphingCalculator?: boolean;
+  enableBasicCalculator?: boolean;
+  enableStepByStepHints?: boolean;
   createdAt: string;
   updatedAt: string;
   class?: {
@@ -55,10 +60,34 @@ export interface Assignment {
   studentSubmission?: StudentSubmission;
 }
 
+export interface EssayConfig {
+  minWords?: number;
+  maxWords?: number;
+  rubric?: RubricCriterion[];
+  showRubricToStudent: boolean;
+  allowAIAssistant: boolean;
+}
+
+export interface RubricCriterion {
+  id: string;
+  name: string;
+  description: string;
+  maxPoints: number;
+  order: number;
+  proficiencyLevels?: ProficiencyLevel[];
+}
+
+export interface ProficiencyLevel {
+  id: string;
+  name: string;
+  description: string;
+  points: number;
+}
+
 export interface Question {
   id: string;
   assignmentId: string;
-  type: 'MULTIPLE_CHOICE' | 'FREE_RESPONSE';
+  type: 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' | 'MATH_EXPRESSION';
   questionText: string;
   questionOrder: number;
   points: number;
@@ -72,6 +101,10 @@ export interface Question {
   explanation?: string;
   concept?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
+  // Math-specific fields
+  latexExpression?: string;
+  hints?: string[];
+  imageUrl?: string;
   aiGenerated: boolean;
   createdAt: string;
   updatedAt: string;
@@ -121,7 +154,7 @@ export interface CreateAssignmentDTO {
   title: string;
   description?: string;
   instructions?: string;
-  type: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+  type: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'ESSAY' | 'INTERACTIVE_MATH';
   totalPoints?: number;
   passingScore?: number;
   dueDate?: string;
@@ -132,15 +165,20 @@ export interface CreateAssignmentDTO {
   shuffleOptions?: boolean;
   timeLimit?: number;
   maxAttempts?: number;
+  essayConfig?: EssayConfig;
+  // Interactive Math settings
+  enableGraphingCalculator?: boolean;
+  enableBasicCalculator?: boolean;
+  enableStepByStepHints?: boolean;
   questions?: Omit<Question, 'id' | 'assignmentId' | 'createdAt' | 'updatedAt' | 'aiGenerated'>[];
 }
 
 export interface GenerateQuizDTO {
   classId: string;
   curriculumText: string;
-  assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+  assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'INTERACTIVE_MATH';
   numQuestions?: number;
-  questionTypes?: Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE'>;
+  questionTypes?: Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE' | 'MATH_EXPRESSION'>;
   difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
   subject?: string;
   gradeLevel?: string;
@@ -150,7 +188,7 @@ export interface UpdateAssignmentDTO {
   title?: string;
   description?: string;
   instructions?: string;
-  type?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+  type?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'ESSAY' | 'INTERACTIVE_MATH';
   totalPoints?: number;
   passingScore?: number;
   dueDate?: string;
@@ -161,6 +199,11 @@ export interface UpdateAssignmentDTO {
   shuffleOptions?: boolean;
   timeLimit?: number;
   maxAttempts?: number;
+  essayConfig?: EssayConfig;
+  // Interactive Math settings
+  enableGraphingCalculator?: boolean;
+  enableBasicCalculator?: boolean;
+  enableStepByStepHints?: boolean;
 }
 
 export interface PublishAssignmentDTO {
@@ -177,6 +220,21 @@ export interface SubmitAnswerDTO {
 export interface OverrideGradeDTO {
   pointsEarned: number;
   teacherFeedback?: string;
+}
+
+export interface LockdownViolationDTO {
+  assignmentId: string;
+  submissionId?: string;
+  violationType: 'TAB_SWITCH' | 'COPY_ATTEMPT' | 'PASTE_ATTEMPT' | 'FULLSCREEN_EXIT';
+  timestamp: string;
+  message: string;
+}
+
+export interface QuestionConceptMappingDTO {
+  questionId: string;
+  conceptId?: string;
+  conceptName?: string;
+  subtopicName?: string;
 }
 
 // ============================================================================
@@ -206,7 +264,7 @@ class AssignmentService {
     lessonId: string;
     numQuestions?: number;
     difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
-    assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+    assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'INTERACTIVE_MATH';
   }): Promise<Assignment> {
     const response = await apiService.post<{ success: boolean; data: Assignment }>(
       '/assignments/generate-from-lesson',
@@ -326,6 +384,51 @@ class AssignmentService {
     const response = await apiService.patch<{ success: boolean; data: Answer }>(
       `/submissions/${submissionId}/answers/${answerId}/grade`,
       data
+    );
+    return response.data.data;
+  }
+
+  // ========================================
+  // TEST LOCKDOWN & SECURITY
+  // ========================================
+
+  /**
+   * Log a lockdown violation for a test assignment
+   */
+  async logLockdownViolation(data: LockdownViolationDTO): Promise<void> {
+    await apiService.post('/assignments/lockdown-violations', data);
+  }
+
+  /**
+   * Get lockdown violations for a submission (teachers only)
+   */
+  async getLockdownViolations(submissionId: string): Promise<LockdownViolationDTO[]> {
+    const response = await apiService.get<{ success: boolean; data: LockdownViolationDTO[] }>(
+      `/submissions/${submissionId}/lockdown-violations`
+    );
+    return response.data.data;
+  }
+
+  // ========================================
+  // CONCEPT MAPPING
+  // ========================================
+
+  /**
+   * Update concept mappings for an assignment's questions
+   */
+  async updateQuestionConceptMappings(
+    assignmentId: string,
+    mappings: QuestionConceptMappingDTO[]
+  ): Promise<void> {
+    await apiService.post(`/assignments/${assignmentId}/concept-mappings`, { mappings });
+  }
+
+  /**
+   * Get concept mappings for an assignment
+   */
+  async getQuestionConceptMappings(assignmentId: string): Promise<QuestionConceptMappingDTO[]> {
+    const response = await apiService.get<{ success: boolean; data: QuestionConceptMappingDTO[] }>(
+      `/assignments/${assignmentId}/concept-mappings`
     );
     return response.data.data;
   }

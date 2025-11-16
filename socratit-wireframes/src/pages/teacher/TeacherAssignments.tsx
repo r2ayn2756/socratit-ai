@@ -243,11 +243,7 @@ export const TeacherAssignments: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    if (window.confirm(`Are you sure you want to delete "${assignment.title}"?`)) {
-                      deleteMutation.mutate(assignment.id);
-                    }
-                  }}
+                  onClick={() => deleteMutation.mutate(assignment.id)}
                   disabled={deleteMutation.isPending}
                 >
                   <Trash2 className="w-4 h-4" />

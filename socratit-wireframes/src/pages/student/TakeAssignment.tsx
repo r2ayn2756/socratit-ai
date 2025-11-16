@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
 import { AlwaysVisibleAIChat } from '../../components/ai/AlwaysVisibleAIChat';
+import { TestLockdown, LockdownInfoBanner, LockdownViolation } from '../../components/student/TestLockdown';
+import { EssayEditor } from '../../components/student/EssayEditor';
 
 export const TakeAssignment: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>();
@@ -31,6 +33,13 @@ export const TakeAssignment: React.FC = () => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'idle'>('idle');
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Essay content state
+  const [essayContent, setEssayContent] = useState('');
+
+  // Test lockdown state
+  const [lockdownAccepted, setLockdownAccepted] = useState(false);
+  const [lockdownViolations, setLockdownViolations] = useState<LockdownViolation[]>([]);
 
   // Fetch assignment details
   const { data: assignment, isLoading: assignmentLoading } = useQuery({
@@ -143,7 +152,8 @@ export const TakeAssignment: React.FC = () => {
     );
   }
 
-  if (!assignment || !assignment.questions || assignment.questions.length === 0) {
+  // Allow ESSAY assignments to have no questions
+  if (!assignment || (assignment.type !== 'ESSAY' && (!assignment.questions || assignment.questions.length === 0))) {
     return (
       <DashboardLayout userRole="student">
         <Card>
@@ -164,18 +174,21 @@ export const TakeAssignment: React.FC = () => {
     );
   }
 
-  const currentQuestion = assignment.questions[currentQuestionIndex];
-  const totalQuestions = assignment.questions.length;
+  const isEssayAssignment = assignment.type === 'ESSAY';
+  const currentQuestion = !isEssayAssignment && assignment.questions ? assignment.questions[currentQuestionIndex] : null;
+  const totalQuestions = !isEssayAssignment && assignment.questions ? assignment.questions.length : 0;
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
-  const currentAnswer = answers[currentQuestion.id] || '';
+  const currentAnswer = currentQuestion ? (answers[currentQuestion.id] || '') : '';
 
   const handleAnswerChange = (value: string) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    if (currentQuestion) {
+      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    }
   };
 
   const handleNext = () => {
     // Submit current answer
-    if (currentAnswer) {
+    if (currentAnswer && currentQuestion) {
       answerMutation.mutate({
         questionId: currentQuestion.id,
         answer: currentAnswer,
@@ -195,8 +208,16 @@ export const TakeAssignment: React.FC = () => {
 
   const handleSubmitAssignment = () => {
     if (window.confirm('Are you sure you want to submit this assignment? You cannot change your answers after submission.')) {
-      // Submit last answer if not submitted
-      if (currentAnswer && !answerMutation.isPending) {
+      // For essay assignments, submit essay content
+      if (isEssayAssignment && essayContent && submissionId) {
+        // Create a fake question ID for essays (or use assignment ID)
+        answerMutation.mutate({
+          questionId: `essay-${assignmentId}`,
+          answer: essayContent,
+        });
+      }
+      // Submit last answer if not submitted (for regular assignments)
+      else if (currentAnswer && currentQuestion && !answerMutation.isPending) {
         answerMutation.mutate({
           questionId: currentQuestion.id,
           answer: currentAnswer,
@@ -208,21 +229,80 @@ export const TakeAssignment: React.FC = () => {
     }
   };
 
-  const answeredCount = Object.keys(answers).length;
-  const progress = Math.round((answeredCount / totalQuestions) * 100);
+  const handleEssayAutoSave = () => {
+    if (essayContent && submissionId) {
+      setAutoSaveStatus('saving');
+      answerMutation.mutate({
+        questionId: `essay-${assignmentId}`,
+        answer: essayContent,
+      });
+    }
+  };
+
+  const answeredCount = isEssayAssignment ? (essayContent.length > 0 ? 1 : 0) : Object.keys(answers).length;
+  const progress = isEssayAssignment ? (essayContent.length > 0 ? 100 : 0) : Math.round((answeredCount / totalQuestions) * 100);
+
+  // Determine if this is a test and needs lockdown
+  const isTestAssignment = assignment.type === 'TEST';
+  const lockdownEnabled = isTestAssignment && !lockdownAccepted;
+
+  // Lockdown settings (these could come from assignment settings in the future)
+  const lockdownSettings = {
+    enableTabSwitchDetection: true,
+    enableCopyPasteBlocking: true,
+    enableFullscreen: false, // Optional - can be enabled per teacher preference
+    maxViolations: 5,
+    autoSubmitOnMaxViolations: true,
+  };
+
+  // Handle lockdown violation
+  const handleLockdownViolation = (violation: LockdownViolation) => {
+    setLockdownViolations(prev => [...prev, violation]);
+    // In a real implementation, this would call the backend to log the violation
+    console.log('Logging violation to backend:', violation);
+  };
+
+  // Handle max violations reached - auto submit
+  const handleMaxViolationsReached = () => {
+    alert('Maximum security violations reached. Your test will now be submitted automatically.');
+    handleSubmitAssignment();
+  };
+
+  // Show lockdown info banner for tests
+  if (isTestAssignment && !lockdownAccepted) {
+    return (
+      <DashboardLayout userRole="student">
+        <div className="max-w-2xl mx-auto mt-8">
+          <LockdownInfoBanner
+            settings={lockdownSettings}
+            onAccept={() => setLockdownAccepted(true)}
+          />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout userRole="student">
-      {/* Always-visible AI Chat (right sidebar) */}
-      <AlwaysVisibleAIChat
+      <TestLockdown
+        enabled={isTestAssignment && lockdownAccepted}
+        settings={lockdownSettings}
         assignmentId={assignmentId!}
-        assignmentTitle={assignment.title}
-        currentQuestionId={currentQuestion?.id}
-        currentQuestionText={currentQuestion?.questionText}
-      />
+        onViolation={handleLockdownViolation}
+        onMaxViolationsReached={handleMaxViolationsReached}
+      >
+        {/* Always-visible AI Chat (right sidebar) - Hidden for tests */}
+        {!isTestAssignment && !isEssayAssignment && (
+          <AlwaysVisibleAIChat
+            assignmentId={assignmentId!}
+            assignmentTitle={assignment.title}
+            currentQuestionId={currentQuestion?.id}
+            currentQuestionText={currentQuestion?.questionText}
+          />
+        )}
 
-      {/* Main content area (with margin for chat) */}
-      <div className="max-w-4xl mx-auto space-y-6 mr-96 pr-6">
+      {/* Main content area (with margin for chat only if not a test) */}
+      <div className={`max-w-4xl mx-auto space-y-6 ${!isTestAssignment ? 'mr-96 pr-6' : ''}`}>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -274,30 +354,48 @@ export const TakeAssignment: React.FC = () => {
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <Card>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-700">
-              Question {currentQuestionIndex + 1} of {totalQuestions}
-            </span>
-            <span className="text-sm text-slate-600">{progress}% Complete</span>
-          </div>
-          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </Card>
-
-        {/* Question Card */}
-        <motion.div
-          key={currentQuestion.id}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-        >
+        {/* Progress Bar - Hide for essay assignments */}
+        {!isEssayAssignment && (
           <Card>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-slate-700">
+                Question {currentQuestionIndex + 1} of {totalQuestions}
+              </span>
+              <span className="text-sm text-slate-600">{progress}% Complete</span>
+            </div>
+            <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </Card>
+        )}
+
+        {/* Essay Editor for ESSAY assignments */}
+        {isEssayAssignment ? (
+          <EssayEditor
+            essayContent={essayContent}
+            onChange={setEssayContent}
+            onAutoSave={handleEssayAutoSave}
+            essayConfig={assignment.essayConfig}
+            rubric={assignment.essayConfig?.rubric}
+            autoSaveStatus={autoSaveStatus}
+            aiAssistantEnabled={assignment.essayConfig?.allowAIAssistant}
+            onAIAssist={() => {
+              // Could open AI chat or assistant modal here
+              console.log('AI Assistant requested');
+            }}
+          />
+        ) : (
+          currentQuestion && (
+            <motion.div
+              key={currentQuestion.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <Card>
             <div className="mb-6">
               <div className="flex items-start justify-between mb-4">
                 <h2 className="text-xl font-bold text-slate-900">
@@ -385,16 +483,35 @@ export const TakeAssignment: React.FC = () => {
                 </Button>
               )}
             </div>
-          </Card>
-        </motion.div>
+              </Card>
+            </motion.div>
+          )
+        )}
 
-        {/* Question Navigator */}
-        <Card>
-          <h3 className="text-sm font-medium text-slate-700 mb-3">
-            Question Navigator
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {assignment.questions.map((q, index) => (
+        {/* Submit Button for Essay Assignments */}
+        {isEssayAssignment && (
+          <Card>
+            <div className="flex items-center justify-end">
+              <Button
+                variant="primary"
+                onClick={handleSubmitAssignment}
+                disabled={submitMutation.isPending || !essayContent.trim()}
+              >
+                <Send className="w-4 h-4 mr-2" />
+                {submitMutation.isPending ? 'Submitting...' : 'Submit Essay'}
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {/* Question Navigator - Only for non-essay assignments */}
+        {!isEssayAssignment && assignment.questions && (
+          <Card>
+            <h3 className="text-sm font-medium text-slate-700 mb-3">
+              Question Navigator
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {assignment.questions.map((q, index) => (
               <button
                 key={q.id}
                 onClick={() => setCurrentQuestionIndex(index)}
@@ -408,10 +525,12 @@ export const TakeAssignment: React.FC = () => {
               >
                 {index + 1}
               </button>
-            ))}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
+      </TestLockdown>
     </DashboardLayout>
   );
 };

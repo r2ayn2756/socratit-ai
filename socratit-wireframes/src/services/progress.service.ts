@@ -231,3 +231,74 @@ export const getClassProgressTrends = async (classId: string): Promise<ClassProg
   const response = await apiClient.get(`/progress/trends/class/${classId}`);
   return response.data.data;
 };
+
+// ============================================================================
+// CONCEPT MASTERY ENDPOINTS (for practice assignments)
+// ============================================================================
+
+/**
+ * Get student's concept mastery data from practice assignments
+ */
+export const getConceptMasteryData = async (
+  studentId: string,
+  classId: string
+): Promise<{
+  conceptId: string;
+  conceptName: string;
+  subtopicName: string;
+  unitTitle?: string;
+  masteryScore: number;
+  questionsAttempted: number;
+  questionsCorrect: number;
+  averageScore: number;
+  trend: 'improving' | 'declining' | 'stable';
+  lastPracticed?: string;
+  recommendations?: string[];
+}[]> => {
+  const response = await apiClient.get(
+    `/progress/concepts/${studentId}/class/${classId}/mastery`
+  );
+  return response.data.data;
+};
+
+/**
+ * Update concept mastery score after practice question response
+ * This is typically called automatically by the backend after answer submission
+ */
+export const updateConceptMastery = async (
+  studentId: string,
+  conceptId: string,
+  data: {
+    questionId: string;
+    isCorrect: boolean;
+    score: number;
+    timeSpent?: number;
+  }
+): Promise<void> => {
+  await apiClient.post(`/progress/concepts/${studentId}/update`, {
+    conceptId,
+    ...data,
+  });
+};
+
+/**
+ * Get concept mastery summary for a specific concept across all students (teachers only)
+ */
+export const getConceptMasterySummary = async (
+  conceptId: string,
+  classId: string
+): Promise<{
+  conceptId: string;
+  conceptName: string;
+  classAverage: number;
+  studentsCount: number;
+  studentsAbove70: number;
+  studentsBelow50: number;
+  topPerformers: Array<{ studentId: string; studentName: string; score: number }>;
+  needsSupport: Array<{ studentId: string; studentName: string; score: number }>;
+}> => {
+  const response = await apiClient.get(
+    `/progress/concepts/${conceptId}/class/${classId}/summary`
+  );
+  return response.data.data;
+};

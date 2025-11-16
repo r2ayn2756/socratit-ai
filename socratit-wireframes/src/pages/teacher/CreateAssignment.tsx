@@ -9,10 +9,15 @@ import { motion } from 'framer-motion';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '../../components/layout';
 import { Card, Button, Input } from '../../components/common';
-import { ArrowLeft, Save, Sparkles, Plus, Trash2, BookOpen, Calendar, Award, Settings } from 'lucide-react';
-import { assignmentService, CreateAssignmentDTO, Question } from '../../services/assignment.service';
+import { ArrowLeft, Save, Sparkles, Plus, Trash2, BookOpen, Calendar, Award, Settings, Calculator, Target, FileText } from 'lucide-react';
+import { assignmentService, CreateAssignmentDTO, Question, EssayConfig, RubricCriterion } from '../../services/assignment.service';
 import { classService } from '../../services/class.service';
 import { AIAssignmentModal } from '../../components/teacher/AIAssignmentModal';
+import { MathQuestionEditor } from '../../components/teacher/MathQuestionEditor';
+import { ConceptMapper, ConceptMapping, CurriculumConcept } from '../../components/teacher/ConceptMapper';
+import { RubricBuilder } from '../../components/teacher/RubricBuilder';
+import { classCurriculumService } from '../../services/classCurriculum.service';
+import type { CurriculumSchedule, CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
 
 export const CreateAssignment: React.FC = () => {
   const navigate = useNavigate();
@@ -52,10 +57,37 @@ export const CreateAssignment: React.FC = () => {
     questions: [],
   });
 
+  // Interactive Math specific settings
+  const [mathSettings, setMathSettings] = useState({
+    enableGraphingCalculator: true,
+    enableStepByStepHints: true,
+    enableBasicCalculator: true,
+  });
+
+  // Concept mapping state (for PRACTICE assignments)
+  const [conceptMappings, setConceptMappings] = useState<ConceptMapping[]>([]);
+  const [availableConcepts, setAvailableConcepts] = useState<CurriculumConcept[]>([]);
+
+  // Essay-specific settings
+  const [essayConfig, setEssayConfig] = useState<EssayConfig>({
+    minWords: undefined,
+    maxWords: undefined,
+    rubric: [],
+    showRubricToStudent: true,
+    allowAIAssistant: true,
+  });
+
   // Fetch teacher's classes
   const { data: classesData } = useQuery({
     queryKey: ['teacher-classes'],
     queryFn: () => classService.getTeacherClasses(),
+  });
+
+  // Fetch curriculum schedule for selected class (to get available concepts)
+  const { data: curriculumSchedule } = useQuery({
+    queryKey: ['class-curriculum', formData.classId],
+    queryFn: () => classCurriculumService.getClassSchedule(formData.classId),
+    enabled: !!formData.classId && formData.type === 'PRACTICE',
   });
 
   // Fetch existing assignment if in edit mode
@@ -64,6 +96,45 @@ export const CreateAssignment: React.FC = () => {
     queryFn: () => assignmentService.getAssignment(assignmentId!),
     enabled: isEditMode,
   });
+
+  // Parse available concepts from curriculum schedule
+  useEffect(() => {
+    if (curriculumSchedule && curriculumSchedule.units) {
+      const concepts: CurriculumConcept[] = [];
+
+      curriculumSchedule.units.forEach((unit: CurriculumUnit) => {
+        // Get concepts from unit's subunits
+        if (unit.subUnits) {
+          unit.subUnits.forEach((subUnit: CurriculumSubUnit) => {
+            subUnit.concepts.forEach((conceptName: string) => {
+              concepts.push({
+                id: `${subUnit.id}-${conceptName}`,
+                name: conceptName,
+                subtopicName: subUnit.name,
+                learningObjectives: subUnit.learningObjectives || [],
+                unitTitle: unit.title,
+              });
+            });
+          });
+        }
+
+        // Get concepts directly from unit if no subunits
+        if (!unit.subUnits || unit.subUnits.length === 0) {
+          unit.concepts?.forEach((conceptName: string) => {
+            concepts.push({
+              id: `${unit.id}-${conceptName}`,
+              name: conceptName,
+              subtopicName: unit.title,
+              learningObjectives: unit.learningObjectives || [],
+              unitTitle: unit.title,
+            });
+          });
+        }
+      });
+
+      setAvailableConcepts(concepts);
+    }
+  }, [curriculumSchedule]);
 
   // Populate form when assignment data loads OR when coming from curriculum
   useEffect(() => {
@@ -180,8 +251,10 @@ export const CreateAssignment: React.FC = () => {
       ...formData,
       // Convert datetime-local to ISO string if present
       dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
-      // Remove questions array if empty (backend validation requires min 1)
+      // Remove questions array if empty (backend validation requires min 1) - but allow empty for ESSAY type
       questions: formData.questions && formData.questions.length > 0 ? formData.questions : undefined,
+      // Include essay config if type is ESSAY
+      essayConfig: formData.type === 'ESSAY' ? essayConfig : undefined,
     };
 
     console.log('Processed submit data:', submitData);
@@ -348,13 +421,15 @@ export const CreateAssignment: React.FC = () => {
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Assignment Type <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {[
                     { value: 'PRACTICE', label: 'Practice', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
                     { value: 'QUIZ', label: 'Quiz', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
                     { value: 'TEST', label: 'Test', activeClass: 'border-red-500 bg-red-50 text-red-700' },
                     { value: 'HOMEWORK', label: 'Homework', activeClass: 'border-green-500 bg-green-50 text-green-700' },
                     { value: 'CHALLENGE', label: 'Challenge', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
+                    { value: 'INTERACTIVE_MATH', label: 'Interactive Math', activeClass: 'border-indigo-500 bg-indigo-50 text-indigo-700' },
+                    { value: 'ESSAY', label: 'Essay', activeClass: 'border-pink-500 bg-pink-50 text-pink-700' },
                   ].map((type) => (
                     <motion.button
                       key={type.value}
@@ -468,32 +543,152 @@ export const CreateAssignment: React.FC = () => {
                   </label>
                 </div>
               </div>
+
+              {/* Interactive Math Settings - Only show when type is INTERACTIVE_MATH */}
+              {formData.type === 'INTERACTIVE_MATH' && (
+                <div className="pt-4 border-t border-slate-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Calculator className="w-4 h-4 text-indigo-600" />
+                    <label className="text-sm font-medium text-indigo-700">Interactive Math Settings</label>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={mathSettings.enableGraphingCalculator}
+                        onChange={(e) => setMathSettings({ ...mathSettings, enableGraphingCalculator: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm text-slate-900 font-medium">Enable Desmos Graphing Calculator</span>
+                        <p className="text-xs text-slate-600 mt-0.5">Allow students to use an interactive graphing calculator</p>
+                      </div>
+                    </label>
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={mathSettings.enableBasicCalculator}
+                        onChange={(e) => setMathSettings({ ...mathSettings, enableBasicCalculator: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm text-slate-900 font-medium">Enable Basic Calculator</span>
+                        <p className="text-xs text-slate-600 mt-0.5">Provide a simple calculator for arithmetic operations</p>
+                      </div>
+                    </label>
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={mathSettings.enableStepByStepHints}
+                        onChange={(e) => setMathSettings({ ...mathSettings, enableStepByStepHints: e.target.checked })}
+                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm text-slate-900 font-medium">Enable Step-by-Step Hints</span>
+                        <p className="text-xs text-slate-600 mt-0.5">Progressive hints that guide without giving the answer</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* Essay Settings - Only show when type is ESSAY */}
+              {formData.type === 'ESSAY' && (
+                <div className="pt-4 border-t border-slate-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <FileText className="w-4 h-4 text-pink-600" />
+                    <label className="text-sm font-medium text-pink-700">Essay Settings</label>
+                  </div>
+                  <div className="space-y-4">
+                    {/* Word Count Requirements */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1.5">Minimum Words</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={essayConfig.minWords || ''}
+                          onChange={(e) => setEssayConfig({ ...essayConfig, minWords: e.target.value ? parseInt(e.target.value) : undefined })}
+                          placeholder="e.g., 500"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:border-pink-500 focus:ring-pink-500/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1.5">Maximum Words</label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={essayConfig.maxWords || ''}
+                          onChange={(e) => setEssayConfig({ ...essayConfig, maxWords: e.target.value ? parseInt(e.target.value) : undefined })}
+                          placeholder="e.g., 1000"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:border-pink-500 focus:ring-pink-500/20"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Essay Checkboxes */}
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-pink-200 bg-pink-50/50 hover:bg-pink-50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={essayConfig.showRubricToStudent}
+                        onChange={(e) => setEssayConfig({ ...essayConfig, showRubricToStudent: e.target.checked })}
+                        className="w-4 h-4 text-pink-600 border-slate-300 rounded focus:ring-2 focus:ring-pink-500"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm text-slate-900 font-medium">Show Rubric to Students</span>
+                        <p className="text-xs text-slate-600 mt-0.5">Display grading criteria while students write</p>
+                      </div>
+                    </label>
+                    <label className="flex items-center gap-3 p-3 rounded-lg border border-pink-200 bg-pink-50/50 hover:bg-pink-50 transition-colors cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={essayConfig.allowAIAssistant}
+                        onChange={(e) => setEssayConfig({ ...essayConfig, allowAIAssistant: e.target.checked })}
+                        className="w-4 h-4 text-pink-600 border-slate-300 rounded focus:ring-2 focus:ring-pink-500"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm text-slate-900 font-medium">Allow AI Writing Assistant</span>
+                        <p className="text-xs text-slate-600 mt-0.5">Students can use AI to brainstorm and develop ideas</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
 
-          {/* Questions */}
-          <Card variant="glassElevated">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">Questions</h2>
-                {isEditMode && existingAssignment?.status !== 'DRAFT' && (
-                  <p className="text-sm text-amber-600 mt-1">
-                    Note: Questions cannot be edited after assignment is published. Only due date and settings can be changed.
-                  </p>
+          {/* Essay Rubric Builder - Only show when type is ESSAY */}
+          {formData.type === 'ESSAY' && (
+            <RubricBuilder
+              rubric={essayConfig.rubric || []}
+              onChange={(rubric) => setEssayConfig({ ...essayConfig, rubric })}
+            />
+          )}
+
+          {/* Questions - Hide for ESSAY type */}
+          {formData.type !== 'ESSAY' && (
+            <Card variant="glassElevated">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">Questions</h2>
+                  {isEditMode && existingAssignment?.status !== 'DRAFT' && (
+                    <p className="text-sm text-amber-600 mt-1">
+                      Note: Questions cannot be edited after assignment is published. Only due date and settings can be changed.
+                    </p>
+                  )}
+                </div>
+                {(!isEditMode || existingAssignment?.status === 'DRAFT') && (
+                  <Button
+                    type="button"
+                    variant="gradient"
+                    size="sm"
+                    onClick={addQuestion}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Question
+                  </Button>
                 )}
               </div>
-              {(!isEditMode || existingAssignment?.status === 'DRAFT') && (
-                <Button
-                  type="button"
-                  variant="gradient"
-                  size="sm"
-                  onClick={addQuestion}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Question
-                </Button>
-              )}
-            </div>
 
             {formData.questions && formData.questions.length > 0 ? (
               <div className="space-y-4">
@@ -632,7 +827,43 @@ export const CreateAssignment: React.FC = () => {
                 <p className="text-sm text-slate-500 mt-1">Click "Add Question" above or use "Generate with AI" to get started</p>
               </div>
             )}
-          </Card>
+            </Card>
+          )}
+
+          {/* Concept Mapping (for PRACTICE assignments only) */}
+          {formData.type === 'PRACTICE' && formData.questions && formData.questions.length > 0 && (
+            <Card variant="glassElevated">
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-bold text-slate-900">Concept Mapping</h2>
+                </div>
+                <p className="text-sm text-slate-600">
+                  Map questions to curriculum concepts to track student mastery and provide personalized insights.
+                </p>
+              </div>
+
+              {availableConcepts.length > 0 ? (
+                <ConceptMapper
+                  questions={formData.questions.map((q, idx) => ({
+                    id: q.id || `temp-${idx}`,
+                    questionText: q.questionText,
+                    questionOrder: q.questionOrder || idx + 1,
+                  }))}
+                  availableConcepts={availableConcepts}
+                  initialMappings={conceptMappings}
+                  onChange={setConceptMappings}
+                  showCoverage={true}
+                />
+              ) : (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>No curriculum concepts available.</strong> To enable concept mapping, ensure your class has a curriculum schedule with defined concepts and subtopics.
+                  </p>
+                </div>
+              )}
+            </Card>
+          )}
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3">

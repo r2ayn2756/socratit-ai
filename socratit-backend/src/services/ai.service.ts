@@ -1065,83 +1065,45 @@ export async function analyzeCurriculumForScheduling(
 ): Promise<AIScheduleGenerationResult> {
   const { gradeLevel, subject, totalWeeks, targetUnits, pacingPreference } = options;
 
-  const systemPrompt = 'You are an expert curriculum designer who creates year-long teaching schedules. You analyze educational content and structure it into logical teaching units with precise time estimates and difficulty assessments.';
+  const systemPrompt = 'You are a curriculum designer. Analyze content and create teaching units with sub-units. Output valid JSON only.';
 
-  const userPrompt = `Analyze this curriculum and create a complete year-long teaching schedule.
+  const userPrompt = `Create ${targetUnits || 8} teaching units from this curriculum for ${gradeLevel} ${subject} (${totalWeeks} weeks).
 
-**CONTEXT:**
-- Grade Level: ${gradeLevel}
-- Subject: ${subject}
-- School Year: ${totalWeeks} weeks available
-${targetUnits ? `- Target: Approximately ${targetUnits} units` : '- Target: 6-12 units'}
-${pacingPreference ? `- Pacing: ${pacingPreference}` : '- Pacing: standard'}
-
-**CURRICULUM CONTENT:**
+CURRICULUM:
 ${curriculumText}
 
-**TASK:**
-Break this curriculum into logical teaching units that span the entire school year. Each unit should represent a major instructional block. Within each unit, create 3-5 sub-units that represent specific topics or lessons that will be taught sequentially.
+For each unit, create 3 sub-units. Keep descriptions 1 sentence max.
 
-**REQUIREMENTS:**
-1. **Unit Structure**: Identify ${targetUnits || '6-12'} major units that follow a logical progression
-2. **Sub-Unit Structure**: For EACH unit, break it down into 3-5 sub-units. Each sub-unit should be a teachable chunk (1-3 class periods) covering a specific concept or skill. Keep descriptions brief (1 sentence max). Sub-units are what teachers will use to generate individual assignments.
-3. **Time Estimation**: Estimate weeks needed for each unit based on:
-   - Content depth and complexity
-   - Number of subtopics to cover
-   - Typical ${gradeLevel} pacing for ${subject}
-   - Skill-building requirements
-3. **Difficulty Analysis**: Rate each unit 1-5:
-   - 1 = Introductory (foundational concepts, minimal prerequisites)
-   - 2 = Basic (building on foundations, moderate complexity)
-   - 3 = Intermediate (requires prior knowledge, moderate challenge)
-   - 4 = Advanced (complex concepts, significant prerequisites)
-   - 5 = Expert (highest complexity, cumulative knowledge required)
-4. **Sequencing**: Identify which topics are prerequisites for others
-5. **Assessment Points**: Suggest where to assess understanding
-
-**PACING GUIDELINES:**
-- Introductory units: 1-2 weeks
-- Core concept units: 2-4 weeks
-- Complex/cumulative units: 3-6 weeks
-- Review/assessment: 1 week
-- Total should approximately match ${totalWeeks} weeks
-
-**RESPONSE FORMAT (JSON):**
+JSON format:
 {
   "units": [
     {
-      "title": "Unit 1: Introduction to [Topic]",
-      "description": "Clear 2-3 sentence description of what students will learn",
+      "title": "Unit title",
+      "description": "1-2 sentence description",
       "subUnits": [
         {
-          "name": "Sub-unit Name",
-          "description": "Brief 1-sentence description",
+          "name": "Sub-unit name",
+          "description": "Brief description",
           "concepts": ["concept1", "concept2"],
-          "learningObjectives": ["Students will be able to...", "Students will understand..."],
+          "learningObjectives": ["Objective 1", "Objective 2"],
           "estimatedHours": 2.5,
           "orderIndex": 1
         }
       ],
-      "estimatedWeeks": 2.5,
-      "estimatedHours": 12.5,
+      "estimatedWeeks": 2,
+      "estimatedHours": 10,
       "confidenceScore": 0.85,
       "difficultyLevel": 1,
-      "difficultyReasoning": "Why this difficulty level (1-2 sentences)",
-      "prerequisiteTopics": ["Topic from earlier unit"],
-      "buildUponTopics": ["Topic this leads into"],
+      "difficultyReasoning": "Why this difficulty",
+      "prerequisiteTopics": [],
+      "buildUponTopics": [],
       "orderInSequence": 1,
-      "suggestedAssessments": [
-        {
-          "type": "quiz",
-          "timing": "end",
-          "estimatedQuestions": 10
-        }
-      ]
+      "suggestedAssessments": [{"type": "quiz", "timing": "end", "estimatedQuestions": 10}]
     }
   ],
   "metadata": {
-    "totalUnits": 8,
-    "estimatedTotalWeeks": 32,
+    "totalUnits": ${targetUnits || 8},
+    "estimatedTotalWeeks": ${totalWeeks},
     "difficultyProgression": "stepped",
     "recommendedPacing": "standard",
     "gradeLevel": "${gradeLevel}",
@@ -1149,20 +1111,11 @@ Break this curriculum into logical teaching units that span the entire school ye
   }
 }
 
-**IMPORTANT:**
-- Units should build logically (easier → harder)
-- Total estimated weeks should be close to ${totalWeeks} (leave 2-4 weeks buffer for review/testing)
-- Difficulty progression should feel natural
-- Each unit should be substantial enough to warrant the time allocated
-- KEEP ALL DESCRIPTIONS CONCISE - 1 sentence max for sub-units, 2-3 sentences for units
-- Limit learning objectives to 2-3 per sub-unit to stay within token limits
-- Respond ONLY with valid JSON, no other text
-
-Generate the schedule now:`;
+Respond with JSON only:`;
 
   try {
-    // Increased to 8000 tokens to accommodate sub-units structure (3-6 sub-units per unit with details)
-    const result = await callAI(systemPrompt, userPrompt, 8000) as AIScheduleGenerationResult;
+    // Reduced to 4000 tokens for faster generation (3 sub-units per unit × 8 units)
+    const result = await callAI(systemPrompt, userPrompt, 4000) as AIScheduleGenerationResult;
 
     // Validate the response
     if (!result.units || !Array.isArray(result.units) || result.units.length === 0) {

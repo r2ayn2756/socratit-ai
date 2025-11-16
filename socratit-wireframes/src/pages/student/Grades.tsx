@@ -264,163 +264,108 @@ export const Grades: React.FC<GradesProps> = () => {
           </div>
         </motion.div>
 
-        {/* Main Content and TA Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Grades List - Takes up 2/3 */}
-          <div className="lg:col-span-2 space-y-6">
-            {classGrades.map((classItem) => {
-              const colors = getColorClasses(classItem.color);
+        {/* Main Content */}
+        <div className="space-y-6">
+          {classGrades.map((classItem) => {
+            const colors = getColorClasses(classItem.color);
 
-              return (
-                <motion.div
-                  key={classItem.id}
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.01, y: -4 }}
-                >
-                  <Card variant="glassElevated" padding="none" className="overflow-hidden">
-                    {/* Class Header with Gradient */}
-                    <div className={`p-6 bg-gradient-to-r ${colors.gradient} text-white`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <BookOpen className="w-6 h-6" />
-                            <h2 className="text-2xl font-bold">{classItem.name}</h2>
-                          </div>
-                          <div className="text-sm opacity-90">
-                            {classItem.teacher}
-                          </div>
+            return (
+              <motion.div
+                key={classItem.id}
+                variants={fadeInUp}
+                whileHover={{ scale: 1.01, y: -4 }}
+              >
+                <Card variant="glassElevated" padding="none" className="overflow-hidden">
+                  {/* Class Header with Gradient */}
+                  <div className={`p-6 bg-gradient-to-r ${colors.gradient} text-white`}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <BookOpen className="w-6 h-6" />
+                          <h2 className="text-2xl font-bold">{classItem.name}</h2>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm opacity-90 mb-1">Current Grade</div>
-                          <div className="text-4xl font-bold">{classItem.currentGrade}%</div>
+                        <div className="text-sm opacity-90">
+                          {classItem.teacher}
                         </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm opacity-90 mb-1">Current Grade</div>
+                        <div className="text-4xl font-bold">{classItem.currentGrade}%</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Grade Breakdown */}
+                  <div className="p-6 bg-white">
+                    <div className="mb-6">
+                      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-4">
+                        Grade Breakdown by Category
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {Object.entries(classItem.breakdown).map(([category, data]: [string, any]) => (
+                          <div key={category} className={`p-4 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-slate-700 capitalize">
+                                {category}
+                              </span>
+                              <span className="text-xs text-slate-600">{data.weight}%</span>
+                            </div>
+                            <div className="text-2xl font-bold text-slate-900">
+                              {data.average}%
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Grade Breakdown */}
-                    <div className="p-6 bg-white">
-                      <div className="mb-6">
-                        <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-4">
-                          Grade Breakdown by Category
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          {Object.entries(classItem.breakdown).map(([category, data]: [string, any]) => (
-                            <div key={category} className={`p-4 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50`}>
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-slate-700 capitalize">
-                                  {category}
-                                </span>
-                                <span className="text-xs text-slate-600">{data.weight}%</span>
-                              </div>
-                              <div className="text-2xl font-bold text-slate-900">
-                                {data.average}%
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                    {/* Recent Assignments */}
+                    <div>
+                      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-4">
+                        Recent Assignments
                       </div>
-
-                      {/* Recent Assignments */}
-                      <div>
-                        <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-4">
-                          Recent Assignments
-                        </div>
-                        <div className="space-y-3">
-                          {classItem.assignments.map((assignment, idx) => (
-                            <div
-                              key={idx}
-                              className={`p-4 rounded-xl ${colors.bg}/50 backdrop-blur-sm border ${colors.border}/30 hover:${colors.bg}/70 hover:shadow-lg transition-all`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <FileText className={`w-4 h-4 ${colors.text}`} />
-                                    <span className="font-semibold text-sm text-slate-900">
-                                      {assignment.name}
-                                    </span>
-                                    <Badge variant="neutral" size="sm">{assignment.type}</Badge>
-                                  </div>
-                                  <div className="flex items-center gap-3 text-xs text-slate-600">
-                                    <span>{assignment.date}</span>
-                                    <span>•</span>
-                                    <span>{assignment.points} points</span>
-                                  </div>
+                      <div className="space-y-3">
+                        {classItem.assignments.map((assignment, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-4 rounded-xl ${colors.bg}/50 backdrop-blur-sm border ${colors.border}/30 hover:${colors.bg}/70 hover:shadow-lg transition-all`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <FileText className={`w-4 h-4 ${colors.text}`} />
+                                  <span className="font-semibold text-sm text-slate-900">
+                                    {assignment.name}
+                                  </span>
+                                  <Badge variant="neutral" size="sm">{assignment.type}</Badge>
                                 </div>
-                                <div className="text-right">
-                                  <div className={`text-3xl font-bold ${getGradeColor(assignment.grade)}`}>
-                                    {assignment.grade}%
-                                  </div>
+                                <div className="flex items-center gap-3 text-xs text-slate-600">
+                                  <span>{assignment.date}</span>
+                                  <span>•</span>
+                                  <span>{assignment.points} points</span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`text-3xl font-bold ${getGradeColor(assignment.grade)}`}>
+                                  {assignment.grade}%
                                 </div>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* View All Button */}
-                      <div className="mt-6 pt-6 border-t border-slate-200">
-                        <Button variant="glass" glow={false} className="w-full">
-                          View All Assignments
-                        </Button>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </div>
 
-          {/* Teaching Assistant - Takes up 1/3 */}
-          <motion.div variants={fadeInUp}>
-            <div className="sticky top-6">
-              {/* TA Card */}
-              <Card variant="glassElevated" padding="none" className="overflow-hidden">
-                <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                      <Brain className="w-6 h-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg">AI Teaching Assistant</h3>
-                      <p className="text-sm opacity-90">24/7 Support</p>
+                    {/* View All Button */}
+                    <div className="mt-6 pt-6 border-t border-slate-200">
+                      <Button variant="glass" glow={false} className="w-full">
+                        View All Assignments
+                      </Button>
                     </div>
                   </div>
-                  <Button
-                    variant="glass"
-                    size="sm"
-                    glow={false}
-                    className="w-full bg-white text-purple-700 hover:bg-white/90"
-                  >
-                    Ask a Question
-                  </Button>
-
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <p className="text-sm opacity-90 mb-4">
-                      Want to improve your grades? I can help with:
-                    </p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start gap-2">
-                        <span className="opacity-70">•</span>
-                        <span>Understanding mistakes</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="opacity-70">•</span>
-                        <span>Test preparation strategies</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="opacity-70">•</span>
-                        <span>Study tips for each subject</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="opacity-70">•</span>
-                        <span>Extra practice problems</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </motion.div>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* NEW ANALYTICS COMPONENTS - Real Backend Integration */}

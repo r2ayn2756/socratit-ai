@@ -69,10 +69,10 @@ enum EnrollmentStatus {
 
 enum AssignmentType {
   PRACTICE
-  QUIZ
   TEST
   HOMEWORK
-  CHALLENGE
+  ESSAY
+  INTERACTIVE_MATH
 }
 
 enum AssignmentStatus {
@@ -242,6 +242,9 @@ model User {
 
   // Lesson Recording Relations
   recordedLessons ClassLesson[] @relation("TeacherLessons")
+
+  // Rubric Relations
+  rubrics Rubric[] @relation("TeacherRubrics")
 
   @@index([email])
   @@index([schoolId])
@@ -436,30 +439,30 @@ model ClassEnrollment {
 // ============================================================================
 
 model ClassLesson {
-  id       String @id @default(uuid())
-  classId  String @map("class_id")
-  schoolId String @map("school_id") // For multi-tenancy
+  id        String @id @default(uuid())
+  classId   String @map("class_id")
+  schoolId  String @map("school_id") // For multi-tenancy
   teacherId String @map("teacher_id") // Teacher who recorded the lesson
 
   // Lesson Metadata
-  title       String
-  lessonDate  DateTime @map("lesson_date") // When the class session occurred
-  durationSeconds Int?  @map("duration_seconds") // Duration of original recording
+  title           String
+  lessonDate      DateTime @map("lesson_date") // When the class session occurred
+  durationSeconds Int?     @map("duration_seconds") // Duration of original recording
 
   // AI-Generated Content
-  summary         String  @db.Text // Brief summary of the lesson
-  keyConcepts     String[] @default([]) @map("key_concepts") // Array of key concepts covered
-  actionItems     String[] @default([]) @map("action_items") // Array of action items for teacher
-  homework        String?  @db.Text // Homework assignments mentioned
+  summary     String   @db.Text // Brief summary of the lesson
+  keyConcepts String[] @default([]) @map("key_concepts") // Array of key concepts covered
+  actionItems String[] @default([]) @map("action_items") // Array of action items for teacher
+  homework    String?  @db.Text // Homework assignments mentioned
 
   // Full Context (for teachers)
-  fullTranscript  String?  @db.Text @map("full_transcript") // Full transcription (optional)
-  teacherNotes    String?  @db.Text @map("teacher_notes") // Additional notes teacher can add
+  fullTranscript String? @map("full_transcript") @db.Text // Full transcription (optional)
+  teacherNotes   String? @map("teacher_notes") @db.Text // Additional notes teacher can add
 
   // AI Processing Metadata
-  aiModel         String?  @map("ai_model") // e.g., "gemini-pro", "gpt-4"
-  processingTime  Int?     @map("processing_time") // Milliseconds to process
-  confidenceScore Float?   @map("confidence_score") // AI confidence 0-1
+  aiModel         String? @map("ai_model") // e.g., "gemini-pro", "gpt-4"
+  processingTime  Int?    @map("processing_time") // Milliseconds to process
+  confidenceScore Float?  @map("confidence_score") // AI confidence 0-1
 
   // Timestamps
   createdAt DateTime  @default(now()) @map("created_at")
@@ -543,6 +546,9 @@ model Assignment {
   curriculumSubUnitId String?            @map("curriculum_sub_unit_id")
   curriculumSubUnit   CurriculumSubUnit? @relation("SubUnitAssignments", fields: [curriculumSubUnitId], references: [id], onDelete: SetNull)
 
+  // Rubric Relations
+  assignmentRubrics AssignmentRubric[]
+
   @@index([classId])
   @@index([schoolId])
   @@index([createdBy])
@@ -591,6 +597,10 @@ model Question {
   // AI Generation
   aiGenerated Boolean @default(false) @map("ai_generated")
 
+  // Concept Mapping - links to curriculum sub-units for mastery tracking
+  curriculumSubUnitId String?            @map("curriculum_sub_unit_id")
+  curriculumSubUnit   CurriculumSubUnit? @relation("QuestionConceptMapping", fields: [curriculumSubUnitId], references: [id], onDelete: SetNull)
+
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -602,6 +612,7 @@ model Question {
   @@index([assignmentId])
   @@index([type])
   @@index([concept])
+  @@index([curriculumSubUnitId])
   @@map("questions")
 }
 
@@ -645,10 +656,11 @@ model Submission {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  student    User       @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
-  grader     User?      @relation("SubmissionGrader", fields: [gradedBy], references: [id], onDelete: SetNull)
-  answers    Answer[]
+  assignment  Assignment             @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student     User                   @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  grader      User?                  @relation("SubmissionGrader", fields: [gradedBy], references: [id], onDelete: SetNull)
+  answers     Answer[]
+  attemptLogs AssignmentAttemptLog[]
 
   @@unique([assignmentId, studentId, attemptNumber]) // One submission per attempt
   @@index([assignmentId])
@@ -738,6 +750,62 @@ model AnalyticsEvent {
   @@index([eventType])
   @@index([createdAt])
   @@map("analytics_events")
+}
+
+// ============================================================================
+// ASSIGNMENT ATTEMPT LOG MODEL
+// Tracks security events and behaviors during assignment attempts
+// For test lockdown and academic integrity monitoring
+// ============================================================================
+
+model AssignmentAttemptLog {
+  id           String @id @default(uuid())
+  submissionId String @map("submission_id")
+  studentId    String @map("student_id")
+  assignmentId String @map("assignment_id")
+  schoolId     String @map("school_id")
+
+  // Event Types
+  eventType String @map("event_type")
+  // Types: "tab_switch", "copy_attempt", "paste_attempt", "screenshot_attempt",
+  //        "window_blur", "window_focus", "question_view", "answer_change",
+  //        "suspicious_behavior", "fullscreen_exit", "browser_extension_detected"
+
+  // Event Details
+  eventData Json? @map("event_data") // Flexible JSON for event-specific data
+  // Example: { "previousTab": "ChatGPT", "duration": 30, "questionId": "..." }
+
+  // Time Tracking
+  questionId       String? @map("question_id") // If event is question-specific
+  timeOnQuestion   Int?    @map("time_on_question") // Seconds spent on question
+  totalTimeElapsed Int?    @map("total_time_elapsed") // Total seconds since start
+
+  // Security Flags
+  isSuspicious      Boolean @default(false) @map("is_suspicious") // Flagged as suspicious
+  severityLevel     String  @default("low") @map("severity_level") // "low", "medium", "high"
+  reviewedByTeacher Boolean @default(false) @map("reviewed_by_teacher")
+  teacherNotes      String? @map("teacher_notes") @db.Text
+
+  // Browser/Device Context
+  userAgent        String? @map("user_agent")
+  ipAddress        String? @map("ip_address")
+  screenResolution String? @map("screen_resolution") // e.g., "1920x1080"
+  isFullscreen     Boolean @default(false) @map("is_fullscreen")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([studentId])
+  @@index([assignmentId])
+  @@index([schoolId])
+  @@index([eventType])
+  @@index([isSuspicious])
+  @@index([createdAt])
+  @@map("assignment_attempt_logs")
 }
 
 // ============================================================================
@@ -836,6 +904,82 @@ model Grade {
   @@index([categoryName])
   @@index([gradeDate])
   @@map("grades")
+}
+
+// ============================================================================
+// RUBRIC MODEL
+// Reusable grading rubrics for assignments with criteria definitions
+// ============================================================================
+
+model Rubric {
+  id        String @id @default(uuid())
+  teacherId String @map("teacher_id")
+  schoolId  String @map("school_id")
+
+  // Rubric Details
+  name        String
+  description String? @db.Text
+  isTemplate  Boolean @default(true) @map("is_template") // Can be saved as reusable template
+
+  // Criteria - stored as JSON for flexibility
+  // Structure: [{ name: "Content", description: "...", points: 10, levels: [{ name: "Excellent", points: 10, description: "..." }] }]
+  criteria Json
+
+  // Total possible points (calculated from criteria)
+  totalPoints Int @default(100) @map("total_points")
+
+  // Metadata
+  subject    String? // e.g., "Mathematics", "English"
+  gradeLevel String?  @map("grade_level") // e.g., "9th Grade"
+  tags       String[] @default([]) // For organization and filtering
+
+  // Usage tracking
+  usageCount Int       @default(0) @map("usage_count") // Times used in assignments
+  lastUsedAt DateTime? @map("last_used_at")
+
+  // Timestamps
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Relations
+  teacher           User               @relation("TeacherRubrics", fields: [teacherId], references: [id], onDelete: Cascade)
+  assignmentRubrics AssignmentRubric[]
+
+  @@index([teacherId])
+  @@index([schoolId])
+  @@index([isTemplate])
+  @@index([subject])
+  @@map("rubrics")
+}
+
+// ============================================================================
+// ASSIGNMENT RUBRIC MODEL
+// Junction table linking assignments to rubrics
+// ============================================================================
+
+model AssignmentRubric {
+  id           String @id @default(uuid())
+  assignmentId String @map("assignment_id")
+  rubricId     String @map("rubric_id")
+  schoolId     String @map("school_id")
+
+  // Rubric customization (optional overrides for this specific assignment)
+  customCriteria Json? @map("custom_criteria") // Modified criteria specific to this assignment
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  rubric     Rubric     @relation(fields: [rubricId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, rubricId]) // One rubric per assignment (or allow multiple if needed)
+  @@index([assignmentId])
+  @@index([rubricId])
+  @@index([schoolId])
+  @@map("assignment_rubrics")
 }
 
 // ============================================================================
@@ -2010,6 +2154,7 @@ model CurriculumSubUnit {
 
   // Relationships
   assignments Assignment[] @relation("SubUnitAssignments")
+  questions   Question[]   @relation("QuestionConceptMapping")
 
   // Timestamps
   createdAt DateTime  @default(now()) @map("created_at")

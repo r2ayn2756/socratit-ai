@@ -122,8 +122,11 @@ export const createClass = async (
         console.log('[DEBUG] Curriculum schedule created successfully:', scheduleId);
 
         // If pre-generated units are provided, create them immediately
+        console.log('[DEBUG] Checking for pre-generated units. Has preGeneratedUnits:', !!body.preGeneratedUnits, 'Length:', body.preGeneratedUnits?.length || 0);
+
         if (body.preGeneratedUnits && body.preGeneratedUnits.length > 0) {
           console.log('[DEBUG] Creating pre-generated units:', body.preGeneratedUnits.length);
+          console.log('[DEBUG] First unit sample:', JSON.stringify(body.preGeneratedUnits[0]).substring(0, 200));
 
           // Calculate date ranges for each unit
           let currentDate = new Date(schoolYearStart);
