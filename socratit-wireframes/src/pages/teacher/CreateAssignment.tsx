@@ -460,7 +460,7 @@ export const CreateAssignment: React.FC = () => {
                         placeholder="Enter question text..."
                         rows={2}
                         disabled={isReadOnly}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                       />
 
                       {/* Points */}
@@ -471,7 +471,7 @@ export const CreateAssignment: React.FC = () => {
                         onChange={(e) => updateQuestion(index, 'points', parseInt(e.target.value))}
                         placeholder="Points"
                         disabled={isReadOnly}
-                        className="w-24 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        className="w-24 px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                       />
 
                       {/* Multiple Choice Options */}
@@ -493,7 +493,7 @@ export const CreateAssignment: React.FC = () => {
                                 onChange={(e) => updateQuestion(index, `option${option}`, e.target.value)}
                                 placeholder={`Option ${option}`}
                                 disabled={isReadOnly}
-                                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                                className="flex-1 px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                               />
                             </div>
                           ))}
@@ -508,7 +508,7 @@ export const CreateAssignment: React.FC = () => {
                           placeholder="Sample correct answer (for AI grading)..."
                           rows={3}
                           disabled={isReadOnly}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                          className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                         />
                       )}
                     </div>

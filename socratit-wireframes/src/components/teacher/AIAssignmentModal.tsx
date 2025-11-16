@@ -285,7 +285,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             value={curriculumTitle}
             onChange={(e) => setCurriculumTitle(e.target.value)}
             placeholder="e.g., Algebra 1 - Quadratic Equations"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
@@ -299,7 +299,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             onChange={(e) => setCurriculumDescription(e.target.value)}
             placeholder="Brief description of the curriculum content..."
             rows={3}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           />
         </div>
 
@@ -342,7 +342,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             value={assignmentConfig.title}
             onChange={(e) => setAssignmentConfig({ ...assignmentConfig, title: e.target.value })}
             placeholder="e.g., Quadratic Equations Quiz"
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
@@ -356,7 +356,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             onChange={(e) => setAssignmentConfig({ ...assignmentConfig, description: e.target.value })}
             placeholder="Brief description..."
             rows={2}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           />
         </div>
 
@@ -367,7 +367,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
           <select
             value={assignmentConfig.classId}
             onChange={(e) => setAssignmentConfig({ ...assignmentConfig, classId: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           >
             <option value="">Select a class</option>
@@ -391,7 +391,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             onChange={(e) =>
               setAssignmentConfig({ ...assignmentConfig, numQuestions: parseInt(e.target.value) || 10 })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -404,7 +404,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             onChange={(e) =>
               setAssignmentConfig({ ...assignmentConfig, difficulty: e.target.value as any })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
@@ -420,7 +420,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
           <select
             value={assignmentConfig.type}
             onChange={(e) => setAssignmentConfig({ ...assignmentConfig, type: e.target.value as any })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="PRACTICE">Practice</option>
             <option value="QUIZ">Quiz</option>
@@ -441,7 +441,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             onChange={(e) =>
               setAssignmentConfig({ ...assignmentConfig, totalPoints: parseInt(e.target.value) || 100 })
             }
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -453,7 +453,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             type="datetime-local"
             value={assignmentConfig.dueDate}
             onChange={(e) => setAssignmentConfig({ ...assignmentConfig, dueDate: e.target.value })}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>

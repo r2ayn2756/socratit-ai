@@ -197,7 +197,7 @@ export const StudentAnalytics: React.FC = () => {
             <select
               value={selectedClassId || ''}
               onChange={(e) => setSelectedClassId(e.target.value || null)}
-              className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue bg-white text-slate-900"
+              className="px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue text-slate-900"
             >
               <option value="">Select a class</option>
               {mockClasses.map((cls) => (

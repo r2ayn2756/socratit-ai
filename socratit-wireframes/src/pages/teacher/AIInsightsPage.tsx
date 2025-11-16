@@ -141,7 +141,7 @@ export const AIInsightsPage: React.FC<AIInsightsPageProps> = ({ selectedClassId 
               <select
                 value={classFilter}
                 onChange={(e) => setClassFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-transparent"
+                className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-brand-blue focus:border-transparent"
               >
                 <option value="">Select a class</option>
                 {teacherClasses?.map((cls: any) => (
@@ -160,7 +160,7 @@ export const AIInsightsPage: React.FC<AIInsightsPageProps> = ({ selectedClassId 
               <select
                 value={assignmentFilter}
                 onChange={(e) => setAssignmentFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-transparent"
+                className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-brand-blue focus:border-transparent"
               >
                 <option value="all">All Assignments</option>
                 {assignments?.map((assignment: any) => (
