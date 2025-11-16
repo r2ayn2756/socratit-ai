@@ -447,7 +447,7 @@ export const CreateAssignment: React.FC = () => {
                         value={question.type}
                         onChange={(e) => updateQuestion(index, 'type', e.target.value)}
                         disabled={isReadOnly}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                       >
                         <option value="MULTIPLE_CHOICE">Multiple Choice</option>
                         <option value="FREE_RESPONSE">Free Response</option>

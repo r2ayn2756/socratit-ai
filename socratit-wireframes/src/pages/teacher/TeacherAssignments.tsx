@@ -151,9 +151,9 @@ export const TeacherAssignments: React.FC = () => {
     const submissionRate = 0; // TODO: Need to fetch actual submitted vs in-progress submissions
 
     return (
-      <motion.div key={assignment.id} variants={fadeInUp} whileHover={{ scale: 1.01 }}>
-        <Card padding="none" className="overflow-hidden">
-          <div className="p-5 bg-white">
+      <motion.div key={assignment.id} variants={fadeInUp} whileHover={{ scale: 1.01, y: -2 }}>
+        <Card variant="glassElevated" padding="none" className="overflow-hidden">
+          <div className="p-5 bg-white/70 backdrop-blur-md">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -288,7 +288,7 @@ export const TeacherAssignments: React.FC = () => {
 
         {/* Filter Bar */}
         <motion.div variants={fadeInUp}>
-          <Card>
+          <Card variant="glassElevated">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-slate-600" />
@@ -371,7 +371,7 @@ export const TeacherAssignments: React.FC = () => {
           {/* Right Column - AI Teaching Assistant */}
           <div className="space-y-6">
             <motion.div variants={fadeInUp}>
-              <Card padding="none" className="overflow-hidden sticky top-6">
+              <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
                 <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
