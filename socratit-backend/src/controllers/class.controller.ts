@@ -125,19 +125,39 @@ export const createClass = async (
         if (body.preGeneratedUnits && body.preGeneratedUnits.length > 0) {
           console.log('[DEBUG] Creating pre-generated units:', body.preGeneratedUnits.length);
 
+          // Calculate date ranges for each unit
+          let currentDate = new Date(schoolYearStart);
+
           for (let i = 0; i < body.preGeneratedUnits.length; i++) {
             const unit = body.preGeneratedUnits[i];
+            const weeks = unit.estimatedWeeks || 1;
+
+            // Calculate start and end dates for this unit
+            const startDate = new Date(currentDate);
+            const endDate = new Date(currentDate);
+            endDate.setDate(endDate.getDate() + (weeks * 7));
+
+            // Move to next unit's start date
+            currentDate = new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1);
 
             await prisma.curriculumUnit.create({
               data: {
                 scheduleId: schedule.id,
+                schoolId,
                 title: unit.title || `Unit ${i + 1}`,
                 description: unit.description,
-                order: i + 1,
-                estimatedWeeks: unit.estimatedWeeks || 1,
+                unitNumber: i + 1,
+                orderIndex: i + 1,
+                startDate,
+                endDate,
+                estimatedWeeks: weeks,
+                difficultyLevel: unit.difficultyLevel || 3, // Default to medium difficulty
                 topics: unit.topics || [],
                 learningObjectives: unit.learningObjectives || [],
+                concepts: unit.concepts || [],
                 status: 'SCHEDULED',
+                aiGenerated: true,
               },
             });
           }
