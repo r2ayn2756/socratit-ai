@@ -96,7 +96,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
               {allUnits.map((unit) => {
                 const isCurrent = currentUnit?.id === unit.id;
                 const topicNames = unit.subUnits?.map(su => su.name) ||
-                                   unit.topics?.flatMap(t => [t.name, ...t.subtopics]) || [];
+                                   unit.topics?.flatMap(t => [t.name, ...(t.subtopics || [])]) || [];
 
                 return (
                   <Card
