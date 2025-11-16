@@ -165,7 +165,7 @@ export const ViewSubmissions: React.FC = () => {
 
           {/* Stats Row */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card padding="sm">
+            <Card variant="glassElevated" padding="sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                   <FileText className="w-5 h-5 text-blue-600" />
@@ -176,7 +176,7 @@ export const ViewSubmissions: React.FC = () => {
                 </div>
               </div>
             </Card>
-            <Card padding="sm">
+            <Card variant="glassElevated" padding="sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -187,7 +187,7 @@ export const ViewSubmissions: React.FC = () => {
                 </div>
               </div>
             </Card>
-            <Card padding="sm">
+            <Card variant="glassElevated" padding="sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                   <Clock className="w-5 h-5 text-orange-600" />
@@ -198,7 +198,7 @@ export const ViewSubmissions: React.FC = () => {
                 </div>
               </div>
             </Card>
-            <Card padding="sm">
+            <Card variant="glassElevated" padding="sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-purple-600" />
@@ -218,7 +218,7 @@ export const ViewSubmissions: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Submissions List - Left Column */}
           <div className="lg:col-span-1">
-            <Card>
+            <Card variant="glassElevated">
               <h2 className="text-xl font-bold text-slate-900 mb-4">Student Submissions</h2>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {submissions.length === 0 ? (
@@ -278,7 +278,7 @@ export const ViewSubmissions: React.FC = () => {
                   className="space-y-4"
                 >
                   {/* Submission Header */}
-                  <Card>
+                  <Card variant="glassElevated">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-slate-900">
@@ -319,7 +319,7 @@ export const ViewSubmissions: React.FC = () => {
                         const currentFeedback = teacherFeedback[answer.id] ?? answer.teacherFeedback ?? '';
 
                         return (
-                          <Card key={answer.id}>
+                          <Card variant="glass" key={answer.id}>
                             <div className="space-y-3">
                               {/* Question */}
                               <div>
@@ -439,7 +439,7 @@ export const ViewSubmissions: React.FC = () => {
                                         Cancel
                                       </Button>
                                       <Button
-                                        variant="primary"
+                                        variant="gradient"
                                         size="sm"
                                         onClick={() => handleSaveGrade(answer.id, question?.points || 0)}
                                         disabled={overrideGradeMutation.isPending}
@@ -450,8 +450,9 @@ export const ViewSubmissions: React.FC = () => {
                                     </div>
                                   ) : (
                                     <Button
-                                      variant="secondary"
+                                      variant="glass"
                                       size="sm"
+                                      glow={false}
                                       onClick={() => {
                                         setGradingMode({ ...gradingMode, [answer.id]: true });
                                         setManualGrades({ ...manualGrades, [answer.id]: answer.pointsEarned ?? 0 });
@@ -480,7 +481,7 @@ export const ViewSubmissions: React.FC = () => {
                                       }
                                       placeholder="Add feedback for the student..."
                                       rows={2}
-                                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                                      className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-blue-500"
                                     />
                                   </div>
                                 )}
@@ -491,7 +492,7 @@ export const ViewSubmissions: React.FC = () => {
                       })}
                     </div>
                   ) : (
-                    <Card>
+                    <Card variant="glassElevated">
                       <div className="text-center py-8 text-slate-500">
                         <FileText className="w-12 h-12 mx-auto mb-2 text-slate-300" />
                         <p>No answers submitted yet</p>
@@ -500,7 +501,7 @@ export const ViewSubmissions: React.FC = () => {
                   )}
                 </motion.div>
               ) : (
-                <Card>
+                <Card variant="glassElevated">
                   <div className="text-center py-12 text-slate-500">
                     <User className="w-16 h-16 mx-auto mb-4 text-slate-300" />
                     <p className="text-lg font-medium">Select a student submission</p>

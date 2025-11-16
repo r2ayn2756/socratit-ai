@@ -35,7 +35,6 @@ interface ClassGradeDisplay {
   name: string;
   teacher: string;
   currentGrade: number;
-  trend: { value: number; isPositive: boolean };
   color: string;
   assignments: Array<{
     name: string;
@@ -157,18 +156,11 @@ export const Grades: React.FC<GradesProps> = () => {
           };
         });
 
-        // Calculate trend (mock for now - would need historical data)
-        const trend = {
-          value: Math.floor(Math.random() * 5),
-          isPositive: Math.random() > 0.5,
-        };
-
         return {
           id: grade.classId,
           name: grade.class.name,
           teacher: 'Teacher', // TODO: Add teacher info to backend response
           currentGrade: Math.round(classGradeData.current.overallPercentage),
-          trend,
           color: grade.class.color || 'blue',
           assignments: recentAssignments,
           breakdown,
@@ -462,7 +454,7 @@ export const Grades: React.FC<GradesProps> = () => {
             animate={{ opacity: 1 }}
             className="mt-6"
           >
-            <Card>
+            <Card variant="glassElevated">
               <div className="p-12 text-center">
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -484,14 +476,14 @@ export const Grades: React.FC<GradesProps> = () => {
             animate={{ opacity: 1 }}
             className="mt-6"
           >
-            <Card>
+            <Card variant="glassElevated">
               <div className="p-8 text-center">
                 <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
                   Error Loading Grades
                 </h3>
                 <p className="text-slate-600 mb-4">{error}</p>
-                <Button onClick={fetchStudentData} variant="primary">
+                <Button onClick={fetchStudentData} variant="gradient">
                   Try Again
                 </Button>
               </div>

@@ -230,7 +230,7 @@ export const CreateAssignment: React.FC = () => {
           </div>
           {!isEditMode && (
             <Button
-              variant="secondary"
+              variant="gradient"
               size="md"
               onClick={() => setShowAIModal(true)}
             >
@@ -242,7 +242,7 @@ export const CreateAssignment: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
-          <Card>
+          <Card variant="glassElevated">
             <h2 className="text-xl font-bold text-slate-900 mb-4">Basic Information</h2>
 
             <div className="space-y-4">
@@ -256,7 +256,7 @@ export const CreateAssignment: React.FC = () => {
                   value={formData.classId}
                   onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
                   disabled={isEditMode}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
                 >
                   <option value="">Select a class</option>
                   {classesData?.map((cls) => (
@@ -283,7 +283,7 @@ export const CreateAssignment: React.FC = () => {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g., Triangle Properties Quiz"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -296,7 +296,7 @@ export const CreateAssignment: React.FC = () => {
                   required
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="PRACTICE">Practice</option>
                   <option value="QUIZ">Quiz</option>
@@ -316,7 +316,7 @@ export const CreateAssignment: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Brief description of this assignment..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -330,7 +330,7 @@ export const CreateAssignment: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
                   placeholder="Detailed instructions for students..."
                   rows={4}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -346,7 +346,7 @@ export const CreateAssignment: React.FC = () => {
                     min="1"
                     value={formData.totalPoints}
                     onChange={(e) => setFormData({ ...formData, totalPoints: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -357,7 +357,7 @@ export const CreateAssignment: React.FC = () => {
                     type="datetime-local"
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -396,7 +396,7 @@ export const CreateAssignment: React.FC = () => {
           </Card>
 
           {/* Questions */}
-          <Card>
+          <Card variant="glassElevated">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Questions</h2>
@@ -409,7 +409,7 @@ export const CreateAssignment: React.FC = () => {
               {(!isEditMode || existingAssignment?.status === 'DRAFT') && (
                 <Button
                   type="button"
-                  variant="primary"
+                  variant="gradient"
                   size="sm"
                   onClick={addQuestion}
                 >
@@ -424,7 +424,7 @@ export const CreateAssignment: React.FC = () => {
                 {formData.questions.map((question, index) => {
                   const isReadOnly = isEditMode && existingAssignment?.status !== 'DRAFT';
                   return (
-                  <div key={index} className="p-4 border border-slate-200 rounded-lg">
+                  <div key={index} className="p-4 bg-white/50 backdrop-blur-md border border-white/30 rounded-xl">
                     <div className="flex items-start justify-between mb-3">
                       <span className="text-sm font-medium text-slate-700">
                         Question {index + 1}
@@ -528,14 +528,15 @@ export const CreateAssignment: React.FC = () => {
           <div className="flex items-center justify-end gap-3">
             <Button
               type="button"
-              variant="secondary"
+              variant="glass"
               onClick={() => navigate('/teacher/assignments')}
+              glow={false}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="gradient"
               disabled={
                 (isEditMode ? updateMutation.isPending : createMutation.isPending) ||
                 !formData.classId ||

@@ -294,7 +294,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
             <select
               value={classFilter}
               onChange={(e) => setClassFilter(e.target.value)}
-              className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue bg-white text-slate-900"
+              className="px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue text-slate-900"
             >
               <option value="all">All Classes</option>
               {teacherClasses?.map((cls) => (
@@ -311,7 +311,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
 
             {/* Recalculate Button */}
             <Button
-              variant="primary"
+              variant="gradient"
               size="md"
               onClick={handleRecalculate}
               disabled={recalculating || classFilter === 'all'}
@@ -325,7 +325,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
         {/* Tab Navigation */}
         {classFilter !== 'all' && (
           <motion.div variants={fadeInUp}>
-            <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1">
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-xl border border-white/20 rounded-xl p-1">
               {(['overview', 'performance', 'concepts', 'engagement'] as const).map((tab) => (
                 <button
                   key={tab}
@@ -349,7 +349,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
         {/* Content */}
         {classFilter === 'all' ? (
           <motion.div variants={fadeInUp}>
-            <Card>
+            <Card variant="glassElevated">
               <div className="p-12 text-center">
                 <BarChart3 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -363,7 +363,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
           </motion.div>
         ) : loading ? (
           <motion.div variants={fadeInUp}>
-            <Card>
+            <Card variant="glassElevated">
               <div className="p-12 text-center">
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -378,7 +378,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
           </motion.div>
         ) : error ? (
           <motion.div variants={fadeInUp}>
-            <Card>
+            <Card variant="glassElevated">
               <div className="p-8 text-center">
                 <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -458,7 +458,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
               >
                 {/* Student Selector */}
                 <motion.div variants={fadeInUp}>
-                  <Card>
+                  <Card variant="glassElevated">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-900">Student Performance Analysis</h3>
@@ -467,7 +467,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({ selectedClas
                       <select
                         value={selectedStudentId}
                         onChange={(e) => handleStudentSelect(e.target.value)}
-                        className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue bg-white"
+                        className="px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue"
                       >
                         {strugglingStudents.map((student) => (
                           <option key={student.studentId} value={student.studentId}>
