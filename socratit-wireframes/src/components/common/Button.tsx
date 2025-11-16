@@ -131,7 +131,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const iconContent = loading ? (
       <Loader2 className={cn(iconSizes[size], 'animate-spin')} />
     ) : icon ? (
-      <span className={cn('flex-shrink-0', iconSizes[size])}>{icon}</span>
+      <span className="flex items-center justify-center flex-shrink-0">
+        {React.isValidElement(icon)
+          ? React.cloneElement(icon, {
+              className: cn(iconSizes[size], icon.props.className)
+            } as any)
+          : icon}
+      </span>
     ) : null;
 
     return (

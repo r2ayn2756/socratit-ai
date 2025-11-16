@@ -478,14 +478,29 @@ export const deleteClass = async (
     const schoolId = req.user!.schoolId;
     const classData = req.class;
 
-    // Soft delete
-    await prisma.class.update({
-      where: { id: classData.id },
-      data: {
-        deletedAt: new Date(),
-        isActive: false,
-      },
-    });
+    const deletionDate = new Date();
+
+    // Soft delete class and all associated assignments
+    await prisma.$transaction([
+      // Soft delete the class
+      prisma.class.update({
+        where: { id: classData.id },
+        data: {
+          deletedAt: deletionDate,
+          isActive: false,
+        },
+      }),
+      // Soft delete all assignments associated with this class
+      prisma.assignment.updateMany({
+        where: {
+          classId: classData.id,
+          deletedAt: null, // Only delete assignments that aren't already deleted
+        },
+        data: {
+          deletedAt: deletionDate,
+        },
+      }),
+    ]);
 
     // Log audit event
     await logAudit({
