@@ -24,10 +24,12 @@ import {
 import classService from '../../services/class.service';
 import { assignmentService } from '../../services/assignment.service';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Fetch all classes in the school
   const { data: classes = [], isLoading: classesLoading } = useQuery({
@@ -105,7 +107,7 @@ export const AdminDashboard: React.FC = () => {
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-              School Administration Dashboard
+              {t('admin.dashboard.title')}
             </h1>
             <p className="text-neutral-600">
               Overview of school performance and metrics
@@ -158,7 +160,7 @@ export const AdminDashboard: React.FC = () => {
           <motion.div variants={fadeInUp}>
             <StatCard
               icon={FileText}
-              label="Active Assignments"
+              label={t('admin.dashboard.activeAssignments')}
               value={activeAssignments}
               color="warning"
             />
@@ -173,7 +175,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 mb-1">
-                    Top Performing Classes
+                    {t('admin.dashboard.topPerformingClasses')}
                   </h2>
                   <p className="text-sm text-slate-600">Highest average grades</p>
                 </div>
@@ -182,7 +184,7 @@ export const AdminDashboard: React.FC = () => {
 
               {topPerformingClasses.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-slate-500">No classes data available</p>
+                  <p className="text-slate-500">{t('admin.dashboard.noClassesData')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -218,7 +220,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 mb-1">
-                    Classes Needing Attention
+                    {t('admin.dashboard.classesNeedingAttention')}
                   </h2>
                   <p className="text-sm text-slate-600">Below 70% average</p>
                 </div>
@@ -231,7 +233,7 @@ export const AdminDashboard: React.FC = () => {
                     <TrendingUp className="w-8 h-8 text-green-600" />
                   </div>
                   <p className="font-semibold text-slate-900 mb-2">All classes performing well!</p>
-                  <p className="text-sm text-slate-600">No classes below 70% threshold</p>
+                  <p className="text-sm text-slate-600">{t('admin.dashboard.noClassesBelowThreshold')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -277,7 +279,7 @@ export const AdminDashboard: React.FC = () => {
                   <TrendingUp className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="text-3xl font-bold text-slate-900 mb-2">{totalClasses}</div>
-                <div className="text-sm text-slate-600">Active Classes</div>
+                <div className="text-sm text-slate-600">{t('admin.dashboard.activeClasses')}</div>
                 <div className="mt-3 text-sm text-blue-700">
                   {totalTeachers} teachers • {totalStudents} students
                 </div>
@@ -291,9 +293,9 @@ export const AdminDashboard: React.FC = () => {
                   <Clock className="w-6 h-6 text-purple-600" />
                 </div>
                 <div className="text-3xl font-bold text-slate-900 mb-2">{totalAssignments}</div>
-                <div className="text-sm text-slate-600">Total Assignments</div>
+                <div className="text-sm text-slate-600">{t('admin.dashboard.totalAssignments')}</div>
                 <div className="mt-3 text-sm text-purple-700">
-                  {activeAssignments} currently active
+                  {t('admin.dashboard.currentlyActive').replace('{count}', activeAssignments.toString())}
                 </div>
               </div>
 
@@ -317,7 +319,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Quick Actions */}
         <motion.div variants={fadeInUp}>
           <Card>
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-4">{t('admin.dashboard.quickActions')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Button
                 variant="ghost"

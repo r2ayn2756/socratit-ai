@@ -31,9 +31,11 @@ import {
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
 import { aiTAService } from '../../services/aiTA.service';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [chatMessage, setChatMessage] = useState('');
 
   // Fetch assignments from backend
@@ -228,11 +230,14 @@ export const StudentDashboard: React.FC = () => {
         {/* Header */}
         <motion.div variants={fadeInUp}>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Welcome back! 👋
+            {t('student.dashboard.welcome')}
           </h1>
           <p className="text-slate-600">
-            You have {dueToday.length} assignment{dueToday.length !== 1 ? 's' : ''}{' '}
-            due today
+            {dueToday.length === 0
+              ? t('student.dashboard.noAssignmentsDue')
+              : dueToday.length === 1
+              ? t('student.dashboard.assignmentDue')
+              : t('student.dashboard.assignmentsDue').replace('{count}', dueToday.length.toString())}
           </p>
         </motion.div>
 
@@ -245,7 +250,7 @@ export const StudentDashboard: React.FC = () => {
               <motion.div variants={fadeInUp}>
                 <div className="flex items-center gap-3 mb-4">
                   <AlertCircle className="w-6 h-6 text-red-500" />
-                  <h2 className="text-xl font-bold text-slate-900">Due Today</h2>
+                  <h2 className="text-xl font-bold text-slate-900">{t('student.dashboard.dueToday')}</h2>
                   <Badge variant="error" size="sm">
                     {dueToday.length}
                   </Badge>
@@ -291,7 +296,7 @@ export const StudentDashboard: React.FC = () => {
                             {progress > 0 && progress < 100 && (
                               <div className="mb-3">
                                 <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
-                                  <span>Progress</span>
+                                  <span>{t('student.dashboard.progress')}</span>
                                   <span className="font-semibold">{progress}%</span>
                                 </div>
                                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -305,7 +310,7 @@ export const StudentDashboard: React.FC = () => {
 
                             <Button variant="primary" size="sm" className="w-full">
                               <Play className="w-4 h-4 mr-2" />
-                              {progress > 0 ? 'Continue' : 'Start Assignment'}
+                              {progress > 0 ? t('common.buttons.continue') : t('common.buttons.startAssignment')}
                             </Button>
                           </div>
                         </Card>
@@ -322,7 +327,7 @@ export const StudentDashboard: React.FC = () => {
                 <div className="flex items-center gap-3 mb-4">
                   <Clock className="w-6 h-6 text-orange-500" />
                   <h2 className="text-xl font-bold text-slate-900">
-                    In Progress
+                    {t('student.dashboard.inProgress')}
                   </h2>
                   <Badge variant="warning" size="sm">
                     {inProgress.length}
@@ -356,7 +361,7 @@ export const StudentDashboard: React.FC = () => {
                             <div className="text-2xl font-bold text-slate-900">
                               {progress}%
                             </div>
-                            <div className="text-xs text-slate-600">complete</div>
+                            <div className="text-xs text-slate-600">{t('student.dashboard.complete')}</div>
                           </div>
                         </div>
                       </Card>
@@ -372,7 +377,7 @@ export const StudentDashboard: React.FC = () => {
                 <div className="flex items-center gap-3 mb-4">
                   <FileText className="w-6 h-6 text-blue-500" />
                   <h2 className="text-xl font-bold text-slate-900">
-                    Pending Assignments
+                    {t('student.dashboard.pendingAssignments')}
                   </h2>
                   <Badge variant="primary" size="sm">
                     {notStarted.length}
@@ -432,14 +437,14 @@ export const StudentDashboard: React.FC = () => {
                     <CheckCircle className="w-10 h-10" />
                   </div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                    All Caught Up! 🎉
+                    {t('student.dashboard.allCaughtUp')}
                   </h3>
                   <p className="text-slate-600 mb-4">
-                    You've completed all your assignments. Great job!
+                    {t('student.dashboard.allCaughtUpDesc')}
                   </p>
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
                     <TrendingUp className="w-4 h-4" />
-                    <span className="font-semibold">Keep up the excellent work!</span>
+                    <span className="font-semibold">{t('student.dashboard.keepUpWork')}</span>
                   </div>
                 </Card>
               </motion.div>
@@ -453,10 +458,10 @@ export const StudentDashboard: React.FC = () => {
                     <FileText className="w-10 h-10" />
                   </div>
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                    No Assignments Yet
+                    {t('student.dashboard.noAssignmentsYet')}
                   </h3>
                   <p className="text-slate-600">
-                    Check back later for new assignments from your teachers.
+                    {t('student.dashboard.checkBackLater')}
                   </p>
                 </Card>
               </motion.div>
@@ -469,7 +474,7 @@ export const StudentDashboard: React.FC = () => {
                 className="w-full"
                 onClick={() => navigate('/student/assignments')}
               >
-                View All Assignments
+                {t('student.dashboard.viewAllAssignments')}
               </Button>
             )}
           </div>
@@ -493,15 +498,15 @@ export const StudentDashboard: React.FC = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-xl text-slate-800">SocratIt!</h3>
+                      <h3 className="font-bold text-xl text-slate-800">{t('student.dashboard.aiTutor.title')}</h3>
                       <Sparkles className="w-4 h-4 text-purple-600" />
                     </div>
-                    <p className="text-sm text-purple-700 font-medium">24/7 Support • Always Ready</p>
+                    <p className="text-sm text-purple-700 font-medium">{t('student.dashboard.aiTutor.subtitle')}</p>
                   </div>
                 </div>
 
                 <p className="text-sm text-slate-700 mb-4 leading-relaxed">
-                  Ask me anything! I can help with homework, explain concepts, or guide you through problems.
+                  {t('student.dashboard.aiTutor.description')}
                 </p>
 
                 {/* Text input form - neomorphic style */}
@@ -511,7 +516,7 @@ export const StudentDashboard: React.FC = () => {
                       type="text"
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
-                      placeholder="Type your question here..."
+                      placeholder={t('student.dashboard.aiTutor.placeholder')}
                       className="w-full pl-4 pr-12 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-purple-200/50
                                shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400
                                text-slate-800 placeholder-slate-500 transition-all"
@@ -531,7 +536,7 @@ export const StudentDashboard: React.FC = () => {
                 {/* Quick Actions */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-purple-700/80">
-                    Quick Actions
+                    {t('student.dashboard.quickActions')}
                   </p>
                   {taQuickActions.slice(0, 4).map((action, index) => (
                     <motion.button
@@ -556,7 +561,7 @@ export const StudentDashboard: React.FC = () => {
             {/* Recent Grades */}
             {gradedAssignments.length > 0 && (
               <Card>
-                <h3 className="font-bold text-slate-900 mb-4">Recent Grades</h3>
+                <h3 className="font-bold text-slate-900 mb-4">{t('student.dashboard.recentGrades')}</h3>
                 <div className="space-y-3">
                   {gradedAssignments.slice(0, 3).map((assignment) => (
                     <div
@@ -595,7 +600,7 @@ export const StudentDashboard: React.FC = () => {
                   className="w-full mt-3"
                   onClick={() => navigate('/student/grades')}
                 >
-                  View All Grades
+                  {t('student.dashboard.viewAllGrades')}
                 </Button>
               </Card>
             )}

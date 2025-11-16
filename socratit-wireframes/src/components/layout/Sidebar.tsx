@@ -24,6 +24,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 import messageService from '../../services/message.service';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface SidebarProps {
   userRole: 'teacher' | 'student' | 'admin';
@@ -39,6 +40,7 @@ interface NavItem {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggleCollapse }) => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,29 +58,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
   // to provide class-specific context and better user experience
   const navItems: Record<string, NavItem[]> = {
     teacher: [
-      { label: 'Dashboard', icon: LayoutDashboard, path: '/teacher/dashboard' },
-      { label: 'Classes', icon: BookOpen, path: '/teacher/classes' },
-      { label: 'Assignments', icon: FileText, path: '/teacher/assignments' },
-      { label: 'SocratIt', icon: Brain, path: '/teacher/ai-tutor' },
-      { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
+      { label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/teacher/dashboard' },
+      { label: t('sidebar.classes'), icon: BookOpen, path: '/teacher/classes' },
+      { label: t('sidebar.assignments'), icon: FileText, path: '/teacher/assignments' },
+      { label: t('sidebar.aiTutor'), icon: Brain, path: '/teacher/ai-tutor' },
+      { label: t('sidebar.messages'), icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
       // REMOVED: Analytics and AI Insights - now part of class pages
       // Analytics features: Performance tracking, concept mastery, engagement metrics
       // AI Insights features: Student AI usage monitoring, common questions, struggling concepts
     ],
     student: [
-      { label: 'Dashboard', icon: LayoutDashboard, path: '/student/dashboard' },
-      { label: 'My Classes', icon: BookOpen, path: '/student/classes' },
-      { label: 'Assignments', icon: FileText, path: '/student/assignments' },
-      { label: 'Grades', icon: BarChart3, path: '/student/grades' },
-      { label: 'SocratIt', icon: Brain, path: '/student/ai-tutor' },
-      { label: 'Messages', icon: MessageSquare, path: '/student/messages', badge: unreadCount },
+      { label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/student/dashboard' },
+      { label: t('sidebar.myClasses'), icon: BookOpen, path: '/student/classes' },
+      { label: t('sidebar.assignments'), icon: FileText, path: '/student/assignments' },
+      { label: t('sidebar.grades'), icon: BarChart3, path: '/student/grades' },
+      { label: t('sidebar.aiTutor'), icon: Brain, path: '/student/ai-tutor' },
+      { label: t('sidebar.messages'), icon: MessageSquare, path: '/student/messages', badge: unreadCount },
     ],
     admin: [
-      { label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
-      { label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
-      { label: 'Teachers', icon: GraduationCap, path: '/admin/teachers' },
-      { label: 'Students', icon: Users, path: '/admin/students' },
-      { label: 'Reports', icon: FileText, path: '/admin/reports' },
+      { label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/admin/dashboard' },
+      { label: t('sidebar.analytics'), icon: BarChart3, path: '/admin/analytics' },
+      { label: t('sidebar.teachers'), icon: GraduationCap, path: '/admin/teachers' },
+      { label: t('sidebar.students'), icon: Users, path: '/admin/students' },
+      { label: t('sidebar.reports'), icon: FileText, path: '/admin/reports' },
     ],
   };
 
@@ -182,7 +184,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
             ) : (
               <>
                 <ChevronLeft className="w-5 h-5" />
-                <span className="text-sm font-medium">Collapse</span>
+                <span className="text-sm font-medium">{t('sidebar.collapse')}</span>
               </>
             )}
           </button>

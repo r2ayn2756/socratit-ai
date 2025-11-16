@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
   Settings,
   LogOut,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 
 export const TopNav: React.FC = () => {
+  const { t } = useLanguage();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -71,11 +73,11 @@ export const TopNav: React.FC = () => {
                     <div className="py-2">
                       <button className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-all text-slate-700">
                         <User className="w-4 h-4" />
-                        <span className="text-sm">My Profile</span>
+                        <span className="text-sm">{t('topnav.myProfile')}</span>
                       </button>
                       <button className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-50 transition-all text-slate-700">
                         <Settings className="w-4 h-4" />
-                        <span className="text-sm">Settings</span>
+                        <span className="text-sm">{t('topnav.settings')}</span>
                       </button>
                     </div>
 
@@ -85,7 +87,7 @@ export const TopNav: React.FC = () => {
                         className="w-full flex items-center gap-3 px-4 py-2 hover:bg-red-50 transition-all text-error rounded-lg"
                       >
                         <LogOut className="w-4 h-4" />
-                        <span className="text-sm font-medium">Sign Out</span>
+                        <span className="text-sm font-medium">{t('topnav.signOut')}</span>
                       </button>
                     </div>
                   </motion.div>

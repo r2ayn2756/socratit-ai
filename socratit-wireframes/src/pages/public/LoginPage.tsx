@@ -9,12 +9,14 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { Button, Input, Card } from '../../components/common';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { LoginFormData } from '../../types';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,8 +103,8 @@ export const LoginPage: React.FC = () => {
           <Link to="/">
             <img src="/logo.svg" alt="Socratit.ai" className="h-24 w-auto mx-auto mb-4" />
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h1>
-          <p className="text-slate-600">Sign in to your account to continue</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('login.title')}</h1>
+          <p className="text-slate-600">{t('login.subtitle')}</p>
         </div>
 
         <Card variant="elevated" padding="lg">
@@ -120,7 +122,7 @@ export const LoginPage: React.FC = () => {
                   <p className="text-sm text-error">{error}</p>
                   {error.includes('Too many') && (
                     <p className="text-xs text-error/80 mt-1">
-                      This is a security measure. Please wait before trying again.
+                      {t('login.error.securityMessage')}
                     </p>
                   )}
                 </div>
@@ -129,35 +131,35 @@ export const LoginPage: React.FC = () => {
 
             {/* Email Field */}
             <Input
-              label="Email Address"
+              label={t('login.emailLabel')}
               type="email"
-              placeholder="teacher@school.edu"
+              placeholder={t('login.emailPlaceholder')}
               leftIcon={<Mail className="w-5 h-5" />}
               error={errors.email?.message}
               value={emailValue || ''}
               {...register('email', {
-                required: 'Email is required',
+                required: t('login.validation.emailRequired'),
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address',
+                  message: t('login.validation.invalidEmail'),
                 },
               })}
             />
 
             {/* Password Field */}
             <Input
-              label="Password"
+              label={t('login.passwordLabel')}
               type="password"
-              placeholder="Enter your password"
+              placeholder={t('login.passwordPlaceholder')}
               leftIcon={<Lock className="w-5 h-5" />}
               showPasswordToggle={true}
               error={errors.password?.message}
               value={passwordValue || ''}
               {...register('password', {
-                required: 'Password is required',
+                required: t('login.validation.passwordRequired'),
                 minLength: {
                   value: 6,
-                  message: 'Password must be at least 6 characters',
+                  message: t('login.validation.passwordLength'),
                 },
               })}
             />
@@ -166,10 +168,10 @@ export const LoginPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="w-4 h-4 text-brand-blue border-slate-300 rounded focus:ring-brand-blue" />
-                <span className="text-sm text-slate-600">Remember me</span>
+                <span className="text-sm text-slate-600">{t('login.rememberMe')}</span>
               </label>
               <Link to="/forgot-password" className="text-sm text-brand-blue hover:text-blue-600 font-medium">
-                Forgot password?
+                {t('login.forgotPassword')}
               </Link>
             </div>
 
@@ -181,25 +183,25 @@ export const LoginPage: React.FC = () => {
               fullWidth
               loading={isLoading}
             >
-              Sign In
+              {t('login.signIn')}
             </Button>
 
             {/* Demo Account Hints */}
             <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <p className="text-sm text-slate-600 font-medium mb-2">Demo Accounts:</p>
+              <p className="text-sm text-slate-600 font-medium mb-2">{t('login.demoAccounts')}</p>
               <div className="space-y-1 text-xs text-slate-500">
-                <p>• Teacher: teacher@demo.com / password</p>
-                <p>• Student: student@demo.com / password</p>
-                <p>• Admin: admin@demo.com / password</p>
+                <p>• {t('login.demoTeacher')}</p>
+                <p>• {t('login.demoStudent')}</p>
+                <p>• {t('login.demoAdmin')}</p>
               </div>
             </div>
 
             {/* Sign Up Link */}
             <div className="text-center pt-4 border-t border-slate-200">
               <p className="text-slate-600">
-                Don't have an account?{' '}
+                {t('login.noAccount')}{' '}
                 <Link to="/signup" className="text-brand-blue hover:text-blue-600 font-semibold">
-                  Sign up for free
+                  {t('login.signUpFree')}
                 </Link>
               </p>
             </div>
@@ -210,7 +212,7 @@ export const LoginPage: React.FC = () => {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-            ← Back to home
+            ← {t('nav.backToHome')}
           </Link>
         </div>
 

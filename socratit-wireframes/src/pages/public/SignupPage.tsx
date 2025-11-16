@@ -9,12 +9,14 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { Button, Input, Card, Badge } from '../../components/common';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { SignupFormData, UserRole } from '../../types';
 import { Mail, Lock, User, GraduationCap, Users, Shield, AlertCircle, CheckCircle } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
   const { signup } = useAuth();
+  const { t } = useLanguage();
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
@@ -30,7 +32,7 @@ export const SignupPage: React.FC = () => {
 
   const onSubmit = async (data: SignupFormData) => {
     if (!selectedRole) {
-      setError('Please select your role');
+      setError(t('signup.validation.roleRequired'));
       return;
     }
 
@@ -61,7 +63,7 @@ export const SignupPage: React.FC = () => {
         throw new Error('User data not found after signup');
       }
     } catch (err) {
-      setError('Failed to create account. Please try again.');
+      setError(t('signup.error.accountCreation'));
     } finally {
       setIsLoading(false);
     }
@@ -71,20 +73,20 @@ export const SignupPage: React.FC = () => {
     {
       value: 'teacher' as UserRole,
       icon: GraduationCap,
-      title: 'Teacher',
-      description: 'Create classes, assignments, and track student progress',
+      title: t('signup.roleTeacher'),
+      description: t('signup.roleTeacherDesc'),
     },
     {
       value: 'student' as UserRole,
       icon: User,
-      title: 'Student',
-      description: 'Complete assignments and get AI tutoring help',
+      title: t('signup.roleStudent'),
+      description: t('signup.roleStudentDesc'),
     },
     {
       value: 'admin' as UserRole,
       icon: Shield,
-      title: 'Admin',
-      description: 'Manage school/district and view analytics',
+      title: t('signup.roleAdmin'),
+      description: t('signup.roleAdminDesc'),
     },
   ];
 
@@ -109,8 +111,8 @@ export const SignupPage: React.FC = () => {
           <Link to="/">
             <img src="/logo.svg" alt="Socratit.ai" className="h-12 w-auto mx-auto mb-4" />
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Your Account</h1>
-          <p className="text-slate-600">Get started with your 14-day free trial</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('signup.title')}</h1>
+          <p className="text-slate-600">{t('signup.subtitle')}</p>
         </div>
 
         <Card variant="elevated" padding="lg">
@@ -131,7 +133,7 @@ export const SignupPage: React.FC = () => {
             {/* Role Selection */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-3">
-                I am a... *
+                {t('signup.roleLabel')}
               </label>
               <div className="grid grid-cols-3 gap-3">
                 {roles.map((role) => (
@@ -173,7 +175,7 @@ export const SignupPage: React.FC = () => {
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="First Name"
+                label={t('signup.firstNameLabel')}
                 type="text"
                 placeholder="John"
                 error={errors.firstName?.message}
@@ -186,7 +188,7 @@ export const SignupPage: React.FC = () => {
                 })}
               />
               <Input
-                label="Last Name"
+                label={t('signup.lastNameLabel')}
                 type="text"
                 placeholder="Doe"
                 error={errors.lastName?.message}
@@ -202,7 +204,7 @@ export const SignupPage: React.FC = () => {
 
             {/* Email Field */}
             <Input
-              label="Email Address"
+              label={t('signup.emailLabel')}
               type="email"
               placeholder="you@school.edu"
               leftIcon={<Mail className="w-5 h-5" />}
@@ -219,7 +221,7 @@ export const SignupPage: React.FC = () => {
             {/* Password Fields */}
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Password"
+                label={t('signup.passwordLabel')}
                 type="password"
                 placeholder="Min. 8 characters"
                 leftIcon={<Lock className="w-5 h-5" />}
@@ -252,7 +254,7 @@ export const SignupPage: React.FC = () => {
 
             {/* School Code - Required for ALL roles */}
             <Input
-              label="School Code"
+              label={t('signup.schoolCodeLabel')}
               type="text"
               placeholder="e.g., DEMO0001"
               error={errors.schoolCode?.message}
@@ -273,7 +275,7 @@ export const SignupPage: React.FC = () => {
             {/* Conditional Fields Based on Role */}
             {selectedRole === 'student' && (
               <Input
-                label="Grade Level"
+                label={t('signup.gradeLevelLabel')}
                 type="text"
                 placeholder="e.g., 9th Grade"
                 error={errors.gradeLevel?.message}
@@ -330,9 +332,9 @@ export const SignupPage: React.FC = () => {
             {/* Sign In Link */}
             <div className="text-center pt-4 border-t border-slate-200">
               <p className="text-slate-600">
-                Already have an account?{' '}
+                {t('signup.hasAccount')}{' '}
                 <Link to="/login" className="text-brand-blue hover:text-blue-600 font-semibold">
-                  Sign in
+                  {t('nav.login')}
                 </Link>
               </p>
             </div>
@@ -343,7 +345,7 @@ export const SignupPage: React.FC = () => {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-            ← Back to home
+            ← {t('nav.backToHome')}
           </Link>
         </div>
 

@@ -21,10 +21,12 @@ import { assignmentService } from '../../services/assignment.service';
 import messageService from '../../services/message.service';
 import analyticsService from '../../services/analytics.service';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const TeacherDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Fetch teacher's classes
   const { data: classes = [], isLoading: classesLoading } = useQuery({
@@ -81,18 +83,20 @@ export const TeacherDashboard: React.FC = () => {
   const actionItems = [
     {
       id: 1,
-      title: `${strugglingStudentsData.length} students need attention`,
+      title: t('teacher.dashboard.studentsNeedAttention').replace('{count}', strugglingStudentsData.length.toString()),
       subtitle: strugglingStudentsData.length > 0
-        ? 'Students struggling with recent assignments'
-        : 'All students are on track',
+        ? t('teacher.dashboard.studentsStruggling')
+        : t('teacher.dashboard.allStudentsOnTrack'),
       priority: strugglingStudentsData.length > 5 ? 'high' : 'medium',
       icon: <AlertCircle className="w-5 h-5" />,
       action: () => navigate('/teacher/analytics'),
     },
     {
       id: 3,
-      title: `${unreadMessageCount} unread messages`,
-      subtitle: unreadMessageCount > 0 ? 'Students and parents awaiting response' : 'Inbox clear',
+      title: unreadMessageCount === 1
+        ? t('teacher.dashboard.unreadMessage')
+        : t('teacher.dashboard.unreadMessages').replace('{count}', unreadMessageCount.toString()),
+      subtitle: unreadMessageCount > 0 ? t('teacher.dashboard.awaitingResponse') : t('teacher.dashboard.inboxClear'),
       priority: unreadMessageCount > 5 ? 'high' : 'low',
       icon: <MessageSquare className="w-5 h-5" />,
       action: () => navigate('/teacher/messages'),
@@ -141,10 +145,12 @@ export const TeacherDashboard: React.FC = () => {
         <motion.div variants={fadeInUp} className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-              Good morning, {user?.firstName || 'Teacher'} 👋
+              {t('teacher.dashboard.greeting').replace('{name}', user?.firstName || 'Teacher')}
             </h1>
             <p className="text-neutral-600">
-              You have {classes.length} classes and {pendingReviews} assignments to review
+              {t('teacher.dashboard.summary')
+                .replace('{classCount}', classes.length.toString())
+                .replace('{assignmentCount}', pendingReviews.toString())}
             </p>
           </div>
 
@@ -155,7 +161,7 @@ export const TeacherDashboard: React.FC = () => {
             iconPosition="left"
             onClick={() => navigate('/teacher/assignments/new')}
           >
-            Create Assignment
+            {t('teacher.dashboard.createAssignment')}
           </Button>
         </motion.div>
 
@@ -168,9 +174,9 @@ export const TeacherDashboard: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl font-bold text-neutral-900 mb-1">
-                      My Classes
+                      {t('teacher.dashboard.myClasses')}
                     </h2>
-                    <p className="text-sm text-neutral-600">Active classes</p>
+                    <p className="text-sm text-neutral-600">{t('teacher.dashboard.activeClasses')}</p>
                   </div>
                   <Button
                     variant="ghost"
@@ -179,7 +185,7 @@ export const TeacherDashboard: React.FC = () => {
                     iconPosition="right"
                     onClick={() => navigate('/teacher/classes/new')}
                   >
-                    Add Class
+                    {t('teacher.dashboard.addClass')}
                   </Button>
                 </div>
               </div>
@@ -187,9 +193,9 @@ export const TeacherDashboard: React.FC = () => {
               <div className="p-6">
                 {upcomingClasses.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-neutral-500 mb-4">No classes yet</p>
+                    <p className="text-neutral-500 mb-4">{t('teacher.dashboard.noClasses')}</p>
                     <Button onClick={() => navigate('/teacher/classes/new')}>
-                      Create Your First Class
+                      {t('teacher.dashboard.createFirstClass')}
                     </Button>
                   </div>
                 ) : (
@@ -215,9 +221,9 @@ export const TeacherDashboard: React.FC = () => {
                           <div className="flex items-center gap-4 text-sm text-neutral-600">
                             <span className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
-                              {cls.studentCount || 0} students
+                              {cls.studentCount || 0} {t('teacher.dashboard.students')}
                             </span>
-                            <span>Grade {cls.gradeLevel || 'Mixed'}</span>
+                            <span>{t('teacher.dashboard.grade').replace('{grade}', cls.gradeLevel || 'Mixed')}</span>
                           </div>
                         </div>
 
@@ -225,7 +231,7 @@ export const TeacherDashboard: React.FC = () => {
                           <div className="text-2xl font-bold text-slate-900">
                             {Math.round(cls.averageGrade || 0)}%
                           </div>
-                          <div className="text-xs text-slate-500">Class Avg</div>
+                          <div className="text-xs text-slate-500">{t('teacher.dashboard.classAvg')}</div>
                         </div>
                       </motion.div>
                     ))}
@@ -238,7 +244,7 @@ export const TeacherDashboard: React.FC = () => {
                       variant="ghost"
                       onClick={() => navigate('/teacher/classes')}
                     >
-                      View All Classes
+                      {t('teacher.dashboard.viewAllClasses')}
                     </Button>
                   </div>
                 )}
@@ -251,9 +257,9 @@ export const TeacherDashboard: React.FC = () => {
             <Card padding="none" className="h-full">
               <div className="p-6 border-b border-slate-200">
                 <h2 className="text-xl font-bold text-slate-900 mb-1">
-                  Action Items
+                  {t('teacher.dashboard.actionItems')}
                 </h2>
-                <p className="text-sm text-slate-600">Things that need attention</p>
+                <p className="text-sm text-slate-600">{t('teacher.dashboard.actionItemsDesc')}</p>
               </div>
 
               <div className="p-6 space-y-4">
@@ -298,7 +304,7 @@ export const TeacherDashboard: React.FC = () => {
         {/* Quick Actions */}
         <motion.div variants={fadeInUp}>
           <Card>
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-4">{t('teacher.dashboard.quickActions')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Button
                 variant="ghost"
@@ -306,9 +312,9 @@ export const TeacherDashboard: React.FC = () => {
                 onClick={() => navigate('/teacher/assignments/new')}
               >
                 <div className="text-left">
-                  <div className="font-semibold mb-1">Create Assignment</div>
+                  <div className="font-semibold mb-1">{t('teacher.dashboard.createAssignment')}</div>
                   <div className="text-sm text-slate-600">
-                    Generate AI-powered quizzes
+                    {t('teacher.dashboard.generateQuizzes')}
                   </div>
                 </div>
               </Button>
@@ -319,9 +325,9 @@ export const TeacherDashboard: React.FC = () => {
                 onClick={() => navigate('/teacher/analytics')}
               >
                 <div className="text-left">
-                  <div className="font-semibold mb-1">View Analytics</div>
+                  <div className="font-semibold mb-1">{t('sidebar.analytics')}</div>
                   <div className="text-sm text-slate-600">
-                    Track student performance
+                    {t('teacher.dashboard.trackPerformance')}
                   </div>
                 </div>
               </Button>
@@ -332,9 +338,9 @@ export const TeacherDashboard: React.FC = () => {
                 onClick={() => navigate('/teacher/curriculum')}
               >
                 <div className="text-left">
-                  <div className="font-semibold mb-1">Upload Curriculum</div>
+                  <div className="font-semibold mb-1">{t('common.buttons.upload')} Curriculum</div>
                   <div className="text-sm text-slate-600">
-                    Generate from documents
+                    {t('teacher.dashboard.generateFromDocs')}
                   </div>
                 </div>
               </Button>
