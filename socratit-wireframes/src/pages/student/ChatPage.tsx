@@ -50,6 +50,13 @@ interface Conversation {
 export const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // DEBUG: Log that this is the STUDENT chat page
+  useEffect(() => {
+    console.log('🎒 STUDENT CHAT PAGE LOADED - This should show student navigation');
+    console.log('📍 Current path:', location.pathname);
+  }, []);
+
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');

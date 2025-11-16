@@ -48,6 +48,13 @@ interface Conversation {
 export const TeacherChatPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // DEBUG: Log that this is the TEACHER chat page
+  useEffect(() => {
+    console.log('🎓 TEACHER CHAT PAGE LOADED - This should show teacher navigation');
+    console.log('📍 Current path:', location.pathname);
+  }, []);
+
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -237,18 +244,28 @@ export const TeacherChatPage: React.FC = () => {
 
   const handleNewConversation = async () => {
     try {
+      console.log('🎓 TEACHER attempting to create conversation...');
+      console.log('🔑 Auth token:', localStorage.getItem('authToken')?.substring(0, 20) + '...');
+
       const conversation = await aiTAService.createConversation({
         conversationType: 'GENERAL_HELP',
         title: 'New Conversation',
       });
+
+      console.log('✅ Conversation created successfully:', conversation.id);
       setSelectedConversation(conversation.id);
       setMessages([]);
       setStreamingMessage('');
       setHasAutoSent(false);
       refetch();
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      alert('Failed to start conversation. Please try again.');
+    } catch (error: any) {
+      console.error('❌ Error creating conversation:', error);
+      console.error('❌ Error response:', error.response?.data);
+      console.error('❌ Error status:', error.response?.status);
+      console.error('❌ Error message:', error.message);
+
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to start conversation';
+      alert(`Failed to start conversation: ${errorMsg}\n\nStatus: ${error.response?.status || 'unknown'}`);
     }
   };
 
