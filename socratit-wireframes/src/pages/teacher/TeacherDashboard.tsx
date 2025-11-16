@@ -9,13 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout';
 import { Card, Button, Badge } from '../../components/common';
-import { StatCard } from '../../components/common/StatCard';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import {
   Users,
-  FileText,
-  Clock,
-  TrendingUp,
   MessageSquare,
   AlertCircle,
   Plus,
@@ -94,14 +90,6 @@ export const TeacherDashboard: React.FC = () => {
       action: () => navigate('/teacher/analytics'),
     },
     {
-      id: 2,
-      title: `${pendingReviews} assignments need review`,
-      subtitle: pendingReviews > 0 ? 'Published assignments awaiting submissions' : 'All caught up!',
-      priority: pendingReviews > 10 ? 'high' : 'medium',
-      icon: <FileText className="w-5 h-5" />,
-      action: () => navigate('/teacher/assignments'),
-    },
-    {
       id: 3,
       title: `${unreadMessageCount} unread messages`,
       subtitle: unreadMessageCount > 0 ? 'Students and parents awaiting response' : 'Inbox clear',
@@ -169,48 +157,6 @@ export const TeacherDashboard: React.FC = () => {
           >
             Create Assignment
           </Button>
-        </motion.div>
-
-        {/* Stats Grid */}
-        <motion.div
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          <motion.div variants={fadeInUp}>
-            <StatCard
-              icon={Users}
-              label="Total Students"
-              value={totalStudents}
-              color="primary"
-            />
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <StatCard
-              icon={FileText}
-              label="Pending Reviews"
-              value={pendingReviews}
-              color="warning"
-            />
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <StatCard
-              icon={TrendingUp}
-              label="Avg. Class Performance"
-              value={`${avgPerformance}%`}
-              color="success"
-            />
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <StatCard
-              icon={Clock}
-              label="Active Classes"
-              value={classes.length}
-              color="secondary"
-            />
-          </motion.div>
         </motion.div>
 
         {/* Main Content Grid */}

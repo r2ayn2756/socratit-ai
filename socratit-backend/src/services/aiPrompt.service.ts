@@ -167,6 +167,21 @@ export class AIPromptService {
       if (ac.concepts.length > 0) {
         prompt += `\nConcepts covered: ${ac.concepts.join(', ')}.`;
       }
+
+      // CRITICAL: Include current question context prominently
+      if (ac.currentQuestion) {
+        prompt += `\n\n=== CURRENT QUESTION CONTEXT ===`;
+        prompt += `\nThe student is CURRENTLY working on this specific question:`;
+        prompt += `\n\nQuestion: "${ac.currentQuestion.questionText}"`;
+        prompt += `\nType: ${ac.currentQuestion.type}`;
+        if (ac.currentQuestion.concept) {
+          prompt += `\nConcept: ${ac.currentQuestion.concept}`;
+        }
+        prompt += `\nPoints: ${ac.currentQuestion.points}`;
+        prompt += `\n\nWhen the student asks for help with "the current question" or "this question", they are referring to the question above.`;
+        prompt += `\nYou should help them understand the concepts needed to solve this question without giving the direct answer.`;
+        prompt += `\n================================`;
+      }
     }
 
     prompt += `\n\nIMPORTANT RULES:`;
@@ -175,6 +190,7 @@ export class AIPromptService {
     prompt += `\n- If asked for "the answer", politely redirect to learning`;
     prompt += `\n- Provide hints progressively, starting with conceptual reminders`;
     prompt += `\n- Use examples that are similar but not identical to the question`;
+    prompt += `\n- When helping with the current question, focus on explaining the relevant concepts and problem-solving strategies`;
 
     return prompt;
   }

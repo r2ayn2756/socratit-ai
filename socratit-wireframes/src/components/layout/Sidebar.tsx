@@ -101,18 +101,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
     >
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className="p-6 flex items-center justify-center">
+        <div className="p-3 flex items-center justify-center">
           {!isCollapsed ? (
             <img
               src="/logo.svg"
               alt="Socratit Logo"
-              className="h-12 w-auto"
+              className="h-20 w-auto"
             />
           ) : (
             <img
               src="/logo.svg"
               alt="Socratit Logo"
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           )}
         </div>
