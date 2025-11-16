@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Clock, CheckCircle, Users, UserCheck, UserX, Flame, TrendingUp } from 'lucide-react';
-import { EngagementMetrics, formatTimeSpent } from '../../types/analytics.types';
+import { Activity, Users, UserCheck, UserX, TrendingUp } from 'lucide-react';
+import { EngagementMetrics } from '../../types/analytics.types';
 
 interface EngagementMetricsDisplayProps {
   data: EngagementMetrics;
@@ -18,12 +18,10 @@ export const EngagementMetricsDisplay: React.FC<EngagementMetricsDisplayProps> =
   title = 'Class Engagement Metrics',
 }) => {
   const {
-    avgTimeSpent,
     completionRate,
     activeStudents,
     inactiveStudents,
     totalStudents,
-    avgStreakDays,
   } = data;
 
   // Calculate percentages
@@ -45,83 +43,8 @@ export const EngagementMetricsDisplay: React.FC<EngagementMetricsDisplayProps> =
 
   const health = getEngagementHealth();
 
-  // Get streak color
-  const getStreakColor = (days: number) => {
-    if (days >= 7) return 'from-orange-500 to-red-500';
-    if (days >= 3) return 'from-yellow-500 to-orange-500';
-    return 'from-blue-500 to-cyan-500';
-  };
-
   return (
     <div className="space-y-6">
-          {/* Main Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {/* Average Time Spent */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200"
-            >
-              <div className="flex items-center gap-2 text-xs text-blue-700 font-medium mb-2">
-                <Clock className="w-4 h-4" />
-                Avg Time per Student
-              </div>
-              <div className="text-3xl font-bold text-blue-900">
-                {formatTimeSpent(avgTimeSpent)}
-              </div>
-              <div className="text-xs text-blue-600 mt-2">
-                Total learning time
-              </div>
-            </motion.div>
-
-            {/* Completion Rate */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200"
-            >
-              <div className="flex items-center gap-2 text-xs text-green-700 font-medium mb-2">
-                <CheckCircle className="w-4 h-4" />
-                Completion Rate
-              </div>
-              <div className="text-3xl font-bold text-green-900">
-                {completionRate.toFixed(1)}%
-              </div>
-              <div className="mt-3">
-                <div className="h-2 bg-green-200 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${completionRate}%` }}
-                    transition={{ duration: 1, delay: 0.5 }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Streak Days */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-5 border border-orange-200"
-            >
-              <div className="flex items-center gap-2 text-xs text-orange-700 font-medium mb-2">
-                <Flame className="w-4 h-4" />
-                Avg Streak
-              </div>
-              <div className="text-3xl font-bold text-orange-900">
-                {avgStreakDays.toFixed(0)} day{avgStreakDays !== 1 ? 's' : ''}
-              </div>
-              <div className="text-xs text-orange-600 mt-2 flex items-center gap-1">
-                <Flame className="w-3 h-3" />
-                Consistency score
-              </div>
-            </motion.div>
-          </div>
-
           {/* Student Activity Breakdown */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold text-slate-700">Student Activity Status</h4>
