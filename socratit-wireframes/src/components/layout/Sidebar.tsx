@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'My Classes', icon: BookOpen, path: '/student/classes' },
       { label: 'Assignments', icon: FileText, path: '/student/assignments' },
       { label: 'Grades', icon: BarChart3, path: '/student/grades' },
-      { label: 'SocratIt!', icon: Brain, path: '/student/ai-tutor' },
+      { label: 'SocratIt', icon: Brain, path: '/student/ai-tutor' },
       { label: 'Messages', icon: MessageSquare, path: '/student/messages', badge: unreadCount },
     ],
     admin: [
@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isCollapsed ? '5rem' : '16rem' }}
+      animate={{ width: isCollapsed ? '4rem' : '12rem' }}
       className="fixed left-0 top-0 h-screen glass border-r border-white/20 shadow-xl z-40"
     >
       <div className="flex flex-col h-full">

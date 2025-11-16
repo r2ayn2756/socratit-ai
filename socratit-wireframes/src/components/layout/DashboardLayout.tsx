@@ -23,7 +23,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, user
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'ml-20' : 'ml-64'} flex flex-col h-screen`}>
+      <div className={`transition-all duration-300 ${isSidebarCollapsed ? 'ml-16' : 'ml-48'} flex flex-col h-screen`}>
         <TopNav />
 
         <main className="flex-1 p-6 overflow-y-auto">
