@@ -221,31 +221,52 @@ export const ChatPage: React.FC = () => {
       onToken: (token: string) => {
         setStreamingMessage((prev) => prev + token);
       },
-      onComplete: async (fullResponse: string) => {
+      onComplete: async (fullResponse: string, usage: any) => {
+        console.log('✅ AI Response complete:', {
+          responseLength: fullResponse.length,
+          conversationId: selectedConversation,
+          usage
+        });
+
         const newMessage: Message = {
           id: Math.random().toString(),
           role: 'ASSISTANT',
           content: fullResponse,
           createdAt: new Date(),
         };
-        setMessages((prev) => [...prev, newMessage]);
+        setMessages((prev) => {
+          console.log('💬 Adding AI message, previous count:', prev.length);
+          return [...prev, newMessage];
+        });
         setStreamingMessage('');
         setIsStreaming(false);
         setIsTyping(false);
 
+        // Wait a moment for backend to save
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         // Refetch conversation list to update message count
-        refetch();
+        console.log('🔄 Refetching conversation list...');
+        await refetch();
 
         // Reload conversation to ensure we have all messages from backend
         try {
+          console.log('🔄 Reloading conversation from backend...');
           const data = await aiTAService.getConversation(selectedConversation!);
-          console.log('🔄 Reloaded conversation after message, total messages:', data.messages.length);
+          console.log('📥 Backend returned messages:', data.messages.length);
+          console.log('📥 Backend messages:', data.messages.map((m: any) => ({
+            role: m.role,
+            content: m.content.substring(0, 50) + '...',
+            id: m.id
+          })));
+
           setMessages(
             data.messages.map((msg: any) => ({
               ...msg,
               createdAt: new Date(msg.createdAt),
             }))
           );
+          console.log('✅ Messages updated from backend');
         } catch (error) {
           console.error('❌ Error reloading conversation:', error);
         }

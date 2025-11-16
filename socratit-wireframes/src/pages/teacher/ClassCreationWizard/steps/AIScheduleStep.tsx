@@ -11,6 +11,7 @@ import { GlassCard } from '../../../../components/curriculum/GlassCard';
 import { CircularProgress } from '../../../../components/curriculum/ProgressBar';
 import type { ClassCreationState } from '../ClassCreationWizard';
 import { uploadService } from '../../../../services/upload.service';
+import { curriculumApi } from '../../../../services/curriculumApi.service';
 
 interface AIScheduleStepProps {
   wizardState: ClassCreationState;
@@ -91,51 +92,79 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
         });
       }
 
-      // Step 2: Process curriculum with AI
+      // Step 2: Process curriculum with AI - REAL AI CALL
       setGenerationStage('processing');
-      const tasks = [
-        { label: 'Analyzing curriculum structure...', duration: 1500 },
-        { label: 'Extracting topics and learning objectives...', duration: 2500 },
-        { label: 'Identifying key concepts and subtopics...', duration: 2000 },
-        { label: 'Calculating difficulty levels...', duration: 1500 },
-        { label: 'Generating unit breakdown...', duration: 2000 },
-        { label: 'Optimizing pacing and sequencing...', duration: 1500 },
-      ];
+      setCurrentTask('Analyzing curriculum with AI...');
+      setProgress(35);
 
-      for (let i = 0; i < tasks.length; i++) {
-        setCurrentTask(tasks[i].label);
-        setProgress(30 + (i / tasks.length) * 65);
-        await new Promise(resolve => setTimeout(resolve, tasks[i].duration));
-      }
+      try {
+        const targetUnits = wizardState.aiPreferences.targetUnits || 8;
+        const pacingPreference = wizardState.aiPreferences.pacingPreference || 'standard';
 
-      setProgress(95);
-      setCurrentTask('Finalizing curriculum breakdown...');
-
-      // Create structured preview units based on uploaded files
-      const targetUnits = wizardState.aiPreferences.targetUnits || 8;
-      const fileNames = wizardState.curriculumFiles.map(f => f.name).join(', ');
-
-      const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
-        id: `preview-unit-${i + 1}`,
-        title: `Unit ${i + 1}`,
-        description: `Topics and subtopics will be extracted from: ${fileNames}`,
-        topics: [],
-        source: 'AI-analyzed from uploaded curriculum',
-      }));
-      setGeneratedUnits(mockUnits);
-
-      setProgress(100);
-      setCurrentTask('Processing complete!');
-
-      setTimeout(() => {
-        setGenerationStage('complete');
-        onUpdate({
-          aiPreferences: {
-            ...wizardState.aiPreferences,
-            targetUnits: targetUnits,
-          }
+        // Call the AI API to analyze curriculum and generate unit structure
+        const aiResult = await curriculumApi.schedules.generateCurriculumPreview({
+          curriculumMaterialId: fileIds[0], // Use first file as primary
+          schoolYearStart: wizardState.schoolYearStart!.toISOString(),
+          schoolYearEnd: wizardState.schoolYearEnd!.toISOString(),
+          meetingPattern: wizardState.meetingPattern,
+          preferences: {
+            targetUnits,
+            pacingPreference: pacingPreference as any,
+          },
         });
-      }, 500);
+
+        setProgress(90);
+        setCurrentTask('Processing AI results...');
+
+        // Extract units with topics and subtopics from AI result
+        const extractedUnits = aiResult.units || [];
+        setGeneratedUnits(extractedUnits);
+
+        setProgress(100);
+        setCurrentTask('Analysis complete!');
+
+        setTimeout(() => {
+          setGenerationStage('complete');
+          onUpdate({
+            aiPreferences: {
+              ...wizardState.aiPreferences,
+              targetUnits: extractedUnits.length || targetUnits,
+            },
+            generatedUnits: extractedUnits, // Store in wizard state for review step
+          });
+        }, 500);
+
+      } catch (aiError: any) {
+        console.error('AI analysis failed:', aiError);
+
+        // Fallback: create mock units if AI fails
+        const targetUnits = wizardState.aiPreferences.targetUnits || 8;
+        const fileNames = wizardState.curriculumFiles.map(f => f.name).join(', ');
+
+        const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
+          id: `preview-unit-${i + 1}`,
+          title: `Unit ${i + 1}`,
+          description: `AI analysis pending. Topics will be generated from: ${fileNames}`,
+          topics: [],
+          learningObjectives: [],
+          estimatedWeeks: Math.ceil(40 / targetUnits), // ~40 week school year
+        }));
+        setGeneratedUnits(mockUnits);
+
+        setProgress(100);
+        setCurrentTask('Using preview mode (AI will generate full content when class is created)');
+
+        setTimeout(() => {
+          setGenerationStage('complete');
+          onUpdate({
+            aiPreferences: {
+              ...wizardState.aiPreferences,
+              targetUnits: targetUnits,
+            },
+            generatedUnits: mockUnits,
+          });
+        }, 500);
+      }
 
     } catch (error: any) {
       console.error('AI generation failed:', error);
@@ -396,26 +425,50 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Curriculum Breakdown</h4>
               <p className="text-sm text-gray-600 mb-4">
-                The AI has analyzed your curriculum and will generate {generatedUnits.length} units with specific topics, learning objectives, and subtopics when you finalize the class.
+                AI has extracted and organized {generatedUnits.length} units from your curriculum materials. Review and edit on the next step.
               </p>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {generatedUnits.slice(0, 5).map((unit, index) => (
                   <motion.div
                     key={unit.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="px-4 py-3 rounded-xl bg-white/70 backdrop-blur-xl border border-gray-200"
+                    className="px-4 py-4 rounded-xl bg-white/70 backdrop-blur-xl border border-gray-200 hover:border-blue-300 transition-colors"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{unit.title}</p>
-                      <p className="text-sm text-gray-600">{unit.description}</p>
+                    <div className="space-y-2">
+                      <div className="flex items-start justify-between">
+                        <p className="font-semibold text-gray-900">{unit.title}</p>
+                        {unit.estimatedWeeks && (
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            ~{unit.estimatedWeeks}w
+                          </span>
+                        )}
+                      </div>
+                      {unit.description && (
+                        <p className="text-sm text-gray-700">{unit.description}</p>
+                      )}
+                      {unit.topics && unit.topics.length > 0 && (
+                        <div className="pt-2 border-t border-gray-100">
+                          <p className="text-xs font-medium text-gray-600 mb-1">Topics:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {unit.topics.slice(0, 3).map((topic: any, i: number) => (
+                              <span key={i} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                                {typeof topic === 'string' ? topic : topic.name}
+                              </span>
+                            ))}
+                            {unit.topics.length > 3 && (
+                              <span className="text-xs text-gray-500">+{unit.topics.length - 3} more</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
                 {generatedUnits.length > 5 && (
-                  <p className="text-sm text-gray-500 text-center py-2">
-                    + {generatedUnits.length - 5} more units
+                  <p className="text-sm text-gray-500 text-center py-2 bg-gray-50 rounded-lg">
+                    + {generatedUnits.length - 5} more units (view all on next step)
                   </p>
                 )}
               </div>

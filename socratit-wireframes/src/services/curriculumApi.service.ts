@@ -103,6 +103,30 @@ export const scheduleApi = {
   },
 
   /**
+   * Generate curriculum preview (before class creation)
+   * Analyzes curriculum files and returns unit structure without creating a schedule
+   */
+  async generateCurriculumPreview(data: {
+    curriculumMaterialId: string;
+    schoolYearStart: string;
+    schoolYearEnd: string;
+    meetingPattern: string;
+    preferences: {
+      targetUnits?: number;
+      pacingPreference?: 'slow' | 'standard' | 'fast' | 'accelerated' | 'extended';
+    };
+  }): Promise<AIScheduleResponse> {
+    const response = await apiService.post<APIResponse<AIScheduleResponse>>(
+      `/curriculum/analyze-preview`,
+      data,
+      {
+        timeout: 300000, // 5 minutes for AI analysis
+      }
+    );
+    return response.data.data!;
+  },
+
+  /**
    * Generate schedule from AI
    * Uses extended timeout (5 minutes) because AI generation takes longer
    */

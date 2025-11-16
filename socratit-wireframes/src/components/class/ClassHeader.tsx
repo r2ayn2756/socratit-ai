@@ -4,8 +4,7 @@
 // ============================================================================
 
 import React from 'react';
-import { Users, BookOpen, TrendingUp, Edit } from 'lucide-react';
-import { Button } from '../common/Button';
+import { Users, BookOpen, TrendingUp } from 'lucide-react';
 import { Card } from '../common/Card';
 import { StatCard } from '../common/StatCard';
 
@@ -17,7 +16,6 @@ interface ClassHeaderProps {
   unitCount: number;
   progressPercentage: number;
   classCode?: string;
-  onEdit?: () => void;
 }
 
 export const ClassHeader: React.FC<ClassHeaderProps> = ({
@@ -28,7 +26,6 @@ export const ClassHeader: React.FC<ClassHeaderProps> = ({
   unitCount,
   progressPercentage,
   classCode,
-  onEdit,
 }) => {
   return (
     <Card variant="ghost" padding="md" className="shadow-lg">
@@ -50,33 +47,10 @@ export const ClassHeader: React.FC<ClassHeaderProps> = ({
 
         {/* Class Code Display */}
         {classCode && (
-          <div className="flex items-center gap-4">
-            <div className="text-right px-4 py-2 rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-200">
-              <p className="text-xs text-neutral-600 mb-0.5">Class Code</p>
-              <p className="text-2xl font-bold text-neutral-900 tracking-wider">{classCode}</p>
-            </div>
-            {/* Edit Button */}
-            {onEdit && (
-              <Button
-                variant="secondary"
-                onClick={onEdit}
-                icon={<Edit />}
-              >
-                Edit Class
-              </Button>
-            )}
+          <div className="text-right px-4 py-2 rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-200">
+            <p className="text-xs text-neutral-600 mb-0.5">Class Code</p>
+            <p className="text-2xl font-bold text-neutral-900 tracking-wider">{classCode}</p>
           </div>
-        )}
-
-        {/* Edit Button (when no class code) */}
-        {!classCode && onEdit && (
-          <Button
-            variant="secondary"
-            onClick={onEdit}
-            icon={<Edit />}
-          >
-            Edit Class
-          </Button>
         )}
       </div>
 

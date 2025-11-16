@@ -48,6 +48,7 @@ export interface ClassCreationState {
     pacingPreference?: 'slow' | 'standard' | 'fast';
     focusAreas?: string[];
   };
+  generatedUnits?: any[]; // AI-generated unit previews with topics/subtopics
 
   // Final data
   classId?: string;

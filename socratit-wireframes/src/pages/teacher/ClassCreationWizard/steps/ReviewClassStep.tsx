@@ -274,23 +274,105 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         </div>
       </GlassCard>
 
-      {/* Curriculum Status */}
-      <GlassCard variant="elevated">
-        <div className="p-6 space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              wizardState.curriculumFiles.length > 0 ? 'bg-green-100' : 'bg-gray-100'
-            }`}>
-              {wizardState.curriculumFiles.length > 0 ? (
-                <Sparkles className="w-5 h-5 text-green-600" />
-              ) : (
-                <FileText className="w-5 h-5 text-gray-400" />
-              )}
+      {/* Generated Units - Full Preview */}
+      {wizardState.generatedUnits && wizardState.generatedUnits.length > 0 && (
+        <GlassCard variant="elevated">
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">AI-Generated Curriculum ({wizardState.generatedUnits.length} Units)</h3>
+                  <p className="text-sm text-gray-600">Extracted from {wizardState.curriculumFiles.length} file(s)</p>
+                </div>
+              </div>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Curriculum</h3>
-          </div>
 
-          {wizardState.curriculumFiles.length > 0 ? (
+            <div className="space-y-3 max-h-96 overflow-y-auto modal-scroll">
+              {wizardState.generatedUnits.map((unit: any, index: number) => (
+                <motion.div
+                  key={unit.id || index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="p-4 rounded-xl bg-white border border-gray-200"
+                >
+                  <div className="space-y-3">
+                    {/* Unit Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{unit.title}</h4>
+                        {unit.description && (
+                          <p className="text-sm text-gray-600 mt-1">{unit.description}</p>
+                        )}
+                      </div>
+                      {unit.estimatedWeeks && (
+                        <span className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full ml-3">
+                          {unit.estimatedWeeks} weeks
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Topics */}
+                    {unit.topics && unit.topics.length > 0 && (
+                      <div className="pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">Topics ({unit.topics.length}):</p>
+                        <div className="flex flex-wrap gap-2">
+                          {unit.topics.map((topic: any, i: number) => (
+                            <span key={i} className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-lg">
+                              {typeof topic === 'string' ? topic : topic.name || topic.title}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Learning Objectives */}
+                    {unit.learningObjectives && unit.learningObjectives.length > 0 && (
+                      <div className="pt-3 border-t border-gray-100">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">Learning Objectives:</p>
+                        <ul className="space-y-1">
+                          {unit.learningObjectives.slice(0, 3).map((obj: string, i: number) => (
+                            <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                              <span className="w-1 h-1 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                              <span>{obj}</span>
+                            </li>
+                          ))}
+                          {unit.learningObjectives.length > 3 && (
+                            <li className="text-sm text-gray-500 pl-3">
+                              +{unit.learningObjectives.length - 3} more objectives
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              <p className="text-xs text-gray-600">
+                💡 Units will be created in this order. You can edit and reorder them after class creation.
+              </p>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* Curriculum Status (if no AI-generated units) */}
+      {(!wizardState.generatedUnits || wizardState.generatedUnits.length === 0) && wizardState.curriculumFiles.length > 0 && (
+        <GlassCard variant="elevated">
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Curriculum</h3>
+            </div>
+
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-600" />
@@ -317,15 +399,9 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
                 )}
               </div>
             </div>
-          ) : (
-            <div>
-              <p className="text-gray-600">
-                No curriculum uploaded. You can add curriculum materials later.
-              </p>
-            </div>
-          )}
-        </div>
-      </GlassCard>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Error Message */}
       {error && (

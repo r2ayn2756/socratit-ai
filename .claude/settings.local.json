@@ -57,7 +57,9 @@
       "Bash(git rm:*)",
       "Bash(git log:*)",
       "Bash(nul)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []
