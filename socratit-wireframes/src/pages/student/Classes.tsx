@@ -40,7 +40,7 @@ const ActiveAssignments: React.FC<{ classId: string; colors: any }> = ({ classId
         <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3">
           Active Assignments
         </div>
-        <div className={`p-4 rounded-lg ${colors.bg} border ${colors.border}`}>
+        <div className={`p-4 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50`}>
           <Loader2 className={`w-5 h-5 ${colors.text} mx-auto animate-spin`} />
         </div>
       </div>
@@ -55,7 +55,7 @@ const ActiveAssignments: React.FC<{ classId: string; colors: any }> = ({ classId
         Active Assignments
       </div>
       {activeAssignments.length === 0 ? (
-        <div className={`p-4 rounded-lg ${colors.bg} border ${colors.border} text-center`}>
+        <div className={`p-4 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50 text-center`}>
           <FileText className={`w-6 h-6 ${colors.text} mx-auto mb-2`} />
           <p className="text-sm text-slate-600">
             No active assignments at the moment
@@ -66,7 +66,7 @@ const ActiveAssignments: React.FC<{ classId: string; colors: any }> = ({ classId
           {activeAssignments.map((assignment: any) => (
             <div
               key={assignment.id}
-              className={`p-3 rounded-lg ${colors.bg} border ${colors.border} hover:shadow-sm transition-shadow`}
+              className={`p-3 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50 hover:${colors.bg}/90 hover:shadow-lg transition-all`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
@@ -202,7 +202,7 @@ export const Classes: React.FC = () => {
                 )}
               </p>
             </div>
-            <Button variant="primary" onClick={() => setShowEnrollModal(true)}>
+            <Button variant="gradient" onClick={() => setShowEnrollModal(true)}>
               <PlusCircle className="w-5 h-5 mr-2" />
               Enroll in Class
             </Button>
@@ -212,9 +212,11 @@ export const Classes: React.FC = () => {
         {/* Pending Enrollments Alert */}
         {pendingCount > 0 && (
           <motion.div variants={fadeInUp}>
-            <Card className="bg-orange-50 border-orange-200">
+            <Card variant="glass" padding="lg" className="bg-orange-50/70 backdrop-blur-md border-orange-200/50">
               <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 text-orange-600 mt-0.5" />
+                <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-orange-600" />
+                </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-orange-900">
                     {pendingCount} Enrollment Request{pendingCount !== 1 ? 's' : ''} Pending
@@ -233,14 +235,16 @@ export const Classes: React.FC = () => {
           {/* Classes List - Takes up 2/3 */}
           <div className="lg:col-span-2 space-y-6">
             {approvedClasses.length === 0 ? (
-              <Card>
+              <Card variant="glassElevated" padding="xl">
                 <div className="text-center py-12">
-                  <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                    <BookOpen className="w-10 h-10" />
+                  </div>
                   <h3 className="text-lg font-semibold text-slate-900 mb-2">No classes yet</h3>
                   <p className="text-slate-600 mb-4">
                     Get started by enrolling in a class using a class code from your teacher
                   </p>
-                  <Button variant="primary" onClick={() => setShowEnrollModal(true)}>
+                  <Button variant="gradient" onClick={() => setShowEnrollModal(true)}>
                     <PlusCircle className="w-5 h-5 mr-2" />
                     Enroll in Class
                   </Button>
@@ -256,11 +260,11 @@ export const Classes: React.FC = () => {
                   <motion.div
                     key={enrollment.id}
                     variants={fadeInUp}
-                    whileHover={{ scale: 1.01 }}
+                    whileHover={{ scale: 1.02, y: -4 }}
                     className="cursor-pointer"
                     onClick={() => navigate(`/student/classes/${classData.id}`)}
                   >
-                    <Card padding="none" className="overflow-hidden">
+                    <Card variant="glassElevated" padding="none" className="overflow-hidden">
                       {/* Class Header with Gradient */}
                       <div className={`p-6 bg-gradient-to-r ${colors.gradient} text-white`}>
                         <div className="flex items-start justify-between">
@@ -293,7 +297,7 @@ export const Classes: React.FC = () => {
                       </div>
 
                       {/* Class Details */}
-                      <div className="p-6 bg-white">
+                      <div className="p-6">
                         <div className="grid grid-cols-2 gap-6 mb-6">
                           {/* Teacher & Schedule */}
                           <div>
@@ -340,8 +344,8 @@ export const Classes: React.FC = () => {
                         <ActiveAssignments classId={classData.id} colors={colors} />
 
                         {/* View Details Button */}
-                        <div className="mt-6 pt-6 border-t border-slate-200">
-                          <Button variant="ghost" className="w-full flex items-center justify-center gap-2">
+                        <div className="mt-6 pt-6 border-t border-white/20">
+                          <Button variant="glass" glow={false} className="w-full flex items-center justify-center gap-2">
                             <span>View Class Details</span>
                             <ChevronRight className="w-4 h-4" />
                           </Button>
@@ -356,8 +360,8 @@ export const Classes: React.FC = () => {
 
           {/* Teaching Assistant - Takes up 1/3 */}
           <motion.div variants={fadeInUp}>
-            <Card padding="none" className="overflow-hidden sticky top-6">
-              <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
+            <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
+              <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                     <Brain className="w-6 h-6" />
@@ -368,9 +372,10 @@ export const Classes: React.FC = () => {
                   </div>
                 </div>
                 <Button
-                  variant="secondary"
+                  variant="glass"
                   size="sm"
-                  className="w-full bg-white text-brand-purple hover:bg-white/90"
+                  glow={false}
+                  className="w-full bg-white text-purple-700 hover:bg-white/90"
                 >
                   Ask a Question
                 </Button>

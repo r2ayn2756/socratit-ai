@@ -157,12 +157,12 @@ export const Assignments: React.FC = () => {
       <motion.div
         key={assignment.id}
         variants={fadeInUp}
-        whileHover={{ scale: 1.01 }}
+        whileHover={{ scale: 1.02, y: -2 }}
         className="cursor-pointer"
         onClick={() => navigate(`/student/assignments/${assignment.id}`)}
       >
-        <Card padding="none" className="overflow-hidden">
-          <div className="p-5 bg-white">
+        <Card variant="glass" padding="lg" hover className="overflow-hidden">
+          <div>
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -212,7 +212,7 @@ export const Assignments: React.FC = () => {
             )}
 
             {/* Action Button */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+            <div className="flex items-center justify-between pt-4 border-t border-white/20">
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <Clock className="w-4 h-4" />
                 <span>
@@ -221,8 +221,9 @@ export const Assignments: React.FC = () => {
                 </span>
               </div>
               <Button
-                variant={status.progress > 0 ? 'primary' : 'secondary'}
+                variant={status.progress > 0 ? 'gradient' : 'glass'}
                 size="sm"
+                glow={status.progress > 0}
               >
                 <Play className="w-4 h-4 mr-2" />
                 {status.progress > 0 && status.progress < 100
@@ -322,9 +323,11 @@ export const Assignments: React.FC = () => {
 
             {/* Empty State */}
             {assignments.length === 0 && (
-              <Card>
+              <Card variant="glassElevated" padding="xl">
                 <div className="text-center py-12">
-                  <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                    <FileText className="w-10 h-10" />
+                  </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">
                     No assignments yet
                   </h3>
