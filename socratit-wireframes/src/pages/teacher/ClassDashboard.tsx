@@ -188,11 +188,6 @@ export const ClassDashboard: React.FC = () => {
     }
   };
 
-  const handleEditClass = () => {
-    // TODO: Implement edit class
-    console.log('Edit class');
-  };
-
   const handleManageCurriculum = () => {
     setShowCurriculumModal(true);
   };
@@ -275,7 +270,6 @@ export const ClassDashboard: React.FC = () => {
             unitCount={classData.schedule?.totalUnits || 0}
             progressPercentage={classData.schedule?.percentComplete || 0}
             classCode={classData.classCode}
-            onEdit={handleEditClass}
           />
         </motion.div>
 

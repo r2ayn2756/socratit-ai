@@ -15,58 +15,65 @@ const router = Router();
 router.use(authenticate);
 
 // ============================================================================
-// STUDENT ROUTES - Conversations & Messaging
+// STUDENT & TEACHER ROUTES - Conversations & Messaging
 // ============================================================================
 
-// Create new conversation
+// Create new conversation (both students and teachers can use AI)
 router.post(
   '/conversations',
-  authorizeRoles(['STUDENT']),
+  authorizeRoles(['STUDENT', 'TEACHER']),
   validateRequest(validators.createConversationSchema),
   aiTAController.createConversation
 );
 
-// List student's conversations
+// List conversations (both students and teachers)
 router.get(
   '/conversations',
-  authorizeRoles(['STUDENT']),
+  authorizeRoles(['STUDENT', 'TEACHER']),
   validateRequest(validators.listConversationsSchema, 'query'),
   aiTAController.listConversations
 );
 
-// Get specific conversation with messages
+// Get specific conversation with messages (both students and teachers)
 router.get(
   '/conversations/:id',
-  authorizeRoles(['STUDENT']),
+  authorizeRoles(['STUDENT', 'TEACHER']),
   aiTAController.getConversation
 );
 
-// Send message (non-streaming)
+// Send message (non-streaming) (both students and teachers)
 router.post(
   '/conversations/:id/messages',
-  authorizeRoles(['STUDENT']),
+  authorizeRoles(['STUDENT', 'TEACHER']),
   validateRequest(validators.sendMessageSchema),
   aiTAController.sendMessage
 );
 
-// Share conversation with teacher
+// Share conversation with teacher (students only)
 router.post(
   '/conversations/:id/share',
   authorizeRoles(['STUDENT']),
   aiTAController.shareConversation
 );
 
-// End conversation
+// End/Close conversation (both students and teachers)
 router.post(
   '/conversations/:id/end',
-  authorizeRoles(['STUDENT']),
+  authorizeRoles(['STUDENT', 'TEACHER']),
   aiTAController.endConversation
 );
 
-// Rate AI message
+// Alias: Close conversation (same as end)
+router.post(
+  '/conversations/:id/close',
+  authorizeRoles(['STUDENT', 'TEACHER']),
+  aiTAController.endConversation
+);
+
+// Rate AI message (both students and teachers)
 router.post(
   '/messages/:id/feedback',
-  authorizeRoles(['STUDENT']),
+  authorizeRoles(['STUDENT', 'TEACHER']),
   validateRequest(validators.rateMessageSchema),
   aiTAController.rateMessage
 );
