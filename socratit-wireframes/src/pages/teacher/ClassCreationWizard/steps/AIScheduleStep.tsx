@@ -60,6 +60,8 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
 
   // Upload files and process curriculum with AI
   const generateSchedule = async () => {
+    let fileIds: string[] = [];
+
     try {
       setErrorMessage('');
 
@@ -69,7 +71,6 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
         setCurrentTask(`Uploading ${wizardState.curriculumFiles.length} curriculum file(s)...`);
         setProgress(10);
 
-        const fileIds: string[] = [];
         for (let i = 0; i < wizardState.curriculumFiles.length; i++) {
           const file = wizardState.curriculumFiles[i];
           setCurrentTask(`Uploading ${file.name}... (${i + 1}/${wizardState.curriculumFiles.length})`);
