@@ -3,17 +3,11 @@
 // Enterprise-quality expandable unit details with Apple glass UI
 // ============================================================================
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
   BookOpen,
-  Target,
-  Lightbulb,
-  CheckCircle,
-  FileText,
-  ChevronDown,
-  ChevronUp,
   Sparkles,
 } from 'lucide-react';
 import type { CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
@@ -33,23 +27,7 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
   userRole,
   onGenerateAssignment,
 }) => {
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['subunits', 'objectives'])
-  );
-
   if (!unit) return null;
-
-  const toggleSection = (section: string) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(section)) {
-        next.delete(section);
-      } else {
-        next.add(section);
-      }
-      return next;
-    });
-  };
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -59,6 +37,14 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
       SKIPPED: 'bg-red-100 text-red-700 border-red-300',
     };
     return colors[status as keyof typeof colors] || colors.SCHEDULED;
+  };
+
+  const getPerformanceColor = (percentage?: number) => {
+    if (!percentage) return 'text-gray-400';
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 60) return 'text-blue-600';
+    if (percentage >= 40) return 'text-orange-600';
+    return 'text-red-600';
   };
 
   return (
@@ -122,172 +108,62 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6 modal-scroll">
-                  {/* Sub-Units Section - Clickable with Generate Assignment */}
-                  {unit.subUnits && unit.subUnits.length > 0 && (
-                    <CollapsibleSection
-                      title="Sub-Units & Topics"
-                      icon={<BookOpen className="w-5 h-5" />}
-                      isExpanded={expandedSections.has('subunits')}
-                      onToggle={() => toggleSection('subunits')}
-                    >
-                      <div className="space-y-3">
-                        {unit.subUnits.map((subUnit, idx) => (
-                          <motion.div
-                            key={subUnit.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className="p-4 rounded-xl bg-gradient-to-br from-white/90 to-white/70 border border-gray-200/50 hover:border-primary-300 hover:shadow-md transition-all group"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="px-2 py-0.5 rounded-md bg-primary-100 text-primary-700 text-xs font-semibold">
-                                    {idx + 1}
-                                  </span>
-                                  <h4 className="font-semibold text-gray-900 text-sm">
-                                    {subUnit.name}
-                                  </h4>
-                                </div>
-                                {subUnit.description && (
-                                  <p className="text-sm text-gray-600 mt-2">
-                                    {subUnit.description}
-                                  </p>
-                                )}
-                              </div>
+                <div className="flex-1 overflow-y-auto p-6 modal-scroll">
+                  {/* Topics List */}
+                  {unit.subUnits && unit.subUnits.length > 0 ? (
+                    <div className="space-y-3">
+                      {unit.subUnits.map((subUnit, idx) => (
+                        <motion.button
+                          key={subUnit.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          onClick={() => userRole === 'teacher' && onGenerateAssignment?.(subUnit)}
+                          disabled={userRole !== 'teacher' || !onGenerateAssignment}
+                          className={`
+                            w-full p-4 rounded-xl bg-gradient-to-br from-white/90 to-white/70
+                            border border-gray-200/50 transition-all text-left
+                            ${
+                              userRole === 'teacher' && onGenerateAssignment
+                                ? 'hover:border-primary-300 hover:shadow-lg cursor-pointer group'
+                                : 'cursor-default'
+                            }
+                          `}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3 flex-1">
+                              <span className="px-2.5 py-1 rounded-lg bg-primary-100 text-primary-700 text-sm font-semibold">
+                                {idx + 1}
+                              </span>
+                              <h4 className="font-semibold text-gray-900">
+                                {subUnit.name}
+                              </h4>
+                            </div>
 
-                              {/* Generate Assignment Button - Only for Teachers */}
+                            <div className="flex items-center gap-3">
+                              {/* Performance Percentage */}
+                              {subUnit.performancePercentage !== undefined && (
+                                <div className={`text-2xl font-bold ${getPerformanceColor(subUnit.performancePercentage)}`}>
+                                  {subUnit.performancePercentage}%
+                                </div>
+                              )}
+
+                              {/* Generate Assignment Icon - Only visible on hover for teachers */}
                               {userRole === 'teacher' && onGenerateAssignment && (
-                                <motion.button
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => onGenerateAssignment(subUnit)}
-                                  className="ml-3 px-3 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-secondary-600 text-white text-sm font-medium hover:shadow-lg transition-all flex items-center gap-2 opacity-0 group-hover:opacity-100"
-                                >
-                                  <Sparkles className="w-4 h-4" />
-                                  Generate Assignment
-                                </motion.button>
-                              )}
-                            </div>
-
-                            {/* Sub-unit Details */}
-                            <div className="mt-3 space-y-2">
-                              {/* Learning Objectives */}
-                              {subUnit.learningObjectives && subUnit.learningObjectives.length > 0 && (
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                                    Objectives
-                                  </p>
-                                  <ul className="space-y-1">
-                                    {subUnit.learningObjectives.map((obj, objIdx) => (
-                                      <li
-                                        key={objIdx}
-                                        className="text-sm text-gray-700 flex items-start gap-2"
-                                      >
-                                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                                        <span>{obj}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Sparkles className="w-5 h-5 text-primary-500" />
                                 </div>
                               )}
-
-                              {/* Concepts */}
-                              {subUnit.concepts && subUnit.concepts.length > 0 && (
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                                    Key Concepts
-                                  </p>
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {subUnit.concepts.map((concept, conceptIdx) => (
-                                      <span
-                                        key={conceptIdx}
-                                        className="px-2 py-1 rounded-md bg-purple-100 text-purple-700 text-xs font-medium"
-                                      >
-                                        {concept}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </CollapsibleSection>
-                  )}
-
-                  {/* Learning Objectives */}
-                  {unit.learningObjectives && unit.learningObjectives.length > 0 && (
-                    <CollapsibleSection
-                      title="Learning Objectives"
-                      icon={<Target className="w-5 h-5" />}
-                      isExpanded={expandedSections.has('objectives')}
-                      onToggle={() => toggleSection('objectives')}
-                    >
-                      <ul className="space-y-2">
-                        {unit.learningObjectives.map((objective, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-start gap-3 p-3 rounded-lg bg-white/70 border border-gray-200/50"
-                          >
-                            <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-gray-700">{objective}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CollapsibleSection>
-                  )}
-
-                  {/* Key Concepts */}
-                  {unit.concepts && unit.concepts.length > 0 && (
-                    <CollapsibleSection
-                      title="Key Concepts"
-                      icon={<Lightbulb className="w-5 h-5" />}
-                      isExpanded={expandedSections.has('concepts')}
-                      onToggle={() => toggleSection('concepts')}
-                    >
-                      <div className="flex flex-wrap gap-2">
-                        {unit.concepts.map((concept, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm font-medium border border-purple-200/50"
-                          >
-                            {concept}
-                          </span>
-                        ))}
-                      </div>
-                    </CollapsibleSection>
-                  )}
-
-                  {/* Assignments */}
-                  {unit.suggestedAssessments && (unit.suggestedAssessments as any[]).length > 0 && (
-                    <CollapsibleSection
-                      title="Suggested Assessments"
-                      icon={<FileText className="w-5 h-5" />}
-                      isExpanded={expandedSections.has('assessments')}
-                      onToggle={() => toggleSection('assessments')}
-                    >
-                      <div className="space-y-2">
-                        {(unit.suggestedAssessments as any[]).map((assessment, idx) => (
-                          <div
-                            key={idx}
-                            className="p-3 rounded-lg bg-white/70 border border-gray-200/50 flex items-center justify-between"
-                          >
-                            <div>
-                              <p className="font-medium text-gray-900 capitalize">
-                                {assessment.type}
-                              </p>
-                              <p className="text-xs text-gray-600">
-                                {assessment.timing} of unit • ~{assessment.estimatedQuestions}{' '}
-                                questions
-                              </p>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </CollapsibleSection>
+                        </motion.button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No topics available for this unit</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -296,57 +172,6 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
         </>
       )}
     </AnimatePresence>
-  );
-};
-
-// Collapsible Section Component
-interface CollapsibleSectionProps {
-  title: string;
-  icon: React.ReactNode;
-  isExpanded: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}
-
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title,
-  icon,
-  isExpanded,
-  onToggle,
-  children,
-}) => {
-  return (
-    <div className="rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-200/50 overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-            {icon}
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        </div>
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-gray-400" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400" />
-        )}
-      </button>
-
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="p-4 pt-0">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   );
 };
 
