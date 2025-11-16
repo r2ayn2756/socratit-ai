@@ -28,11 +28,15 @@ interface Message {
 interface AlwaysVisibleAIChatProps {
   assignmentId: string;
   assignmentTitle?: string;
+  currentQuestionId?: string;
+  currentQuestionText?: string;
 }
 
 export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
   assignmentId,
   assignmentTitle,
+  currentQuestionId,
+  currentQuestionText,
 }) => {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -151,7 +155,7 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
         };
         setMessages((prev) => [...prev, errorMessage]);
       },
-    });
+    }, currentQuestionId);
 
     setInputValue('');
     inputRef.current?.focus();
@@ -187,6 +191,12 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
           <div className="bg-white bg-opacity-10 rounded-lg px-3 py-2 mt-3">
             <p className="text-xs text-white text-opacity-80">Helping with:</p>
             <p className="text-sm font-medium truncate">{assignmentTitle}</p>
+          </div>
+        )}
+        {currentQuestionText && (
+          <div className="bg-white bg-opacity-10 rounded-lg px-3 py-2 mt-2">
+            <p className="text-xs text-white text-opacity-80">Current question:</p>
+            <p className="text-sm font-medium line-clamp-2">{currentQuestionText}</p>
           </div>
         )}
       </div>

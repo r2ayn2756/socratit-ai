@@ -99,7 +99,7 @@ export const LoginPage: React.FC = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/">
-            <img src="/logo.svg" alt="Socratit.ai" className="h-12 w-auto mx-auto mb-4" />
+            <img src="/logo.svg" alt="Socratit.ai" className="h-24 w-auto mx-auto mb-4" />
           </Link>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h1>
           <p className="text-slate-600">Sign in to your account to continue</p>

@@ -61,7 +61,7 @@ export const websocketService = {
     socket?.emit('ai:conversation:leave', { conversationId });
   },
 
-  sendMessage: (conversationId: string, content: string, callbacks: StreamCallbacks) => {
+  sendMessage: (conversationId: string, content: string, callbacks: StreamCallbacks, currentQuestionId?: string) => {
     if (!socket) throw new Error('WebSocket not connected');
 
     // Listen for streaming events
@@ -97,8 +97,8 @@ export const websocketService = {
       }
     });
 
-    // Send the message
-    socket.emit('ai:message:send', { conversationId, content });
+    // Send the message with optional current question ID
+    socket.emit('ai:message:send', { conversationId, content, currentQuestionId });
   },
 
   getSocket: () => socket,

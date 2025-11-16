@@ -19,6 +19,7 @@ import {
 import { getStudentConceptMastery, getStudentInsights } from '../../services/analytics.service';
 import { Grade, StudentClassGrades } from '../../types/grade.types';
 import { ConceptMastery as ConceptMasteryType, StudentInsight } from '../../types/analytics.types';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Award,
   TrendingUp,
@@ -31,33 +32,145 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
-interface GradesProps {
-  studentId?: string; // Pass from auth context
+interface GradesProps {}
+
+interface ClassGradeDisplay {
+  id: string;
+  name: string;
+  teacher: string;
+  currentGrade: number;
+  trend: { value: number; isPositive: boolean };
+  color: string;
+  assignments: Array<{
+    name: string;
+    grade: number;
+    points: number;
+    feedback: string;
+    date: string;
+    type: string;
+  }>;
+  breakdown: Record<string, { weight: number; average: number }>;
 }
 
-export const Grades: React.FC<GradesProps> = ({ studentId = 'mock-student-id' }) => {
+export const Grades: React.FC<GradesProps> = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [allGrades, setAllGrades] = useState<Grade[]>([]);
+  const [classGrades, setClassGrades] = useState<ClassGradeDisplay[]>([]);
   const [conceptMastery, setConceptMastery] = useState<ConceptMasteryType[]>([]);
   const [insights, setInsights] = useState<StudentInsight[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
 
+  // Helper function to format date
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'today';
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 14) return '1 week ago';
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    return `${Math.floor(diffDays / 30)} months ago`;
+  };
+
+  // Helper function to map assignment type to display name
+  const formatAssignmentType = (type: string): string => {
+    const typeMap: Record<string, string> = {
+      'HOMEWORK': 'Homework',
+      'QUIZ': 'Quiz',
+      'TEST': 'Test',
+      'PRACTICE': 'Practice',
+      'CHALLENGE': 'Challenge',
+    };
+    return typeMap[type] || type;
+  };
+
   // Fetch all student data
   const fetchStudentData = async () => {
+    if (!user?.id) {
+      setError('User not authenticated');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
+      // Fetch overall grades for all classes
       const [gradesData, conceptData, insightsData] = await Promise.all([
-        getStudentAllGrades(studentId),
-        getStudentConceptMastery(studentId),
-        getStudentInsights(studentId),
+        getStudentAllGrades(user.id),
+        getStudentConceptMastery(user.id),
+        getStudentInsights(user.id),
       ]);
 
       setAllGrades(gradesData);
       setConceptMastery(conceptData);
       setInsights(insightsData);
+
+      // Transform grades data into display format
+      const classGradesPromises = gradesData.map(async (grade) => {
+        if (!grade.class) return null;
+
+        // Fetch detailed grades for this class
+        const classGradeData: StudentClassGrades = await getStudentClassGrades(
+          user.id,
+          grade.classId
+        );
+
+        // Get assignment grades (type: 'assignment')
+        const assignmentGrades = classGradeData.grades.filter(
+          (g) => g.gradeType === 'assignment'
+        );
+
+        // Sort by date (most recent first) and take top 3
+        const recentAssignments = assignmentGrades
+          .sort((a, b) => new Date(b.gradeDate).getTime() - new Date(a.gradeDate).getTime())
+          .slice(0, 3)
+          .map((ag) => ({
+            name: ag.assignment?.title || 'Untitled Assignment',
+            grade: Math.round(ag.percentage),
+            points: ag.pointsPossible,
+            feedback: ag.teacherComments || 'Good work!',
+            date: formatDate(ag.gradeDate),
+            type: formatAssignmentType(ag.assignment?.type || 'Assignment'),
+          }));
+
+        // Create breakdown from category grades
+        const breakdown: Record<string, { weight: number; average: number }> = {};
+        classGradeData.current.categoryGrades.forEach((cat) => {
+          breakdown[cat.categoryName.toLowerCase()] = {
+            weight: cat.weight,
+            average: Math.round(cat.averagePercentage),
+          };
+        });
+
+        // Calculate trend (mock for now - would need historical data)
+        const trend = {
+          value: Math.floor(Math.random() * 5),
+          isPositive: Math.random() > 0.5,
+        };
+
+        return {
+          id: grade.classId,
+          name: grade.class.name,
+          teacher: 'Teacher', // TODO: Add teacher info to backend response
+          currentGrade: Math.round(classGradeData.current.overallPercentage),
+          trend,
+          color: grade.class.color || 'blue',
+          assignments: recentAssignments,
+          breakdown,
+        };
+      });
+
+      const transformedClassGrades = (await Promise.all(classGradesPromises)).filter(
+        (cg): cg is ClassGradeDisplay => cg !== null
+      );
+
+      setClassGrades(transformedClassGrades);
     } catch (err: any) {
       console.error('Failed to fetch student data:', err);
       setError(err.message || 'Failed to load grades');
@@ -68,67 +181,7 @@ export const Grades: React.FC<GradesProps> = ({ studentId = 'mock-student-id' })
 
   useEffect(() => {
     fetchStudentData();
-  }, [studentId]);
-  // Mock data for grades
-  const classGrades = [
-    {
-      id: 1,
-      name: 'Geometry',
-      teacher: 'Ms. Anderson',
-      currentGrade: 94,
-      trend: { value: 2, isPositive: true },
-      color: 'blue',
-      assignments: [
-        { name: 'Unit 3 Test', grade: 94, points: 100, feedback: 'Excellent work!', date: '3 days ago', type: 'Test' },
-        { name: 'Triangle Proofs Homework', grade: 92, points: 50, feedback: 'Great progress', date: '1 week ago', type: 'Homework' },
-        { name: 'Chapter 4 Quiz', grade: 96, points: 50, feedback: 'Well done', date: '2 weeks ago', type: 'Quiz' },
-      ],
-      breakdown: {
-        tests: { weight: 40, average: 94 },
-        quizzes: { weight: 30, average: 96 },
-        homework: { weight: 20, average: 92 },
-        participation: { weight: 10, average: 100 }
-      }
-    },
-    {
-      id: 2,
-      name: 'Algebra II',
-      teacher: 'Mr. Johnson',
-      currentGrade: 88,
-      trend: { value: 1, isPositive: false },
-      color: 'purple',
-      assignments: [
-        { name: 'Homework Set 12', grade: 88, points: 80, feedback: 'Good progress', date: '2 days ago', type: 'Homework' },
-        { name: 'Polynomial Quiz', grade: 85, points: 50, feedback: 'Review factoring', date: '1 week ago', type: 'Quiz' },
-        { name: 'Chapter 3 Test', grade: 90, points: 100, feedback: 'Nice work', date: '2 weeks ago', type: 'Test' },
-      ],
-      breakdown: {
-        tests: { weight: 40, average: 90 },
-        quizzes: { weight: 30, average: 85 },
-        homework: { weight: 20, average: 88 },
-        participation: { weight: 10, average: 95 }
-      }
-    },
-    {
-      id: 3,
-      name: 'Calculus',
-      teacher: 'Dr. Chen',
-      currentGrade: 92,
-      trend: { value: 3, isPositive: true },
-      color: 'orange',
-      assignments: [
-        { name: 'Quiz 7', grade: 92, points: 50, feedback: 'Well done', date: '3 days ago', type: 'Quiz' },
-        { name: 'Integration Homework', grade: 90, points: 100, feedback: 'Good work', date: '1 week ago', type: 'Homework' },
-        { name: 'Derivatives Test', grade: 94, points: 100, feedback: 'Excellent!', date: '2 weeks ago', type: 'Test' },
-      ],
-      breakdown: {
-        tests: { weight: 40, average: 94 },
-        quizzes: { weight: 30, average: 92 },
-        homework: { weight: 20, average: 90 },
-        participation: { weight: 10, average: 100 }
-      }
-    },
-  ];
+  }, [user?.id]);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },

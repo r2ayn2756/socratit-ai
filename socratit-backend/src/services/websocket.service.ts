@@ -154,7 +154,7 @@ const handleSocketEvents = (socket: Socket, userId: string) => {
   });
 
   // Send AI message with streaming response
-  socket.on('ai:message:send', async (data: { conversationId: string; content: string }) => {
+  socket.on('ai:message:send', async (data: { conversationId: string; content: string; currentQuestionId?: string }) => {
     try {
       // Emit thinking indicator
       socket.emit('ai:thinking', { conversationId: data.conversationId });
@@ -165,6 +165,7 @@ const handleSocketEvents = (socket: Socket, userId: string) => {
           conversationId: data.conversationId,
           studentId: userId,
           content: data.content,
+          currentQuestionId: data.currentQuestionId,
           ipAddress: socket.handshake.address,
           userAgent: socket.handshake.headers['user-agent'],
         },

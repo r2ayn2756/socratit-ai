@@ -25,6 +25,7 @@ export interface SendMessageOptions {
   conversationId: string;
   studentId: string;
   content: string;
+  currentQuestionId?: string;
   ipAddress?: string;
   userAgent?: string;
 }
@@ -89,7 +90,7 @@ export class AITAService {
   async sendMessage(
     options: SendMessageOptions
   ): Promise<{ userMessage: AIMessage; aiResponse: AIMessage }> {
-    const { conversationId, studentId, content, ipAddress, userAgent } = options;
+    const { conversationId, studentId, content, currentQuestionId, ipAddress, userAgent } = options;
 
     // Check message limit
     const limitCheck = await aiContextService.checkMessageLimit(studentId);
@@ -141,7 +142,8 @@ export class AITAService {
     const context = await aiContextService.buildStudentContext(
       studentId,
       conversation.classId || undefined,
-      conversation.assignmentId || undefined
+      conversation.assignmentId || undefined,
+      currentQuestionId
     );
 
     const systemPrompt = await aiPromptService.buildSystemPrompt(
@@ -270,7 +272,7 @@ export class AITAService {
     options: SendMessageOptions,
     streamCallback: StreamCallback
   ): Promise<{ userMessage: AIMessage; conversationId: string }> {
-    const { conversationId, studentId, content, ipAddress, userAgent } = options;
+    const { conversationId, studentId, content, currentQuestionId, ipAddress, userAgent } = options;
 
     // Check message limit
     const limitCheck = await aiContextService.checkMessageLimit(studentId);
@@ -322,7 +324,8 @@ export class AITAService {
     const context = await aiContextService.buildStudentContext(
       studentId,
       conversation.classId || undefined,
-      conversation.assignmentId || undefined
+      conversation.assignmentId || undefined,
+      currentQuestionId
     );
 
     const systemPrompt = await aiPromptService.buildSystemPrompt(

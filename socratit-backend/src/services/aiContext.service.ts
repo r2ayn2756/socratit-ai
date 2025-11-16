@@ -52,6 +52,12 @@ export interface AssignmentContext {
   currentScore?: number;
   timeSpent: number; // minutes
   concepts: string[];
+  currentQuestion?: {
+    questionText: string;
+    type: string;
+    concept?: string;
+    points: number;
+  };
 }
 
 export interface ConceptContext {
@@ -71,7 +77,8 @@ export class AIContextService {
   async buildStudentContext(
     studentId: string,
     classId?: string,
-    assignmentId?: string
+    assignmentId?: string,
+    currentQuestionId?: string
   ): Promise<StudentContext> {
     const student = await prisma.user.findUnique({
       where: { id: studentId },
@@ -129,7 +136,8 @@ export class AIContextService {
     if (assignmentId) {
       context.assignmentContext = await this.getAssignmentContext(
         assignmentId,
-        studentId
+        studentId,
+        currentQuestionId
       );
     }
 
@@ -213,7 +221,8 @@ export class AIContextService {
    */
   async getAssignmentContext(
     assignmentId: string,
-    studentId: string
+    studentId: string,
+    currentQuestionId?: string
   ): Promise<AssignmentContext> {
     const assignment = await prisma.assignment.findUnique({
       where: { id: assignmentId },
@@ -258,6 +267,29 @@ export class AIContextService {
       ),
     ];
 
+    // Get current question details if provided
+    let currentQuestion;
+    if (currentQuestionId) {
+      const question = await prisma.question.findUnique({
+        where: { id: currentQuestionId },
+        select: {
+          questionText: true,
+          type: true,
+          concept: true,
+          points: true,
+        },
+      });
+
+      if (question) {
+        currentQuestion = {
+          questionText: question.questionText,
+          type: question.type,
+          concept: question.concept || undefined,
+          points: question.points,
+        };
+      }
+    }
+
     return {
       title: assignment.title,
       description: assignment.description || undefined,
@@ -269,6 +301,7 @@ export class AIContextService {
       currentScore: submission?.percentage || undefined,
       timeSpent: progress?.timeSpent || 0,
       concepts,
+      currentQuestion,
     };
   }
 
@@ -352,6 +385,15 @@ export class AIContextService {
       }
       if (ac.concepts.length > 0) {
         formatted += `\nConcepts: ${ac.concepts.join(', ')}`;
+      }
+      if (ac.currentQuestion) {
+        formatted += `\n\n**Student is currently working on this question:**`;
+        formatted += `\nQuestion: ${ac.currentQuestion.questionText}`;
+        formatted += `\nType: ${ac.currentQuestion.type}`;
+        if (ac.currentQuestion.concept) {
+          formatted += `\nConcept: ${ac.currentQuestion.concept}`;
+        }
+        formatted += `\nPoints: ${ac.currentQuestion.points}`;
       }
     }
 
