@@ -52,11 +52,19 @@ interface ClassGradeDisplay {
   breakdown: Record<string, { weight: number; average: number }>;
 }
 
+interface PerformanceDataPoint {
+  date: string;
+  score: number;
+  assignmentTitle?: string;
+  categoryName?: string;
+}
+
 export const Grades: React.FC<GradesProps> = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [allGrades, setAllGrades] = useState<Grade[]>([]);
   const [classGrades, setClassGrades] = useState<ClassGradeDisplay[]>([]);
+  const [performanceData, setPerformanceData] = useState<PerformanceDataPoint[]>([]);
   const [conceptMastery, setConceptMastery] = useState<ConceptMasteryType[]>([]);
   const [insights, setInsights] = useState<StudentInsight[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +119,9 @@ export const Grades: React.FC<GradesProps> = () => {
       setConceptMastery(conceptData);
       setInsights(insightsData);
 
-      // Transform grades data into display format
+      // Transform grades data into display format and collect performance data
+      const allAssignmentGrades: Grade[] = [];
+
       const classGradesPromises = gradesData.map(async (grade) => {
         if (!grade.class) return null;
 
@@ -125,6 +135,9 @@ export const Grades: React.FC<GradesProps> = () => {
         const assignmentGrades = classGradeData.grades.filter(
           (g) => g.gradeType === 'assignment'
         );
+
+        // Collect all assignment grades for performance chart
+        allAssignmentGrades.push(...assignmentGrades);
 
         // Sort by date (most recent first) and take top 3
         const recentAssignments = assignmentGrades
@@ -171,6 +184,18 @@ export const Grades: React.FC<GradesProps> = () => {
       );
 
       setClassGrades(transformedClassGrades);
+
+      // Transform assignment grades into performance chart data
+      const performanceChartData: PerformanceDataPoint[] = allAssignmentGrades
+        .map((ag) => ({
+          date: ag.gradeDate,
+          score: ag.percentage,
+          assignmentTitle: ag.assignment?.title || 'Untitled Assignment',
+          categoryName: ag.categoryName || formatAssignmentType(ag.assignment?.type || ''),
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // Sort chronologically
+
+      setPerformanceData(performanceChartData);
     } catch (err: any) {
       console.error('Failed to fetch student data:', err);
       setError(err.message || 'Failed to load grades');
@@ -463,15 +488,9 @@ export const Grades: React.FC<GradesProps> = () => {
               />
             )}
 
-            {/* Performance Chart (using mock data for now) */}
+            {/* Performance Chart - Real Backend Data */}
             <PerformanceChart
-              data={[
-                { date: '2025-10-01', score: 85, assignmentTitle: 'Chapter 1 Quiz', categoryName: 'Quizzes' },
-                { date: '2025-10-08', score: 92, assignmentTitle: 'Homework Set 3', categoryName: 'Homework' },
-                { date: '2025-10-15', score: 88, assignmentTitle: 'Midterm Exam', categoryName: 'Tests' },
-                { date: '2025-10-20', score: 94, assignmentTitle: 'Project 1', categoryName: 'Projects' },
-                { date: '2025-10-23', score: 90, assignmentTitle: 'Chapter 2 Quiz', categoryName: 'Quizzes' },
-              ]}
+              data={performanceData}
               title="Grade Trends"
             />
           </div>

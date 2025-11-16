@@ -27,16 +27,7 @@ export const TopNav: React.FC = () => {
   return (
     <header className="sticky top-0 z-30 glass border-b border-white/20 backdrop-blur-xl">
       <div className="px-6 py-4">
-        <div className="flex items-center justify-between gap-6">
-
-          {/* Logo */}
-          <div className="flex items-center gap-4">
-            <img
-              src="/logo.svg"
-              alt="Socratit Logo"
-              className="h-10 w-auto"
-            />
-          </div>
+        <div className="flex items-center justify-end gap-6">
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
