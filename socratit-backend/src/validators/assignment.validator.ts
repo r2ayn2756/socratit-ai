@@ -51,7 +51,7 @@ export const createAssignmentValidator = Joi.object({
   description: Joi.string().max(1000).allow(null, ''),
   instructions: Joi.string().max(2000).allow(null, ''),
   type: Joi.string()
-    .valid('PRACTICE', 'QUIZ', 'TEST', 'HOMEWORK', 'CHALLENGE')
+    .valid('PRACTICE', 'TEST', 'HOMEWORK', 'ESSAY', 'INTERACTIVE_MATH')
     .required(),
   totalPoints: Joi.number().integer().min(1).max(1000).default(100),
   passingScore: Joi.number().integer().min(0).max(1000).allow(null),
