@@ -99,27 +99,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       className="fixed left-0 top-0 h-screen glass border-r border-white/20 shadow-xl z-40"
     >
       <div className="flex flex-col h-full">
-        {/* Logo & Brand */}
-        <div className="p-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-${config.color} to-brand-purple flex items-center justify-center flex-shrink-0`}>
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-            {!isCollapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="font-bold text-lg text-slate-900">Socratit.ai</div>
-                <div className="text-xs text-slate-500">{config.label} Portal</div>
-              </motion.div>
-            )}
-          </div>
-        </div>
-
         {/* Navigation Items */}
-        <nav className="flex-1 py-6 px-3 overflow-y-auto">
+        <nav className="flex-1 py-6 px-3 overflow-y-auto mt-6">
           <ul className="space-y-2">
             {currentNavItems.map((item) => {
               const Icon = item.icon;

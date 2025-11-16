@@ -171,7 +171,6 @@ export class AITAService {
     const aiResult = await chatCompletion(messages, {
       temperature: 0.7,
       maxTokens: 500,
-      model: 'gpt-3.5-turbo',
     });
     const responseTime = Date.now() - startTime;
 
@@ -198,7 +197,7 @@ export class AITAService {
         conversationId,
         role: 'ASSISTANT',
         content: aiContent,
-        model: 'gpt-3.5-turbo',
+        model: process.env.AI_PROVIDER === 'gemini' ? 'gemini-2.0-flash-exp' : (process.env.AI_PROVIDER === 'claude' ? 'claude-3-haiku-20240307' : 'gpt-3.5-turbo'),
         promptTokens: aiResult.usage.promptTokens,
         completionTokens: aiResult.usage.completionTokens,
         totalTokens: aiResult.usage.totalTokens,
@@ -380,7 +379,7 @@ export class AITAService {
               conversationId,
               role: 'ASSISTANT',
               content: finalResponse,
-              model: 'gpt-3.5-turbo',
+              model: process.env.AI_PROVIDER === 'gemini' ? 'gemini-2.0-flash-exp' : (process.env.AI_PROVIDER === 'claude' ? 'claude-3-haiku-20240307' : 'gpt-3.5-turbo'),
               promptTokens: usage.promptTokens,
               completionTokens: usage.completionTokens,
               totalTokens: usage.totalTokens,
@@ -436,7 +435,6 @@ export class AITAService {
       {
         temperature: 0.7,
         maxTokens: 500,
-        model: 'gpt-3.5-turbo',
       }
     );
 

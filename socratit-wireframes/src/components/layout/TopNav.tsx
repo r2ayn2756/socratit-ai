@@ -14,7 +14,8 @@ import {
   User,
   ChevronDown,
   MessageSquare,
-  Calendar
+  Calendar,
+  Brain
 } from 'lucide-react';
 import { NotificationCenter } from '../common/NotificationCenter';
 
@@ -32,6 +33,13 @@ export const TopNav: React.FC = () => {
     <header className="sticky top-0 z-30 glass border-b border-white/20 backdrop-blur-xl">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between gap-6">
+
+          {/* Logo */}
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center flex-shrink-0">
+              <Brain className="w-6 h-6 text-white" />
+            </div>
+          </div>
 
           {/* Search Bar */}
           <div className="flex-1 max-w-xl">
