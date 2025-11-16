@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { classCurriculumService } from '../../services/classCurriculum.service';
 import { curriculumApi } from '../../services/curriculumApi.service';
 import { assignmentService } from '../../services/assignment.service';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface StudentClassData {
   classId: string;
@@ -50,6 +51,7 @@ interface StudentClassData {
 }
 
 export const StudentClassView: React.FC = () => {
+  const { t } = useLanguage();
   const { classId } = useParams<{ classId: string }>();
   const navigate = useNavigate();
 
@@ -164,7 +166,7 @@ export const StudentClassView: React.FC = () => {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading class...</p>
+            <p className="text-gray-600">{t('class.loading')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -176,7 +178,7 @@ export const StudentClassView: React.FC = () => {
       <DashboardLayout userRole="student">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <p className="text-gray-600">Class not found</p>
+            <p className="text-gray-600">{t('class.error')}</p>
           </div>
         </div>
       </DashboardLayout>
@@ -207,19 +209,19 @@ export const StudentClassView: React.FC = () => {
           {/* Progress Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="p-3 rounded-xl bg-blue-50">
-              <p className="text-sm text-gray-600 mb-1">Your Progress</p>
+              <p className="text-sm text-gray-600 mb-1">{t('class.myProgress')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {classData.myProgress.percentComplete}%
               </p>
             </div>
             <div className="p-3 rounded-xl bg-green-50">
-              <p className="text-sm text-gray-600 mb-1">Average Score</p>
+              <p className="text-sm text-gray-600 mb-1">{t('class.averageScore')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {classData.myProgress.averageScore}%
               </p>
             </div>
             <div className="p-3 rounded-xl bg-purple-50">
-              <p className="text-sm text-gray-600 mb-1">Units Completed</p>
+              <p className="text-sm text-gray-600 mb-1">{t('class.unitsCompleted')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {classData.myProgress.unitsCompleted}/{classData.myProgress.totalUnits}
               </p>
@@ -250,7 +252,7 @@ export const StudentClassView: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="px-3 py-1 rounded-lg bg-blue-500 text-white text-xs font-bold">
-                      CURRENT UNIT
+                      {t('class.currentUnit').toUpperCase()}
                     </span>
                     <span className="text-sm text-gray-600">
                       Unit {classData.currentUnit.unitNumber}
@@ -275,7 +277,7 @@ export const StudentClassView: React.FC = () => {
                       </span>
                     </div>
                     <span>•</span>
-                    <span>{classData.currentUnit.estimatedWeeks} weeks</span>
+                    <span>{classData.currentUnit.estimatedWeeks} {classData.currentUnit.estimatedWeeks === 1 ? 'week' : 'weeks'}</span>
                   </div>
 
                   {/* Learning Objectives */}
@@ -316,7 +318,7 @@ export const StudentClassView: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <GlassPanel title="Upcoming Assignments">
+            <GlassPanel title={t('class.upcomingAssignments')}>
               <div className="space-y-2">
                 {classData.upcomingAssignments.map((assignment) => (
                   <motion.div
@@ -358,7 +360,7 @@ export const StudentClassView: React.FC = () => {
                 <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
                   <Award className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900">Your Strengths</h3>
+                <h3 className="font-semibold text-gray-900">{t('class.strengths')}</h3>
               </div>
               <ul className="space-y-2">
                 {classData.insights.strengths.map((strength, index) => (
@@ -376,7 +378,7 @@ export const StudentClassView: React.FC = () => {
                 <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center">
                   <AlertTriangle className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900">Areas to Improve</h3>
+                <h3 className="font-semibold text-gray-900">{t('class.struggles')}</h3>
               </div>
               <ul className="space-y-2">
                 {classData.insights.struggles.map((struggle, index) => (
@@ -394,7 +396,7 @@ export const StudentClassView: React.FC = () => {
                 <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900">Recommended Review</h3>
+                <h3 className="font-semibold text-gray-900">{t('class.recommendedReview')}</h3>
               </div>
               <ul className="space-y-2">
                 {classData.insights.recommendedReview.map((review, index) => (

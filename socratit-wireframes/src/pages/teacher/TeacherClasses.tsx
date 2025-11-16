@@ -357,49 +357,72 @@ export const TeacherClasses: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg text-brand-purple">SocratIt</h3>
-                      <p className="text-sm text-slate-600">Your classroom insights</p>
+                      <p className="text-sm text-slate-600">AI-powered teaching assistant</p>
                     </div>
                   </div>
 
-                  <div className="space-y-3 mb-6">
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                      <p className="text-sm text-slate-600 mb-1">Total Students</p>
-                      <p className="text-2xl font-bold text-brand-purple">{totalStudents}</p>
+                  <div className="mb-6">
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                      <p className="text-sm text-slate-700 leading-relaxed">
+                        Hi! I can help you create assignments, generate quizzes, plan lessons, and more. What would you like to work on today?
+                      </p>
                     </div>
+                  </div>
 
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                      <p className="text-sm text-slate-600 mb-1">Total Classes</p>
-                      <p className="text-2xl font-bold text-brand-purple">{classes?.length || 0}</p>
-                    </div>
+                  <div className="space-y-2 mb-6">
+                    <h4 className="font-semibold text-sm text-slate-900 mb-3">Quick Actions</h4>
 
-                    {classes && classes.some(c => c.enrollmentCounts.pending > 0) && (
+                    {classes && classes.length > 0 && (
+                      <div className="space-y-2">
+                        {classes.slice(0, 3).map((classItem) => (
+                          <button
+                            key={classItem.id}
+                            onClick={() => {
+                              // TODO: Open SocratIt chat modal with assignment creation context
+                              navigate(`/teacher/ai-assistant?action=create-assignment&classId=${classItem.id}`);
+                            }}
+                            className="w-full text-left bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 rounded-lg p-3 transition-all group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-brand-purple" />
+                              <span className="text-sm font-medium text-slate-900 group-hover:text-brand-purple">
+                                Create assignment for {classItem.name}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        // TODO: Open SocratIt chat modal
+                        navigate('/teacher/ai-assistant');
+                      }}
+                      className="w-full text-left bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 rounded-lg p-3 transition-all group"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Brain className="w-4 h-4 text-brand-purple" />
+                        <span className="text-sm font-medium text-slate-900 group-hover:text-brand-purple">
+                          Open SocratIt Chat
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {classes && classes.some(c => c.enrollmentCounts.pending > 0) && (
+                    <div className="pt-6 border-t border-slate-200">
                       <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <AlertCircle className="w-4 h-4 text-orange-600" />
                           <p className="text-sm font-semibold text-orange-900">Needs Attention</p>
                         </div>
-                        <p className="text-2xl font-bold text-orange-600">
-                          {classes.reduce((sum, c) => sum + c.enrollmentCounts.pending, 0)} pending requests
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-200">
-                    <h4 className="font-semibold mb-3 text-sm text-slate-900">Quick Tips</h4>
-                    <div className="space-y-2">
-                      <div className="text-sm bg-purple-50 border border-purple-100 rounded-lg p-3">
-                        <p className="text-slate-700">
-                          Share your class codes with students to let them enroll
-                        </p>
-                      </div>
-                      <div className="text-sm bg-purple-50 border border-purple-100 rounded-lg p-3">
-                        <p className="text-slate-700">
-                          Review pending enrollment requests regularly
+                        <p className="text-sm text-orange-700">
+                          {classes.reduce((sum, c) => sum + c.enrollmentCounts.pending, 0)} pending enrollment request{classes.reduce((sum, c) => sum + c.enrollmentCounts.pending, 0) !== 1 ? 's' : ''}
                         </p>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </Card>
             </motion.div>

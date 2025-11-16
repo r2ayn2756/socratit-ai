@@ -15,6 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import {
   ClassHeader,
@@ -51,6 +52,7 @@ interface ClassData {
 }
 
 export const ClassDashboard: React.FC = () => {
+  const { t } = useLanguage();
   const { classId } = useParams<{ classId: string }>();
   const navigate = useNavigate();
 
@@ -67,7 +69,7 @@ export const ClassDashboard: React.FC = () => {
 
   const loadClassData = async () => {
     if (!classId) {
-      setError('No class ID provided');
+      setError(t('common.error.noId'));
       setIsLoading(false);
       return;
     }
@@ -181,7 +183,7 @@ export const ClassDashboard: React.FC = () => {
       setClassData(classData);
     } catch (error: any) {
       console.error('Failed to load class data:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to load class data';
+      const errorMessage = error.response?.data?.message || error.message || t('class.error');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -228,7 +230,7 @@ export const ClassDashboard: React.FC = () => {
     return (
       <DashboardLayout userRole="teacher">
         <div className="flex items-center justify-center h-64">
-          <LoadingSpinner size="xl" message="Loading class..." />
+          <LoadingSpinner size="xl" message={t('class.loading')} />
         </div>
       </DashboardLayout>
     );
@@ -241,10 +243,10 @@ export const ClassDashboard: React.FC = () => {
           <div className="max-w-md">
             <EmptyState
               icon={AlertTriangle}
-              title="Class Not Found"
-              message={error || 'The class you\'re looking for could not be loaded. It may have been deleted or you may not have permission to access it.'}
+              title={t('common.error.notFound')}
+              message={error || t('class.error')}
               action={{
-                label: 'Back to My Classes',
+                label: t('common.buttons.back'),
                 onClick: () => navigate('/teacher/classes'),
               }}
             />
@@ -271,17 +273,38 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Analytics Section - Full Width */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <ClassAnalyticsSection
-            classId={classId!}
-            onContactStudent={(studentId) => console.log('Contact student:', studentId)}
-          />
-        </motion.div>
+        {/* Analytics & Assignments Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Analytics Section - Left Third */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="lg:col-span-1"
+          >
+            <ClassAnalyticsSection
+              classId={classId!}
+              onContactStudent={(studentId) => console.log('Contact student:', studentId)}
+            />
+          </motion.div>
+
+          {/* Assignments Section - Right Two Thirds */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2"
+          >
+            <AssignmentsSection
+              assignments={classData.assignments}
+              onViewAll={() => navigate('/teacher/assignments', { state: { classId } })}
+              onCreateAssignment={handleCreateAssignment}
+              onAssignmentClick={(assignment) =>
+                navigate(`/teacher/assignments/${assignment.id}/submissions`)
+              }
+            />
+          </motion.div>
+        </div>
 
         {/* 2-Column Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -291,7 +314,7 @@ export const ClassDashboard: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3 }}
             >
               <CurriculumSection
                 schedule={classData.schedule}
@@ -299,22 +322,6 @@ export const ClassDashboard: React.FC = () => {
                 upcomingUnits={classData.upcomingUnits}
                 onManageClick={handleManageCurriculum}
                 onUnitClick={handleUnitClick}
-              />
-            </motion.div>
-
-            {/* Assignments Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <AssignmentsSection
-                assignments={classData.assignments}
-                onViewAll={() => navigate('/teacher/assignments', { state: { classId } })}
-                onCreateAssignment={handleCreateAssignment}
-                onAssignmentClick={(assignment) =>
-                  navigate(`/teacher/assignments/${assignment.id}/submissions`)
-                }
               />
             </motion.div>
           </div>
@@ -325,7 +332,7 @@ export const ClassDashboard: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4 }}
             >
               <RosterSection
                 students={classData.students}
