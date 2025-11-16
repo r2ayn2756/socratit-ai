@@ -21,13 +21,9 @@ import { Grade, StudentClassGrades } from '../../types/grade.types';
 import { ConceptMastery as ConceptMasteryType, StudentInsight } from '../../types/analytics.types';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  Award,
-  TrendingUp,
-  TrendingDown,
   BookOpen,
   FileText,
   Brain,
-  Target,
   RefreshCw,
   AlertCircle,
 } from 'lucide-react';
@@ -254,8 +250,6 @@ export const Grades: React.FC<GradesProps> = () => {
     return 'text-red-600';
   };
 
-  const overallGPA = (classGrades.reduce((sum, c) => sum + c.currentGrade, 0) / classGrades.length).toFixed(1);
-
   return (
     <DashboardLayout userRole="student">
       <motion.div
@@ -272,7 +266,7 @@ export const Grades: React.FC<GradesProps> = () => {
                 My Grades
               </h1>
               <p className="text-slate-600">
-                Current GPA: {overallGPA}%
+                View your grades across all classes
               </p>
             </div>
           </div>
@@ -286,8 +280,12 @@ export const Grades: React.FC<GradesProps> = () => {
               const colors = getColorClasses(classItem.color);
 
               return (
-                <motion.div key={classItem.id} variants={fadeInUp}>
-                  <Card padding="none" className="overflow-hidden">
+                <motion.div
+                  key={classItem.id}
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.01, y: -4 }}
+                >
+                  <Card variant="glassElevated" padding="none" className="overflow-hidden">
                     {/* Class Header with Gradient */}
                     <div className={`p-6 bg-gradient-to-r ${colors.gradient} text-white`}>
                       <div className="flex items-start justify-between">
@@ -301,15 +299,8 @@ export const Grades: React.FC<GradesProps> = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-4xl font-bold mb-1">{classItem.currentGrade}%</div>
-                          <div className="flex items-center gap-1 text-sm justify-end">
-                            {classItem.trend.isPositive ? (
-                              <TrendingUp className="w-4 h-4" />
-                            ) : (
-                              <TrendingDown className="w-4 h-4" />
-                            )}
-                            <span>{classItem.trend.value}% from last week</span>
-                          </div>
+                          <div className="text-sm opacity-90 mb-1">Current Grade</div>
+                          <div className="text-4xl font-bold">{classItem.currentGrade}%</div>
                         </div>
                       </div>
                     </div>
@@ -318,11 +309,11 @@ export const Grades: React.FC<GradesProps> = () => {
                     <div className="p-6 bg-white">
                       <div className="mb-6">
                         <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-4">
-                          Grade Breakdown
+                          Grade Breakdown by Category
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           {Object.entries(classItem.breakdown).map(([category, data]: [string, any]) => (
-                            <div key={category} className={`p-4 rounded-lg ${colors.bg} border ${colors.border}`}>
+                            <div key={category} className={`p-4 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50`}>
                               <div className="flex items-center justify-between mb-2">
                                 <span className="text-sm font-medium text-slate-700 capitalize">
                                   {category}
@@ -346,28 +337,27 @@ export const Grades: React.FC<GradesProps> = () => {
                           {classItem.assignments.map((assignment, idx) => (
                             <div
                               key={idx}
-                              className="flex items-center justify-between p-4 hover:bg-slate-50 rounded-xl transition-all border border-slate-200"
+                              className={`p-4 rounded-xl ${colors.bg}/50 backdrop-blur-sm border ${colors.border}/30 hover:${colors.bg}/70 hover:shadow-lg transition-all`}
                             >
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <FileText className="w-4 h-4 text-slate-400" />
-                                  <span className="font-semibold text-sm text-slate-900">
-                                    {assignment.name}
-                                  </span>
-                                  <Badge variant="neutral" size="sm">{assignment.type}</Badge>
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <FileText className={`w-4 h-4 ${colors.text}`} />
+                                    <span className="font-semibold text-sm text-slate-900">
+                                      {assignment.name}
+                                    </span>
+                                    <Badge variant="neutral" size="sm">{assignment.type}</Badge>
+                                  </div>
+                                  <div className="flex items-center gap-3 text-xs text-slate-600">
+                                    <span>{assignment.date}</span>
+                                    <span>•</span>
+                                    <span>{assignment.points} points</span>
+                                  </div>
                                 </div>
-                                <div className="flex items-center gap-3 text-xs text-slate-600">
-                                  <span>{assignment.date}</span>
-                                  <span>•</span>
-                                  <span className="text-green-600">{assignment.feedback}</span>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className={`text-3xl font-bold ${getGradeColor(assignment.grade)}`}>
-                                  {assignment.grade}
-                                </div>
-                                <div className="text-xs text-slate-600">
-                                  {assignment.grade}/{assignment.points}
+                                <div className="text-right">
+                                  <div className={`text-3xl font-bold ${getGradeColor(assignment.grade)}`}>
+                                    {assignment.grade}%
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -377,7 +367,7 @@ export const Grades: React.FC<GradesProps> = () => {
 
                       {/* View All Button */}
                       <div className="mt-6 pt-6 border-t border-slate-200">
-                        <Button variant="ghost" className="w-full">
+                        <Button variant="glass" glow={false} className="w-full">
                           View All Assignments
                         </Button>
                       </div>
@@ -390,23 +380,24 @@ export const Grades: React.FC<GradesProps> = () => {
 
           {/* Teaching Assistant - Takes up 1/3 */}
           <motion.div variants={fadeInUp}>
-            <div className="space-y-6 sticky top-6">
+            <div className="sticky top-6">
               {/* TA Card */}
-              <Card padding="none" className="overflow-hidden">
-                <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
+              <Card variant="glassElevated" padding="none" className="overflow-hidden">
+                <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                       <Brain className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg">Teaching Assistant</h3>
+                      <h3 className="font-bold text-lg">AI Teaching Assistant</h3>
                       <p className="text-sm opacity-90">24/7 Support</p>
                     </div>
                   </div>
                   <Button
-                    variant="secondary"
+                    variant="glass"
                     size="sm"
-                    className="w-full bg-white text-brand-purple hover:bg-white/90"
+                    glow={false}
+                    className="w-full bg-white text-purple-700 hover:bg-white/90"
                   >
                     Ask a Question
                   </Button>
@@ -433,38 +424,6 @@ export const Grades: React.FC<GradesProps> = () => {
                         <span>Extra practice problems</span>
                       </li>
                     </ul>
-                  </div>
-                </div>
-              </Card>
-
-              {/* GPA Overview Card */}
-              <Card padding="none" className="overflow-hidden">
-                <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Award className="w-8 h-8" />
-                    <div>
-                      <div className="text-sm font-semibold opacity-90">Current GPA</div>
-                      <div className="text-4xl font-bold">{overallGPA}%</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm opacity-90">Semester Goal</span>
-                      <span className="font-bold flex items-center gap-1">
-                        <Target className="w-4 h-4" />
-                        95%
-                      </span>
-                    </div>
-                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-white rounded-full"
-                        style={{ width: `${(parseFloat(overallGPA) / 95) * 100}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-xs opacity-75 mt-2">
-                      You're {(95 - parseFloat(overallGPA)).toFixed(1)}% away from your goal!
-                    </div>
                   </div>
                 </div>
               </Card>

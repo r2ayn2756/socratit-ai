@@ -170,7 +170,7 @@ export const ClassRoster: React.FC = () => {
 
             <button
               onClick={() => setShowAddStudentsModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
             >
               <UserPlus size={20} />
               <span>Add Students</span>
@@ -179,7 +179,7 @@ export const ClassRoster: React.FC = () => {
         </div>
 
         {/* Class Code Display */}
-        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50/70 to-purple-50/70 backdrop-blur-md rounded-2xl border border-blue-200/50">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-700 mb-1">Class Code</p>
@@ -188,7 +188,7 @@ export const ClassRoster: React.FC = () => {
             </div>
             <button
               onClick={handleCopyCode}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl hover:bg-white hover:scale-105 transition-all shadow-sm"
             >
               {copiedCode ? (
                 <>
@@ -207,19 +207,19 @@ export const ClassRoster: React.FC = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4 mb-8">
-          <div className="p-4 bg-white rounded-lg border border-gray-200">
+          <div className="p-4 bg-white/70 backdrop-blur-xl rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all">
             <p className="text-sm text-gray-600 mb-1">Enrolled</p>
             <p className="text-2xl font-bold text-gray-900">{enrollmentCount.approved}</p>
           </div>
-          <div className="p-4 bg-white rounded-lg border border-gray-200">
+          <div className="p-4 bg-white/70 backdrop-blur-xl rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all">
             <p className="text-sm text-gray-600 mb-1">Pending</p>
             <p className="text-2xl font-bold text-yellow-600">{enrollmentCount.pending}</p>
           </div>
-          <div className="p-4 bg-white rounded-lg border border-gray-200">
+          <div className="p-4 bg-white/70 backdrop-blur-xl rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all">
             <p className="text-sm text-gray-600 mb-1">Rejected</p>
             <p className="text-2xl font-bold text-red-600">{enrollmentCount.rejected}</p>
           </div>
-          <div className="p-4 bg-white rounded-lg border border-gray-200">
+          <div className="p-4 bg-white/70 backdrop-blur-xl rounded-xl border border-white/20 shadow-md hover:shadow-lg transition-all">
             <p className="text-sm text-gray-600 mb-1">Removed</p>
             <p className="text-2xl font-bold text-gray-600">{enrollmentCount.removed}</p>
           </div>
@@ -231,10 +231,10 @@ export const ClassRoster: React.FC = () => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-4 py-2 font-medium transition-colors border-b-2 ${
+              className={`flex items-center gap-2 px-4 py-3 font-medium transition-all border-b-2 rounded-t-lg ${
                 activeTab === tab.key
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50/50'
               }`}
             >
               {tab.icon}
@@ -249,13 +249,13 @@ export const ClassRoster: React.FC = () => {
         </div>
 
         {/* Enrollments List */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-md border border-white/20">
           {enrollmentsLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : enrollments && enrollments.length > 0 ? (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-white/20">
               <AnimatePresence mode="wait">
                 {enrollments.map((enrollment: Enrollment) => (
                   <motion.div
@@ -263,7 +263,8 @@ export const ClassRoster: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="p-6 hover:bg-gray-50 transition-colors"
+                    whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+                    className="p-6 transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -311,7 +312,7 @@ export const ClassRoster: React.FC = () => {
                             <button
                               onClick={() => handleApprove(enrollment.id)}
                               disabled={processEnrollmentMutation.isPending}
-                              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-lg shadow-green-500/30 hover:shadow-xl hover:shadow-green-500/40 disabled:opacity-50 hover:scale-105"
                             >
                               <Check size={16} />
                               <span>Approve</span>
@@ -319,7 +320,7 @@ export const ClassRoster: React.FC = () => {
                             <button
                               onClick={() => handleReject(enrollment.id)}
                               disabled={processEnrollmentMutation.isPending}
-                              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                              className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all disabled:opacity-50 hover:scale-105"
                             >
                               <X size={16} />
                               <span>Reject</span>
@@ -330,7 +331,7 @@ export const ClassRoster: React.FC = () => {
                           <button
                             onClick={() => handleRemove(enrollment.id)}
                             disabled={removeStudentMutation.isPending}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                            className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-300 transition-all disabled:opacity-50 hover:scale-105"
                           >
                             <Trash2 size={16} />
                             <span>Remove</span>
