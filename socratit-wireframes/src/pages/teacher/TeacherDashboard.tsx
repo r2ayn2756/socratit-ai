@@ -211,7 +211,7 @@ export const TeacherDashboard: React.FC = () => {
                         transition={{ delay: index * 0.1 }}
                         whileHover={{ scale: 1.02, y: -2 }}
                         className="flex items-center gap-4 p-4 rounded-xl bg-white/70 backdrop-blur-md border border-white/20 hover:bg-white/90 hover:shadow-xl transition-all cursor-pointer"
-                        onClick={() => navigate(`/teacher/classes/${cls.id}/roster`)}
+                        onClick={() => navigate(`/teacher/classes/${cls.id}`)}
                       >
                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white shadow-lg`}>
                           <SubjectIcon className="w-6 h-6" />
