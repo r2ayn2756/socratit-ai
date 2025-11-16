@@ -100,7 +100,12 @@ router.post(
         message: 'Message sent to class successfully',
       });
     } catch (error: any) {
-      console.error('Error sending class message:', error);
+      console.error('❌ Error sending class message:', {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        stack: error.stack,
+      });
       next(error);
     }
   }

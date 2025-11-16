@@ -39,6 +39,9 @@ export const errorHandler = (
   if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;
+  } else if (env.NODE_ENV === 'development') {
+    // In development, expose the actual error message
+    message = err.message || 'Internal server error';
   }
 
   // Log error
@@ -47,6 +50,7 @@ export const errorHandler = (
     stack: env.NODE_ENV === 'development' ? err.stack : undefined,
     url: req.url,
     method: req.method,
+    statusCode,
   });
 
   const response: ApiResponse = {
@@ -54,9 +58,15 @@ export const errorHandler = (
     message,
   };
 
-  // Include stack trace in development
-  if (env.NODE_ENV === 'development' && err.stack) {
-    (response as any).stack = err.stack;
+  // Include stack trace and error details in development
+  if (env.NODE_ENV === 'development') {
+    if (err.stack) {
+      (response as any).stack = err.stack;
+    }
+    (response as any).error = {
+      name: err.name,
+      message: err.message,
+    };
   }
 
   res.status(statusCode).json(response);

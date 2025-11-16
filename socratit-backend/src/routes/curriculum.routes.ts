@@ -29,16 +29,26 @@ import {
 const router = express.Router();
 
 // ============================================================================
+// ROUTES (routes with specific paths BEFORE authentication middleware)
+// ============================================================================
+
+/**
+ * POST /api/v1/curriculum/analyze-preview
+ * Analyze curriculum material with AI and return unit structure (preview mode)
+ * Used during class creation wizard - does not create database records
+ * Protected: Teacher only
+ * Rate limited: 5 analyses per hour (AI intensive operation)
+ * IMPORTANT: This route MUST be before /:id routes to avoid pattern matching conflicts
+ */
+router.post('/analyze-preview', requireAuth, requireRole('TEACHER'), analyzeCurriculumPreview);
+
+// ============================================================================
 // APPLY AUTHENTICATION MIDDLEWARE
-// All curriculum routes require authentication and teacher role
+// All remaining curriculum routes require authentication and teacher role
 // ============================================================================
 
 router.use(requireAuth);
 router.use(requireRole('TEACHER'));
-
-// ============================================================================
-// ROUTES
-// ============================================================================
 
 /**
  * POST /api/v1/curriculum/upload
@@ -110,14 +120,5 @@ router.get('/:id/download', downloadCurriculum);
  * Rate limited: 10 generations per 15 minutes
  */
 router.post('/:id/generate-assignment', validate(generateAssignmentSchema), generateAssignmentFromCurriculum);
-
-/**
- * POST /api/v1/curriculum/analyze-preview
- * Analyze curriculum material with AI and return unit structure (preview mode)
- * Used during class creation wizard - does not create database records
- * Protected: Teacher only
- * Rate limited: 5 analyses per hour (AI intensive operation)
- */
-router.post('/analyze-preview', analyzeCurriculumPreview);
 
 export default router;
