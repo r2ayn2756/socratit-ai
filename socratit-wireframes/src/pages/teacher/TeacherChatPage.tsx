@@ -1,6 +1,6 @@
 /**
- * CHATGPT-STYLE CHAT PAGE
- * Full-screen ChatGPT-style interface for AI conversations
+ * TEACHER CHATGPT-STYLE CHAT PAGE
+ * Full-screen ChatGPT-style interface for teacher AI conversations
  * Modern, clean design matching Socratit's design system
  */
 
@@ -13,14 +13,12 @@ import {
   Plus,
   ThumbsUp,
   ThumbsDown,
-  Share2,
   Menu,
   X,
   Copy,
   Check,
   Trash2,
   MoreVertical,
-  Edit2,
   Search,
   Clock,
 } from 'lucide-react';
@@ -47,7 +45,7 @@ interface Conversation {
   updatedAt: string;
 }
 
-export const ChatPage: React.FC = () => {
+export const TeacherChatPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -265,19 +263,6 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  const handleShareConversation = async () => {
-    if (!selectedConversation) return;
-    if (window.confirm('Share this conversation with your teacher?')) {
-      try {
-        await aiTAService.shareConversation(selectedConversation);
-        alert('Conversation shared with your teacher!');
-      } catch (error) {
-        console.error('Error sharing:', error);
-        alert('Failed to share conversation. Please try again.');
-      }
-    }
-  };
-
   const handleCopyMessage = async (content: string, messageId: string) => {
     try {
       await navigator.clipboard.writeText(content);
@@ -347,7 +332,7 @@ export const ChatPage: React.FC = () => {
   }, []);
 
   return (
-    <DashboardLayout userRole="student">
+    <DashboardLayout userRole="teacher">
       <div className="flex h-full -m-6 overflow-hidden bg-white">
         {/* Sidebar - Conversation History */}
         <AnimatePresence>
@@ -484,18 +469,6 @@ export const ChatPage: React.FC = () => {
                 className="h-10 w-auto object-contain"
               />
             </div>
-
-            {selectedConversation && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleShareConversation}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                  title="Share with teacher"
-                >
-                  <Share2 className="w-5 h-5 text-slate-600" />
-                </button>
-              </div>
-            )}
           </header>
 
           {/* Messages Area */}
@@ -519,29 +492,28 @@ export const ChatPage: React.FC = () => {
                     Hi, I'm SocratIt
                   </h2>
                   <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                    Your personal AI tutor, available 24/7 to help you understand concepts,
-                    solve problems, and ace your assignments.
+                    Your AI assistant for lesson planning, curriculum design, and teaching support.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mb-8">
                     {[
                       {
-                        title: 'Instant Help',
-                        description: 'Get answers to your questions in real-time',
-                        icon: '⚡',
+                        title: 'Lesson Planning',
+                        description: 'Get help creating engaging lesson plans',
+                        icon: '📚',
                       },
                       {
-                        title: 'Step-by-Step',
-                        description: 'Break down complex problems into simple steps',
-                        icon: '📝',
+                        title: 'Assignment Ideas',
+                        description: 'Generate creative assignment concepts',
+                        icon: '✏️',
                       },
                       {
-                        title: 'Concept Mastery',
-                        description: 'Deep understanding, not just answers',
+                        title: 'Teaching Strategies',
+                        description: 'Discover effective teaching methods',
                         icon: '🎯',
                       },
                       {
                         title: 'Always Available',
-                        description: 'Study on your schedule, day or night',
+                        description: 'Plan on your schedule, day or night',
                         icon: '🌟',
                       },
                     ].map((feature, index) => (
@@ -582,15 +554,14 @@ export const ChatPage: React.FC = () => {
                     Ready to help!
                   </h3>
                   <p className="text-slate-600 mb-6">
-                    Ask me anything about your homework, concepts you're learning, or problems
-                    you need help with.
+                    Ask me anything about lesson planning, curriculum design, or teaching strategies.
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     {[
-                      'Help me with question explanations',
-                      'I need help writing an essay',
-                      'Let\'s play an educational game',
-                      'Help me create something cool',
+                      'Help me create a lesson plan for algebra',
+                      'What are effective classroom management strategies?',
+                      'Generate quiz questions for American History',
+                      'How can I engage struggling students?',
                     ].map((prompt, index) => (
                       <button
                         key={index}

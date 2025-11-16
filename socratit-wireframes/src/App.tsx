@@ -7,6 +7,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import { queryClient } from './config/queryClient';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 
@@ -26,6 +27,7 @@ import { ViewSubmissions } from './pages/teacher/ViewSubmissions';
 import { TeacherMessages } from './pages/teacher/TeacherMessages';
 import { TeacherAnalytics } from './pages/teacher/TeacherAnalytics';
 import { AIInsightsPage } from './pages/teacher/AIInsightsPage';
+import { TeacherChatPage } from './pages/teacher/TeacherChatPage';
 
 // Student Pages
 import { StudentDashboard, Classes, Assignments, Grades, Messages } from './pages/student';
@@ -41,9 +43,10 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
+        <LanguageProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <Routes>
 
             {/* PUBLIC ROUTES */}
             <Route path="/" element={<LandingPage />} />
@@ -59,7 +62,7 @@ function App() {
             <Route path="/teacher/assignments/new" element={<CreateAssignment />} />
             <Route path="/teacher/assignments/:assignmentId/edit" element={<CreateAssignment />} />
             <Route path="/teacher/assignments/:assignmentId/submissions" element={<ViewSubmissions />} />
-            <Route path="/teacher/ai-tutor" element={<ChatPage />} />
+            <Route path="/teacher/ai-tutor" element={<TeacherChatPage />} />
             <Route path="/teacher/messages" element={<TeacherMessages />} />
 
             {/* DEPRECATED ROUTES - Analytics and AI Insights removed from sidebar */}
@@ -87,9 +90,10 @@ function App() {
             {/* 404 Redirect */}
             <Route path="*" element={<Navigate to="/" replace />} />
 
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </LanguageProvider>
     </QueryClientProvider>
     </ErrorBoundary>
   );

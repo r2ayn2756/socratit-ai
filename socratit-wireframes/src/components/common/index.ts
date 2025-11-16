@@ -19,3 +19,5 @@ export { StatCard } from './StatCard';
 export type { StatCardProps } from './StatCard';
 
 export { FileUpload } from './FileUpload';
+
+export { LanguageSelector } from './LanguageSelector';

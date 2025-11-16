@@ -6,7 +6,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Card, Badge } from '../../components/common';
+import { Button, Card, Badge, LanguageSelector } from '../../components/common';
+import { useLanguage } from '../../contexts/LanguageContext';
 import {
   Sparkles,
   Clock,
@@ -29,6 +30,7 @@ import {
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // Animation variants
   const fadeInUp = {
@@ -62,20 +64,21 @@ export const LandingPage: React.FC = () => {
               <img src="/logo.svg" alt="Socratit.ai" className="h-20 w-auto" />
             </div>
 
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-4">
+              <LanguageSelector />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/login')}
               >
-                Login
+                {t('nav.login')}
               </Button>
               <Button
                 variant="primary"
                 size="sm"
                 onClick={() => navigate('/signup')}
               >
-                Get Started
+                {t('nav.getStarted')}
               </Button>
             </nav>
           </div>
