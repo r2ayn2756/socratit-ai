@@ -115,109 +115,75 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                       {/* Display Main Topics */}
                       {unit.topics && unit.topics.length > 0 && (
                         <div className="space-y-3">
-                          {unit.topics.length > 0 && (
-                            <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mt-4">
-                              Main Topics
-                            </h3>
-                          )}
-                          {unit.topics.map((topic, idx) => (
-                            <motion.div
-                              key={`topic-${idx}`}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: (unit.subUnits?.length || 0) * 0.05 + idx * 0.05 }}
-                              className="p-4 rounded-xl bg-gradient-to-br from-blue-50/50 to-purple-50/50 border border-blue-200/50"
-                            >
-                              <div className="flex items-start gap-3">
-                                <span className="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 text-sm font-semibold flex-shrink-0">
-                                  {(unit.subUnits?.length || 0) + idx + 1}
-                                </span>
-                                <div className="flex-1">
-                                  <h4 className="font-semibold text-gray-900 mb-2">
-                                    {topic.name}
-                                  </h4>
+                          {unit.topics.map((topic, idx) => {
+                            // Create a pseudo-subunit for the topic
+                            const createPseudoSubUnit = () => ({
+                              id: `topic-${idx}`,
+                              unitId: unit.id,
+                              name: topic.name,
+                              orderIndex: idx,
+                              concepts: topic.concepts || [],
+                              learningObjectives: topic.learningObjectives || [],
+                              estimatedHours: 0,
+                              aiGenerated: unit.aiGenerated,
+                              teacherModified: unit.teacherModified,
+                              createdAt: unit.createdAt,
+                              updatedAt: unit.updatedAt,
+                            });
 
-                                  {/* Subtopics */}
-                                  {topic.subtopics && topic.subtopics.length > 0 && (
-                                    <div className="mb-3">
-                                      <p className="text-xs font-medium text-gray-500 mb-1">Subtopics:</p>
-                                      <div className="flex flex-wrap gap-1.5">
-                                        {topic.subtopics.map((subtopic, subIdx) => (
-                                          <button
-                                            key={`subtopic-${idx}-${subIdx}`}
-                                            onClick={(e) => {
-                                              if (userRole === 'teacher' && onGenerateAssignment) {
-                                                e.stopPropagation();
-                                                // Create a pseudo-subunit for the subtopic
-                                                const pseudoSubUnit = {
-                                                  id: `topic-${idx}-subtopic-${subIdx}`,
-                                                  unitId: unit.id,
-                                                  name: subtopic,
-                                                  orderIndex: subIdx,
-                                                  concepts: topic.concepts || [],
-                                                  learningObjectives: topic.learningObjectives || [],
-                                                  estimatedHours: 0,
-                                                  aiGenerated: unit.aiGenerated,
-                                                  teacherModified: unit.teacherModified,
-                                                  createdAt: unit.createdAt,
-                                                  updatedAt: unit.updatedAt,
-                                                };
-                                                onGenerateAssignment(pseudoSubUnit);
-                                              }
-                                            }}
-                                            disabled={userRole !== 'teacher' || !onGenerateAssignment}
-                                            className={`
-                                              px-2 py-1 rounded-md text-xs font-medium
-                                              bg-white border border-blue-200 text-blue-700
-                                              ${userRole === 'teacher' && onGenerateAssignment
-                                                ? 'hover:bg-blue-50 hover:border-blue-300 cursor-pointer group transition-all'
-                                                : 'cursor-default'}
-                                            `}
-                                          >
-                                            <span className="flex items-center gap-1">
-                                              {subtopic}
-                                              {userRole === 'teacher' && onGenerateAssignment && (
-                                                <Sparkles className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                              )}
-                                            </span>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
+                            return (
+                              <motion.div
+                                key={`topic-${idx}`}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="p-4 rounded-xl bg-gradient-to-br from-white/90 to-white/70 border border-gray-200/50 group hover:border-primary-300 hover:shadow-md transition-all"
+                              >
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    <span className="px-2.5 py-1 rounded-lg bg-primary-100 text-primary-700 text-sm font-semibold flex-shrink-0">
+                                      {idx + 1}
+                                    </span>
+                                    <div className="flex-1">
+                                      <h4 className="font-semibold text-gray-900 mb-2">
+                                        {topic.name}
+                                      </h4>
 
-                                  {/* Learning Objectives */}
-                                  {topic.learningObjectives && topic.learningObjectives.length > 0 && (
-                                    <div className="mb-2">
-                                      <p className="text-xs font-medium text-gray-500 mb-1">Learning Objectives:</p>
-                                      <ul className="text-sm text-gray-700 space-y-0.5 list-disc list-inside">
-                                        {topic.learningObjectives.map((objective, objIdx) => (
-                                          <li key={`objective-${idx}-${objIdx}`}>{objective}</li>
-                                        ))}
-                                      </ul>
+                                      {/* Subtopics */}
+                                      {topic.subtopics && topic.subtopics.length > 0 && (
+                                        <div className="mb-2">
+                                          <p className="text-xs font-medium text-gray-500 mb-1">Subtopics:</p>
+                                          <div className="flex flex-wrap gap-1.5">
+                                            {topic.subtopics.map((subtopic, subIdx) => (
+                                              <span
+                                                key={`subtopic-${idx}-${subIdx}`}
+                                                className="px-2 py-1 rounded-md text-xs bg-neutral-100 text-neutral-700"
+                                              >
+                                                {subtopic}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
+                                  </div>
 
-                                  {/* Key Concepts */}
-                                  {topic.concepts && topic.concepts.length > 0 && (
-                                    <div>
-                                      <p className="text-xs font-medium text-gray-500 mb-1">Key Concepts:</p>
-                                      <div className="flex flex-wrap gap-1">
-                                        {topic.concepts.map((concept, conIdx) => (
-                                          <span
-                                            key={`concept-${idx}-${conIdx}`}
-                                            className="px-2 py-0.5 rounded-md text-xs bg-purple-100 text-purple-700 border border-purple-200"
-                                          >
-                                            {concept}
-                                          </span>
-                                        ))}
-                                      </div>
-                                    </div>
+                                  {/* Create Assignment Button - Only for Teachers */}
+                                  {userRole === 'teacher' && onGenerateAssignment && (
+                                    <motion.button
+                                      whileHover={{ scale: 1.05 }}
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => onGenerateAssignment(createPseudoSubUnit())}
+                                      className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-secondary-600 text-white text-sm font-medium hover:shadow-lg transition-all flex items-center gap-2 opacity-0 group-hover:opacity-100"
+                                    >
+                                      <Sparkles className="w-4 h-4" />
+                                      Create Assignment
+                                    </motion.button>
                                   )}
                                 </div>
-                              </div>
-                            </motion.div>
-                          ))}
+                              </motion.div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
