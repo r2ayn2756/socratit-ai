@@ -341,8 +341,8 @@ export const Assignments: React.FC = () => {
 
           {/* Teaching Assistant - Takes up 1/3 */}
           <motion.div variants={fadeInUp}>
-            <Card padding="none" className="overflow-hidden sticky top-6">
-              <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
+            <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
+              <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                     <Brain className="w-6 h-6" />
@@ -353,9 +353,10 @@ export const Assignments: React.FC = () => {
                   </div>
                 </div>
                 <Button
-                  variant="secondary"
+                  variant="glass"
                   size="sm"
-                  className="w-full bg-white text-brand-purple hover:bg-white/90"
+                  glow={false}
+                  className="w-full bg-white text-purple-700 hover:bg-white/90"
                 >
                   Ask a Question
                 </Button>
