@@ -37,9 +37,10 @@ export interface ClassCreationState {
 
   // Curriculum Upload (Step 2)
   curriculumFiles: File[];
+  curriculumMaterialIds?: string[]; // Uploaded file IDs from server
   skipCurriculum: boolean;
 
-  // AI Generation (Step 4)
+  // AI Generation (Step 3)
   scheduleId?: string;
   aiGenerating: boolean;
   aiPreferences: {

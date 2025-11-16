@@ -88,10 +88,17 @@ export const ChatPage: React.FC = () => {
     }
   }, [location.state]);
 
-  // Fetch conversations
+  // Fetch conversations with proper refetch settings
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['ai-conversations'],
-    queryFn: () => aiTAService.listConversations({ isActive: true }),
+    queryFn: async () => {
+      console.log('🔄 Fetching conversations...');
+      const result = await aiTAService.listConversations({ isActive: true });
+      console.log('📋 Fetched conversations:', result.conversations.length);
+      return result;
+    },
+    refetchOnWindowFocus: true,
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   const conversations = (data?.conversations || []) as Conversation[];
@@ -174,7 +181,17 @@ export const ChatPage: React.FC = () => {
   }, [location.state, hasAutoSent, messages.length, isStreaming, selectedConversation]);
 
   const sendMessageWithContent = (messageContent: string) => {
-    if (!messageContent.trim() || isStreaming || !selectedConversation) return;
+    if (!messageContent.trim() || isStreaming || !selectedConversation) {
+      console.warn('⚠️ Cannot send message:', {
+        hasContent: !!messageContent.trim(),
+        isStreaming,
+        hasConversation: !!selectedConversation
+      });
+      return;
+    }
+
+    console.log('📤 Sending message to conversation:', selectedConversation);
+    console.log('📤 Message content:', messageContent);
 
     // Add user message
     const userMessage: Message = {
@@ -183,7 +200,10 @@ export const ChatPage: React.FC = () => {
       content: messageContent,
       createdAt: new Date(),
     };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => {
+      console.log('💬 Adding user message, previous count:', prev.length);
+      return [...prev, userMessage];
+    });
 
     // Send via WebSocket for streaming
     setIsStreaming(true);
@@ -239,17 +259,19 @@ export const ChatPage: React.FC = () => {
 
   const handleNewConversation = async () => {
     try {
+      console.log('🆕 Creating new conversation...');
       const conversation = await aiTAService.createConversation({
         conversationType: 'GENERAL_HELP',
         title: 'New Conversation',
       });
+      console.log('✅ Created conversation:', conversation.id);
       setSelectedConversation(conversation.id);
-      setMessages([]);
+      setMessages([]); // New conversation starts empty
       setStreamingMessage('');
       setHasAutoSent(false);
-      refetch();
+      refetch(); // Refresh sidebar list
     } catch (error) {
-      console.error('Error creating conversation:', error);
+      console.error('❌ Error creating conversation:', error);
       alert('Failed to start conversation. Please try again.');
     }
   };
@@ -401,7 +423,7 @@ export const ChatPage: React.FC = () => {
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           setSelectedConversation(conv.id);
-                          setMessages([]);
+                          // Don't clear messages - let the useEffect load them
                           setStreamingMessage('');
                           setHasAutoSent(false);
                           setShowConvOptions(null);

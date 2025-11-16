@@ -99,7 +99,7 @@ export const LandingPage: React.FC = () => {
               <motion.div variants={fadeInUp}>
                 <Badge variant="purple" size="md" className="mb-4">
                   <Sparkles className="w-3 h-3 mr-1" />
-                  AI-Powered Teaching Assistant
+                  {t('hero.badge')}
                 </Badge>
               </motion.div>
 
@@ -107,9 +107,9 @@ export const LandingPage: React.FC = () => {
                 variants={fadeInUp}
                 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight"
               >
-                Teaching Shouldn't Feel Like{' '}
+                {t('hero.headline')}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-purple">
-                  Two Full-Time Jobs
+                  {t('hero.headlineHighlight')}
                 </span>
               </motion.h1>
 
@@ -117,9 +117,7 @@ export const LandingPage: React.FC = () => {
                 variants={fadeInUp}
                 className="text-xl text-slate-600 mb-8 leading-relaxed"
               >
-                We're dedicated to saving teachers time by automating grading,
-                generating personalized feedback, and proactively identifying struggling students—all
-                while helping students learn through Socratic questioning.
+                {t('hero.description')}
               </motion.p>
 
               <motion.div
@@ -133,7 +131,7 @@ export const LandingPage: React.FC = () => {
                   icon={<Sparkles className="w-5 h-5" />}
                   iconPosition="right"
                 >
-                  Try It Now
+                  {t('hero.cta')}
                 </Button>
               </motion.div>
             </motion.div>
@@ -278,11 +276,10 @@ export const LandingPage: React.FC = () => {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              Teachers Are Overwhelmed
+              {t('problem.title')}
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-slate-600 max-w-3xl mx-auto">
-              The average teacher spends 50+ hours per week on lesson planning, grading,
-              parent communication, and individualized student support.
+              {t('problem.description')}
             </motion.p>
           </motion.div>
 
@@ -294,9 +291,9 @@ export const LandingPage: React.FC = () => {
             className="grid md:grid-cols-3 gap-8"
           >
             {[
-              { icon: Clock, title: '15 hours/week', desc: 'Spent on grading and feedback' },
-              { icon: MessageSquare, title: '47 emails/day', desc: 'From students and parents' },
-              { icon: Users, title: '30+ students', desc: 'Need individual attention' },
+              { icon: Clock, title: t('problem.stat1.title'), desc: t('problem.stat1.desc') },
+              { icon: MessageSquare, title: t('problem.stat2.title'), desc: t('problem.stat2.desc') },
+              { icon: Users, title: t('problem.stat3.title'), desc: t('problem.stat3.desc') },
             ].map((item, idx) => (
               <motion.div key={idx} variants={fadeInUp}>
                 <Card variant="elevated" padding="lg" className="text-center">
@@ -324,10 +321,10 @@ export const LandingPage: React.FC = () => {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              We Want to Hear What You Struggle With
+              {t('struggles.title')}
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-slate-600">
-              You're not alone. These are the challenges teachers face every day.
+              {t('struggles.description')}
             </motion.p>
           </motion.div>
 
@@ -342,33 +339,33 @@ export const LandingPage: React.FC = () => {
             {[
               {
                 icon: Layers,
-                quote: "In one day, I toggle between Schoology for lessons, TAC for grades, Outlook for communication, Review360 for behavior tracking, and Frontline for absences. None of them sync. That fragmentation is one of the biggest time-wasters in my job.",
-                role: "High School Teacher",
+                quote: t('struggles.quote1'),
+                role: t('struggles.role1'),
               },
               {
                 icon: FileText,
-                quote: "Grading is endless. District policy requires at least two grades per week per student—about 90-130 students total. I create, review, and input each manually. Paper assignments pile up. Students don't write their names, so tracking submissions becomes detective work.",
-                role: "Middle School English Teacher",
+                quote: t('struggles.quote2'),
+                role: t('struggles.role2'),
               },
               {
                 icon: Clock,
-                quote: "Tutorials were supposed to help students, but they became overwhelming. Students drop in unannounced, sometimes several at once, all needing help with different assignments. 30-minute sessions always stretch much longer. And I have to track who came and what they worked on.",
-                role: "7th Grade Math Teacher",
+                quote: t('struggles.quote3'),
+                role: t('struggles.role3'),
               },
               {
                 icon: CalendarX,
-                quote: "Every day's content is prescribed. There's no time to pause or reteach. Tutorials are the only option, but attendance depends on students showing up. Those who miss class need to make up multiple lessons at once, creating even more back-tracking for me.",
-                role: "French Language Teacher",
+                quote: t('struggles.quote4'),
+                role: t('struggles.role4'),
               },
               {
                 icon: AlertCircle,
-                quote: "Between passes, student arrivals, behavior issues, fire drills, active shooter drills, lockdowns, and announcements—there are constant disruptions. Each one breaks teaching flow. I have to restart attention, re-explain material, or pause grading. It makes consistency impossible.",
-                role: "High School Science Teacher",
+                quote: t('struggles.quote5'),
+                role: t('struggles.role5'),
               },
               {
                 icon: MessageSquare,
-                quote: "Some parents don't respond to emails or calls; others don't speak English. I use Outlook for emails but have to look up parent info in TAC. Sometimes there's no email listed, only a phone number. Communication often stops there. A multilingual parent-communication system integrated with grades would save significant time.",
-                role: "Elementary School Teacher",
+                quote: t('struggles.quote6'),
+                role: t('struggles.role6'),
               },
             ].map((struggle, idx) => (
               <motion.div
@@ -395,7 +392,7 @@ export const LandingPage: React.FC = () => {
             className="text-center max-w-3xl mx-auto"
           >
             <motion.p variants={fadeInUp} className="text-lg text-slate-700 mb-8">
-              These challenges are exactly why we built Socratit.ai. Let's show you how we can help.
+              {t('struggles.cta.description')}
             </motion.p>
             <motion.div variants={fadeInUp}>
               <Button
@@ -405,7 +402,7 @@ export const LandingPage: React.FC = () => {
                 icon={<Calendar className="w-5 h-5" />}
                 iconPosition="right"
               >
-                Book a Demo - Let's Solve These Together
+                {t('struggles.cta.button')}
               </Button>
             </motion.div>
           </motion.div>
@@ -423,10 +420,10 @@ export const LandingPage: React.FC = () => {
             className="text-center mb-12"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              How Socratit.ai Solves These Challenges
+              {t('solutions.title')}
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-slate-600">
-              One unified platform that addresses your biggest pain points
+              {t('solutions.description')}
             </motion.p>
           </motion.div>
 
@@ -440,33 +437,33 @@ export const LandingPage: React.FC = () => {
             {[
               {
                 icon: Link,
-                title: 'One Unified Platform',
-                desc: 'All tools in one place: lessons, grades, attendance, behavior tracking, and parent communication—fully integrated',
+                title: t('solutions.item1.title'),
+                desc: t('solutions.item1.desc'),
               },
               {
                 icon: CheckCircle,
-                title: 'AI-Powered Auto-Grading',
-                desc: 'Instant grading with personalized feedback for every student. No more detective work tracking submissions',
+                title: t('solutions.item2.title'),
+                desc: t('solutions.item2.desc'),
               },
               {
                 icon: Brain,
-                title: '24/7 AI Teaching Assistant',
-                desc: 'Students get help anytime through Socratic questioning—reducing tutorial chaos and makeup work',
+                title: t('solutions.item3.title'),
+                desc: t('solutions.item3.desc'),
               },
               {
                 icon: TrendingUp,
-                title: 'Adaptive Learning Paths',
-                desc: 'Automatically identifies gaps and pushes personalized review materials to students who need it',
+                title: t('solutions.item4.title'),
+                desc: t('solutions.item4.desc'),
               },
               {
                 icon: BarChart3,
-                title: 'Proactive Daily Insights',
-                desc: 'Morning briefings with actionable recommendations—no more chasing data across multiple systems',
+                title: t('solutions.item5.title'),
+                desc: t('solutions.item5.desc'),
               },
               {
                 icon: MessageSquare,
-                title: 'Smart Parent Communication',
-                desc: 'AI-drafted emails in multiple languages, integrated with grades and attendance. One click to update parents',
+                title: t('solutions.item6.title'),
+                desc: t('solutions.item6.desc'),
               },
             ].map((solution, idx) => (
               <motion.div key={idx} variants={fadeInUp}>
@@ -491,10 +488,10 @@ export const LandingPage: React.FC = () => {
             variants={staggerContainer}
           >
             <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Help Your Students Succeed?
+              {t('finalCta.title')}
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-white/90 mb-8">
-              Join teachers using Socratit.ai to support every student in their classroom.
+              {t('finalCta.description')}
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -503,14 +500,14 @@ export const LandingPage: React.FC = () => {
                 onClick={() => navigate('/signup')}
                 className="bg-white text-brand-blue hover:bg-slate-100 font-semibold shadow-lg"
               >
-                Get Started Free
+                {t('finalCta.button1')}
               </Button>
               <Button
                 variant="ghost"
                 size="lg"
                 className="border-2 border-white text-white hover:bg-white hover:text-brand-blue font-semibold transition-all"
               >
-                Schedule Demo
+                {t('finalCta.button2')}
               </Button>
             </motion.div>
           </motion.div>
@@ -524,35 +521,35 @@ export const LandingPage: React.FC = () => {
             <div>
               <img src="/logo.svg" alt="Socratit.ai" className="h-8 w-auto mb-4 brightness-0 invert" />
               <p className="text-slate-400 text-sm">
-                Free AI-powered platform built to help teachers support every student.
+                {t('footer.tagline')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="font-semibold mb-4">{t('footer.product')}</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Demo</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.features')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.demo')}</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
+              <h3 className="font-semibold mb-4">{t('footer.company')}</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.about')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.careers')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.contact')}</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
+              <h3 className="font-semibold mb-4">{t('footer.legal')}</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.privacy')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.terms')}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">{t('footer.security')}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-400">
-            © 2025 Socratit.ai. All rights reserved.
+            {t('footer.copyright')}
           </div>
         </div>
       </footer>

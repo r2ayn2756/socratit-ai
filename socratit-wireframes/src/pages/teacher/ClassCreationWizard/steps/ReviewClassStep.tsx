@@ -40,9 +40,14 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       console.log('Starting class creation flow...');
       console.log('[DEBUG] Full wizard state:', wizardState);
 
-      // Step 1: Upload curriculum files if provided
+      // Step 1: Get curriculum file IDs (already uploaded in AI step if applicable)
       let curriculumMaterialIds: string[] = [];
-      if (wizardState.curriculumFiles.length > 0) {
+      if (wizardState.curriculumMaterialIds && wizardState.curriculumMaterialIds.length > 0) {
+        // Files were already uploaded during AI processing
+        curriculumMaterialIds = wizardState.curriculumMaterialIds;
+        console.log('Using pre-uploaded curriculum files:', curriculumMaterialIds);
+      } else if (wizardState.curriculumFiles.length > 0) {
+        // Fallback: Upload files if they weren't uploaded yet (shouldn't happen normally)
         console.log('Uploading curriculum files:', wizardState.curriculumFiles.map(f => f.name).join(', '));
         setLoadingMessage(`Uploading ${wizardState.curriculumFiles.length} file(s)...`);
         try {

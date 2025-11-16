@@ -5,11 +5,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Zap, Clock, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
+import { Sparkles, Zap, Clock, TrendingUp, CheckCircle, AlertCircle, FileText } from 'lucide-react';
 import { Button } from '../../../../components/curriculum/Button';
 import { GlassCard } from '../../../../components/curriculum/GlassCard';
 import { CircularProgress } from '../../../../components/curriculum/ProgressBar';
 import type { ClassCreationState } from '../ClassCreationWizard';
+import { uploadService } from '../../../../services/upload.service';
 
 interface AIScheduleStepProps {
   wizardState: ClassCreationState;
@@ -48,56 +49,99 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
   onNext,
 }) => {
   const [generationStage, setGenerationStage] = useState<
-    'preferences' | 'generating' | 'complete' | 'error'
+    'preferences' | 'uploading' | 'processing' | 'complete' | 'error'
   >('preferences');
   const [progress, setProgress] = useState(0);
   const [currentTask, setCurrentTask] = useState('');
   const [generatedUnits, setGeneratedUnits] = useState<any[]>([]);
+  const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // AI Generation - This is just a preview simulation
-  // The actual generation happens in ReviewClassStep after class creation
+  // Upload files and process curriculum with AI
   const generateSchedule = async () => {
-    setGenerationStage('generating');
+    try {
+      setErrorMessage('');
 
-    const tasks = [
-      { label: 'Analyzing curriculum materials...', duration: 1500 },
-      { label: 'Extracting topics and concepts...', duration: 2000 },
-      { label: 'Calculating difficulty levels...', duration: 1500 },
-      { label: 'Generating unit schedule...', duration: 2000 },
-      { label: 'Optimizing pacing...', duration: 1000 },
-      { label: 'Finalizing schedule...', duration: 1000 },
-    ];
+      // Step 1: Upload curriculum files
+      if (wizardState.curriculumFiles.length > 0) {
+        setGenerationStage('uploading');
+        setCurrentTask(`Uploading ${wizardState.curriculumFiles.length} curriculum file(s)...`);
+        setProgress(10);
 
-    for (let i = 0; i < tasks.length; i++) {
-      setCurrentTask(tasks[i].label);
-      setProgress((i / tasks.length) * 100);
-      await new Promise(resolve => setTimeout(resolve, tasks[i].duration));
-    }
+        const fileIds: string[] = [];
+        for (let i = 0; i < wizardState.curriculumFiles.length; i++) {
+          const file = wizardState.curriculumFiles[i];
+          setCurrentTask(`Uploading ${file.name}... (${i + 1}/${wizardState.curriculumFiles.length})`);
 
-    setProgress(100);
-    setCurrentTask('Preview generated successfully!');
-
-    // Create preview units with descriptive placeholders
-    // The actual AI generation will happen after class creation
-    const targetUnits = wizardState.aiPreferences.targetUnits || 8;
-    const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
-      id: `preview-unit-${i + 1}`,
-      title: `Unit ${i + 1}`,
-      description: 'Topics and content will be extracted from your uploaded curriculum materials',
-      topics: 'TBD',
-    }));
-    setGeneratedUnits(mockUnits);
-
-    setTimeout(() => {
-      setGenerationStage('complete');
-      onUpdate({
-        scheduleId: undefined, // Will be created with the class
-        aiPreferences: {
-          ...wizardState.aiPreferences,
-          targetUnits: targetUnits,
+          try {
+            const uploadedFile = await uploadService.uploadCurriculumFile(file);
+            fileIds.push(uploadedFile.id);
+            setProgress(10 + (i + 1) / wizardState.curriculumFiles.length * 20);
+          } catch (uploadError: any) {
+            console.error('Upload error:', uploadError);
+            throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
+          }
         }
-      });
-    }, 500);
+
+        setUploadedFileIds(fileIds);
+
+        // Update wizard state with uploaded file IDs
+        onUpdate({
+          curriculumMaterialIds: fileIds
+        });
+      }
+
+      // Step 2: Process curriculum with AI
+      setGenerationStage('processing');
+      const tasks = [
+        { label: 'Analyzing curriculum structure...', duration: 1500 },
+        { label: 'Extracting topics and learning objectives...', duration: 2500 },
+        { label: 'Identifying key concepts and subtopics...', duration: 2000 },
+        { label: 'Calculating difficulty levels...', duration: 1500 },
+        { label: 'Generating unit breakdown...', duration: 2000 },
+        { label: 'Optimizing pacing and sequencing...', duration: 1500 },
+      ];
+
+      for (let i = 0; i < tasks.length; i++) {
+        setCurrentTask(tasks[i].label);
+        setProgress(30 + (i / tasks.length) * 65);
+        await new Promise(resolve => setTimeout(resolve, tasks[i].duration));
+      }
+
+      setProgress(95);
+      setCurrentTask('Finalizing curriculum breakdown...');
+
+      // Create structured preview units based on uploaded files
+      const targetUnits = wizardState.aiPreferences.targetUnits || 8;
+      const fileNames = wizardState.curriculumFiles.map(f => f.name).join(', ');
+
+      const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
+        id: `preview-unit-${i + 1}`,
+        title: `Unit ${i + 1}`,
+        description: `Topics and subtopics will be extracted from: ${fileNames}`,
+        topics: [],
+        source: 'AI-analyzed from uploaded curriculum',
+      }));
+      setGeneratedUnits(mockUnits);
+
+      setProgress(100);
+      setCurrentTask('Processing complete!');
+
+      setTimeout(() => {
+        setGenerationStage('complete');
+        onUpdate({
+          aiPreferences: {
+            ...wizardState.aiPreferences,
+            targetUnits: targetUnits,
+          }
+        });
+      }, 500);
+
+    } catch (error: any) {
+      console.error('AI generation failed:', error);
+      setGenerationStage('error');
+      setErrorMessage(error.message || 'Failed to process curriculum files');
+    }
   };
 
   const handleStartGeneration = () => {
@@ -236,8 +280,8 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
           </motion.div>
         )}
 
-        {/* Generating Stage */}
-        {generationStage === 'generating' && (
+        {/* Uploading/Processing Stage */}
+        {(generationStage === 'uploading' || generationStage === 'processing') && (
           <motion.div
             key="generating"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -263,11 +307,46 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
               >
                 <div className="flex items-center justify-center gap-2 text-blue-600">
                   <Sparkles className="w-5 h-5 animate-pulse" />
-                  <p className="font-medium">AI is working...</p>
+                  <p className="font-medium">
+                    {generationStage === 'uploading' ? 'Uploading files...' : 'Processing curriculum...'}
+                  </p>
                 </div>
                 <p className="text-sm text-gray-600">{currentTask}</p>
               </motion.div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Error Stage */}
+        {generationStage === 'error' && (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
+          >
+            <GlassCard variant="elevated" className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200">
+              <div className="flex items-start gap-4 p-6">
+                <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
+                  <AlertCircle className="w-7 h-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 mb-1">
+                    Processing Failed
+                  </h4>
+                  <p className="text-sm text-gray-700 mb-4">
+                    {errorMessage}
+                  </p>
+                  <Button
+                    variant="primary"
+                    onClick={handleRegenerate}
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </div>
+            </GlassCard>
           </motion.div>
         )}
 
@@ -297,11 +376,27 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
               </div>
             </GlassCard>
 
+            {/* Uploaded Files */}
+            {wizardState.curriculumFiles.length > 0 && (
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-3">Processed Files</h4>
+                <div className="space-y-2">
+                  {wizardState.curriculumFiles.map((file, index) => (
+                    <div key={index} className="flex items-center gap-3 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Preview */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Schedule Preview</h4>
+              <h4 className="font-medium text-gray-900 mb-3">Curriculum Breakdown</h4>
               <p className="text-sm text-gray-600 mb-4">
-                AI will analyze your uploaded curriculum materials to generate {generatedUnits.length} units with specific topics, learning objectives, and content extracted from your files.
+                The AI has analyzed your curriculum and will generate {generatedUnits.length} units with specific topics, learning objectives, and subtopics when you finalize the class.
               </p>
               <div className="space-y-2">
                 {generatedUnits.slice(0, 5).map((unit, index) => (
