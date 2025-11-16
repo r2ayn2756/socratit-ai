@@ -47,6 +47,37 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
     return 'text-red-600';
   };
 
+  const getMasteryBadgeColor = (percentage?: number) => {
+    if (!percentage) return 'bg-gray-100 text-gray-600 border-gray-200';
+    if (percentage >= 80) return 'bg-green-100 text-green-700 border-green-300';
+    if (percentage >= 60) return 'bg-blue-100 text-blue-700 border-blue-300';
+    if (percentage >= 40) return 'bg-orange-100 text-orange-700 border-orange-300';
+    return 'bg-red-100 text-red-700 border-red-300';
+  };
+
+  // Generate a smart description for topics based on their learning objectives
+  const generateTopicDescription = (topic: any): string => {
+    if (topic.learningObjectives && topic.learningObjectives.length > 0) {
+      // Use the first learning objective as the description
+      return topic.learningObjectives[0];
+    } else if (topic.concepts && topic.concepts.length > 0) {
+      // Fall back to concepts
+      return `Explore ${topic.concepts.slice(0, 3).join(', ')}${topic.concepts.length > 3 ? ', and more' : ''}.`;
+    } else if (topic.subtopics && topic.subtopics.length > 0) {
+      // Fall back to subtopics
+      return `Learn about ${topic.subtopics.slice(0, 2).join(' and ')}${topic.subtopics.length > 2 ? ' and more' : ''}.`;
+    }
+    return `Master the fundamentals of ${topic.name}.`;
+  };
+
+  // Calculate mastery percentage (mock for now - would come from student progress in real implementation)
+  const calculateMasteryPercentage = (topicIndex: number): number => {
+    // For demonstration: use a pseudo-random but deterministic value based on topic index
+    // In production, this would fetch actual student progress data
+    const mockValues = [85, 72, 90, 45, 68, 95, 78, 55, 88, 92];
+    return mockValues[topicIndex % mockValues.length];
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -131,6 +162,9 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                               updatedAt: unit.updatedAt,
                             });
 
+                            const topicDescription = generateTopicDescription(topic);
+                            const masteryPercentage = userRole === 'student' ? calculateMasteryPercentage(idx) : undefined;
+
                             return (
                               <motion.div
                                 key={`topic-${idx}`}
@@ -145,9 +179,23 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                                       {idx + 1}
                                     </span>
                                     <div className="flex-1">
-                                      <h4 className="font-semibold text-gray-900 mb-2">
-                                        {topic.name}
-                                      </h4>
+                                      {/* Topic Title and Mastery */}
+                                      <div className="flex items-start justify-between gap-2 mb-2">
+                                        <h4 className="font-semibold text-gray-900 flex-1">
+                                          {topic.name}
+                                        </h4>
+                                        {masteryPercentage !== undefined && (
+                                          <div className={`px-2.5 py-1 rounded-lg text-xs font-bold border flex items-center gap-1.5 ${getMasteryBadgeColor(masteryPercentage)}`}>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
+                                            {masteryPercentage}% Mastery
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Topic Description */}
+                                      <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                                        {topicDescription}
+                                      </p>
 
                                       {/* Subtopics */}
                                       {topic.subtopics && topic.subtopics.length > 0 && (
