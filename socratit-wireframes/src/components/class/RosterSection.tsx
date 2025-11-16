@@ -57,14 +57,13 @@ export const RosterSection: React.FC<RosterSectionProps> = ({
       defaultExpanded={false}
       action={
         onAddStudent && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={onAddStudent}
-            icon={<UserPlus />}
+            className="p-2 rounded-lg hover:bg-neutral-100 transition-colors text-neutral-600 hover:text-primary-600"
+            aria-label="Add Student"
           >
-            Add Student
-          </Button>
+            <UserPlus className="w-5 h-5" />
+          </button>
         )
       }
     >

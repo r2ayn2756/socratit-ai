@@ -4,8 +4,9 @@
 // ============================================================================
 
 import React from 'react';
-import { Users } from 'lucide-react';
+import { Users, Megaphone } from 'lucide-react';
 import { Card } from '../common/Card';
+import { Button } from '../common/Button';
 
 interface ClassHeaderProps {
   className: string;
@@ -13,6 +14,7 @@ interface ClassHeaderProps {
   gradeLevel: string;
   studentCount: number;
   classCode?: string;
+  onSendAnnouncement?: () => void;
 }
 
 export const ClassHeader: React.FC<ClassHeaderProps> = ({
@@ -21,6 +23,7 @@ export const ClassHeader: React.FC<ClassHeaderProps> = ({
   gradeLevel,
   studentCount,
   classCode,
+  onSendAnnouncement,
 }) => {
   return (
     <Card variant="ghost" padding="sm" className="shadow-lg">
@@ -48,13 +51,28 @@ export const ClassHeader: React.FC<ClassHeaderProps> = ({
           </div>
         </div>
 
-        {/* Class Code Display */}
-        {classCode && (
-          <div className="text-right px-4 py-2 rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-200">
-            <p className="text-xs text-neutral-600 mb-0.5">Class Code</p>
-            <p className="text-2xl font-bold text-neutral-900 tracking-wider">{classCode}</p>
-          </div>
-        )}
+        {/* Right Side - Actions & Class Code */}
+        <div className="flex items-center gap-4">
+          {/* Send Announcement Button */}
+          {onSendAnnouncement && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onSendAnnouncement}
+              icon={<Megaphone />}
+            >
+              Send Announcement
+            </Button>
+          )}
+
+          {/* Class Code Display */}
+          {classCode && (
+            <div className="text-right px-4 py-2 rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-200">
+              <p className="text-xs text-neutral-600 mb-0.5">Class Code</p>
+              <p className="text-2xl font-bold text-neutral-900 tracking-wider">{classCode}</p>
+            </div>
+          )}
+        </div>
       </div>
     </Card>
   );
