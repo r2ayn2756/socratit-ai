@@ -42,7 +42,7 @@ export const Messages: React.FC = () => {
   const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
     queryKey: ['conversations'],
     queryFn: messageService.getUserConversations,
-    refetchInterval: 5000, // Poll every 5 seconds for new messages
+    refetchInterval: 15000, // Poll every 15 seconds (reduced from 5s to prevent rate limits)
   });
 
   // Fetch conversation history when a conversation is selected
@@ -50,14 +50,14 @@ export const Messages: React.FC = () => {
     queryKey: ['conversation', selectedUserId],
     queryFn: () => messageService.getConversation(selectedUserId!, 1, 50),
     enabled: !!selectedUserId,
-    refetchInterval: 3000, // Poll every 3 seconds for new messages
+    refetchInterval: 10000, // Poll every 10 seconds (reduced from 3s to prevent rate limits)
   });
 
   // Fetch unread count
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['unreadCount'],
     queryFn: messageService.getUnreadCount,
-    refetchInterval: 5000,
+    refetchInterval: 15000, // Poll every 15 seconds (reduced from 5s to prevent rate limits)
   });
 
   // Send message mutation

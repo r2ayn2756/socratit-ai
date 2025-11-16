@@ -3,7 +3,7 @@
 // Main dashboard for students with assignments, grades, and upcoming deadlines
 // ============================================================================
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -26,11 +26,15 @@ import {
   GraduationCap,
   Zap,
   Play,
+  Send,
+  Sparkles,
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
+import { aiTAService } from '../../services/aiTA.service';
 
 export const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [chatMessage, setChatMessage] = useState('');
 
   // Fetch assignments from backend
   const { data: assignmentsData } = useQuery({
@@ -175,6 +179,42 @@ export const StudentDashboard: React.FC = () => {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  // Handle starting a conversation
+  const handleStartConversation = async (initialMessage: string) => {
+    if (!initialMessage.trim()) return;
+
+    try {
+      const conversation = await aiTAService.createConversation({
+        conversationType: 'GENERAL_HELP',
+        title: initialMessage.substring(0, 50) + (initialMessage.length > 50 ? '...' : ''),
+      });
+
+      // Navigate to chat page with the conversation ID and initial message
+      navigate('/student/ai-tutor', {
+        state: {
+          conversationId: conversation.id,
+          autoOpen: true,
+          initialMessage: initialMessage
+        }
+      });
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      alert('Failed to start conversation. Please try again.');
+    }
+  };
+
+  const handleQuickAction = (text: string) => {
+    handleStartConversation(text);
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (chatMessage.trim()) {
+      handleStartConversation(chatMessage);
+      setChatMessage('');
+    }
   };
 
   return (
@@ -467,48 +507,95 @@ export const StudentDashboard: React.FC = () => {
 
           {/* Right Column - Teaching Assistant */}
           <motion.div variants={fadeInUp} className="space-y-6">
-            {/* TA Card */}
-            <Card padding="none" className="overflow-hidden">
-              <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                    <Brain className="w-6 h-6" />
-                  </div>
+            {/* TA Card - Redesigned with transparent purple glow and neomorphism */}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="relative overflow-hidden rounded-2xl"
+            >
+              {/* Purple glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 via-purple-600/20 to-purple-700/30 blur-xl"></div>
+
+              {/* Neomorphic card */}
+              <div className="relative backdrop-blur-md bg-white/40 border border-white/50 shadow-2xl rounded-2xl p-6">
+                {/* Apple-style neomorphic inner shadow */}
+                <div className="absolute inset-0 rounded-2xl shadow-inner opacity-30 pointer-events-none"></div>
+
+                {/* Header with floating icon */}
+                <div className="relative flex items-center gap-3 mb-4">
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        '0 0 20px rgba(168, 85, 247, 0.4)',
+                        '0 0 40px rgba(168, 85, 247, 0.6)',
+                        '0 0 20px rgba(168, 85, 247, 0.4)',
+                      ]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg"
+                  >
+                    <Brain className="w-7 h-7 text-white" />
+                  </motion.div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg">Teaching Assistant</h3>
-                    <p className="text-sm opacity-90">24/7 Support</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-xl text-slate-800">AI Teaching Assistant</h3>
+                      <Sparkles className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <p className="text-sm text-purple-700 font-medium">24/7 Support • Always Ready</p>
                   </div>
                 </div>
 
-                <p className="text-sm opacity-90 mb-4">
-                  Need help? I can assist with homework, studying, or understanding
-                  concepts.
+                <p className="text-sm text-slate-700 mb-4 leading-relaxed">
+                  Ask me anything! I can help with homework, explain concepts, or guide you through problems.
                 </p>
 
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full bg-white text-brand-purple hover:bg-white/90 mb-4"
-                >
-                  Start Conversation
-                </Button>
+                {/* Text input form - neomorphic style */}
+                <form onSubmit={handleSendMessage} className="mb-4">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={chatMessage}
+                      onChange={(e) => setChatMessage(e.target.value)}
+                      placeholder="Type your question here..."
+                      className="w-full pl-4 pr-12 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-purple-200/50
+                               shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400
+                               text-slate-800 placeholder-slate-500 transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!chatMessage.trim()}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700
+                               rounded-lg flex items-center justify-center hover:shadow-lg hover:shadow-purple-500/50
+                               transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                    >
+                      <Send className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                </form>
 
+                {/* Quick Actions */}
                 <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide opacity-75">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-purple-700/80">
                     Quick Actions
                   </p>
                   {taQuickActions.slice(0, 4).map((action, index) => (
-                    <button
+                    <motion.button
                       key={index}
-                      className="w-full text-left px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm flex items-center gap-2"
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleQuickAction(action.text)}
+                      className="w-full text-left px-4 py-2.5 rounded-xl bg-white/50 backdrop-blur-sm border border-white/60
+                               hover:bg-white/70 hover:shadow-md hover:shadow-purple-200/50 transition-all text-sm
+                               flex items-center gap-3 text-slate-700 font-medium"
                     >
-                      {action.icon}
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+                        {action.icon}
+                      </div>
                       <span>{action.text}</span>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
-            </Card>
+            </motion.div>
 
             {/* Recent Grades */}
             {gradedAssignments.length > 0 && (

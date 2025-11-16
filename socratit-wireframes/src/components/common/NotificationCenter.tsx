@@ -33,14 +33,14 @@ export const NotificationCenter: React.FC = () => {
   const { data: notificationData } = useQuery({
     queryKey: ['notifications'],
     queryFn: () => notificationService.getUserNotifications(false, 20, 0),
-    refetchInterval: 10000, // Poll every 10 seconds
+    refetchInterval: 30000, // Poll every 30 seconds (reduced from 10s to prevent rate limits)
   });
 
   // Fetch unread count
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['notificationUnreadCount'],
     queryFn: notificationService.getUnreadNotificationCount,
-    refetchInterval: 10000,
+    refetchInterval: 30000, // Poll every 30 seconds (reduced from 10s to prevent rate limits)
   });
 
   // Mark as read mutation

@@ -46,8 +46,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['unreadMessages'],
     queryFn: messageService.getUnreadCount,
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 20000, // Consider data stale after 20 seconds
+    refetchInterval: 60000, // Refetch every 60 seconds (reduced from 30s to prevent rate limits)
+    staleTime: 50000, // Consider data stale after 50 seconds
   });
 
   // Role-specific navigation items
@@ -69,6 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'My Classes', icon: BookOpen, path: '/student/classes' },
       { label: 'Assignments', icon: FileText, path: '/student/assignments' },
       { label: 'Grades', icon: BarChart3, path: '/student/grades' },
+      { label: 'AI Chat', icon: Brain, path: '/student/ai-tutor' },
       { label: 'Messages', icon: MessageSquare, path: '/student/messages', badge: unreadCount },
     ],
     admin: [

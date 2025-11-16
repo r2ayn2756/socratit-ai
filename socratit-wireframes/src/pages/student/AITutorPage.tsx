@@ -3,17 +3,37 @@
  * Lists all AI conversations and allows creating new ones
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import { AITutorChat } from '../../components/ai/AITutorChat';
 import { aiTAService } from '../../services/aiTA.service';
+import { DashboardLayout } from '../../components/layout';
 
 export const AITutorPage: React.FC = () => {
+  const location = useLocation();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false);
+  const [initialMessage, setInitialMessage] = useState<string>('');
+
+  // Check if we should auto-open a conversation from navigation state
+  useEffect(() => {
+    const state = location.state as {
+      conversationId?: string;
+      autoOpen?: boolean;
+      initialMessage?: string;
+    } | null;
+    if (state?.conversationId && state?.autoOpen) {
+      setSelectedConversation(state.conversationId);
+      setShowChat(true);
+      if (state.initialMessage) {
+        setInitialMessage(state.initialMessage);
+      }
+    }
+  }, [location.state]);
 
   // Fetch conversations
   const { data, isLoading, refetch } = useQuery({
@@ -44,7 +64,7 @@ export const AITutorPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <DashboardLayout userRole="student">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -172,19 +192,21 @@ export const AITutorPage: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Chat Modal */}
-      {selectedConversation && showChat && (
-        <AITutorChat
-          conversationId={selectedConversation}
-          onClose={() => {
-            setSelectedConversation(null);
-            setShowChat(false);
-            refetch(); // Refresh conversation list
-          }}
-        />
-      )}
-    </div>
+        {/* Chat Modal */}
+        {selectedConversation && showChat && (
+          <AITutorChat
+            conversationId={selectedConversation}
+            initialMessage={initialMessage}
+            onClose={() => {
+              setSelectedConversation(null);
+              setShowChat(false);
+              setInitialMessage('');
+              refetch(); // Refresh conversation list
+            }}
+          />
+        )}
+      </div>
+    </DashboardLayout>
   );
 };

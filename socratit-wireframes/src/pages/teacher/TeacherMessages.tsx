@@ -47,7 +47,7 @@ export const TeacherMessages: React.FC = () => {
   const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
     queryKey: ['conversations'],
     queryFn: messageService.getUserConversations,
-    refetchInterval: 5000, // Poll every 5 seconds
+    refetchInterval: 15000, // Poll every 15 seconds (reduced from 5s to prevent rate limits)
   });
 
   // Fetch teacher's classes for class messaging
@@ -61,14 +61,14 @@ export const TeacherMessages: React.FC = () => {
     queryKey: ['conversation', selectedUserId],
     queryFn: () => messageService.getConversation(selectedUserId!, 1, 50),
     enabled: !!selectedUserId,
-    refetchInterval: 3000,
+    refetchInterval: 10000, // Poll every 10 seconds (reduced from 3s to prevent rate limits)
   });
 
   // Fetch unread count
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['unreadCount'],
     queryFn: messageService.getUnreadCount,
-    refetchInterval: 5000,
+    refetchInterval: 15000, // Poll every 15 seconds (reduced from 5s to prevent rate limits)
   });
 
   // Send direct message mutation

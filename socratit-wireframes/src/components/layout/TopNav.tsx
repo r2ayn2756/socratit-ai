@@ -8,16 +8,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  Search,
   Settings,
   LogOut,
   User,
-  ChevronDown,
-  MessageSquare,
-  Calendar,
-  Brain
+  ChevronDown
 } from 'lucide-react';
-import { NotificationCenter } from '../common/NotificationCenter';
 
 export const TopNav: React.FC = () => {
   const { user, logout } = useAuth();
@@ -36,37 +31,15 @@ export const TopNav: React.FC = () => {
 
           {/* Logo */}
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center flex-shrink-0">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="flex-1 max-w-xl">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search for students, classes, assignments..."
-                className="w-full pl-12 pr-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue focus:bg-white transition-all"
-              />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="Socratit Logo"
+              className="h-10 w-auto"
+            />
           </div>
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
-            {/* Calendar */}
-            <button className="p-2 hover:bg-white/50 rounded-lg transition-all">
-              <Calendar className="w-5 h-5 text-slate-600" />
-            </button>
-
-            {/* Messages */}
-            <button className="p-2 hover:bg-white/50 rounded-lg transition-all">
-              <MessageSquare className="w-5 h-5 text-slate-600" />
-            </button>
-
-            {/* Notifications */}
-            <NotificationCenter />
 
             {/* User Profile Dropdown */}
             <div className="relative">

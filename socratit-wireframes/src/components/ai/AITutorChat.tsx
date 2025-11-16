@@ -22,12 +22,14 @@ interface Message {
 interface AITutorChatProps {
   conversationId: string;
   assignmentId?: string;
+  initialMessage?: string;
   onClose: () => void;
 }
 
 export const AITutorChat: React.FC<AITutorChatProps> = ({
   conversationId,
   assignmentId,
+  initialMessage,
   onClose,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -35,6 +37,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [hasAutoSent, setHasAutoSent] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<any>(null);
 
@@ -87,6 +90,20 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
     }
   };
 
+  // Auto-send initial message if provided
+  useEffect(() => {
+    if (initialMessage && !hasAutoSent && messages.length === 0 && !isStreaming) {
+      // Wait a bit for websocket to be ready
+      const timer = setTimeout(() => {
+        setInputValue(initialMessage);
+        setHasAutoSent(true);
+        // Trigger send
+        sendMessageWithContent(initialMessage);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [initialMessage, hasAutoSent, messages.length, isStreaming]);
+
   const handleTokenStream = (data: { token: string }) => {
     setStreamingMessage((prev) => prev + data.token);
   };
@@ -110,14 +127,15 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
     setIsStreaming(false);
   };
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim() || isStreaming) return;
+  // Extracted function to send message with specific content
+  const sendMessageWithContent = (messageContent: string) => {
+    if (!messageContent.trim() || isStreaming) return;
 
     // Add user message
     const userMessage: Message = {
       id: Math.random().toString(),
       role: 'USER',
-      content: inputValue,
+      content: messageContent,
       createdAt: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
@@ -126,7 +144,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
     setIsStreaming(true);
     setIsTyping(true);
 
-    websocketService.sendMessage(conversationId, inputValue, {
+    websocketService.sendMessage(conversationId, messageContent, {
       onThinking: () => setIsTyping(true),
       onToken: (token: string) => {
         setStreamingMessage((prev) => prev + token);
@@ -151,6 +169,10 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
     });
 
     setInputValue('');
+  };
+
+  const handleSendMessage = () => {
+    sendMessageWithContent(inputValue);
   };
 
   const handleRateMessage = async (messageId: string, wasHelpful: boolean) => {
