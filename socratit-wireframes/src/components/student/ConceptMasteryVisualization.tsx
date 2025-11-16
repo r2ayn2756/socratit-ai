@@ -201,7 +201,7 @@ export const ConceptMasteryVisualization: React.FC<ConceptMasteryVisualizationPr
                           ? 'primary'
                           : concept.masteryScore >= 50
                           ? 'warning'
-                          : 'danger'
+                          : 'error'
                       }
                       size="sm"
                     >

@@ -380,37 +380,12 @@ export const Grades: React.FC<GradesProps> = () => {
               title="Grade Trends"
             />
 
-            {conceptMastery.length > 0 ? (
+            {conceptMastery.length > 0 && (
               <ConceptMastery
                 concepts={conceptMastery}
                 title="My Concept Mastery"
                 showTrends={true}
               />
-            ) : (
-              <Card variant="glassElevated" padding="none" className="overflow-hidden">
-                <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                      <Brain className="w-6 h-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg">Need Help?</h3>
-                      <p className="text-sm opacity-90">Ask our AI Assistant</p>
-                    </div>
-                  </div>
-                  <p className="text-sm opacity-90 mb-4">
-                    Get personalized help based on your grades and performance
-                  </p>
-                  <Button
-                    variant="glass"
-                    size="sm"
-                    glow={false}
-                    className="w-full bg-white text-purple-700 hover:bg-white/90"
-                  >
-                    Ask a Question
-                  </Button>
-                </div>
-              </Card>
             )}
           </div>
         </motion.div>
