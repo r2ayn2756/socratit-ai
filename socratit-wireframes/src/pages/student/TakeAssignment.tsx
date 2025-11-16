@@ -211,8 +211,6 @@ export const TakeAssignment: React.FC = () => {
   const answeredCount = Object.keys(answers).length;
   const progress = Math.round((answeredCount / totalQuestions) * 100);
 
-  const currentQuestion = assignment.questions[currentQuestionIndex];
-
   return (
     <DashboardLayout userRole="student">
       {/* Always-visible AI Chat (right sidebar) */}

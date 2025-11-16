@@ -97,6 +97,7 @@ export const emailVerificationLimiter = rateLimit({
 /**
  * Generic rate limiter factory
  * Create custom rate limiters with specified options
+ * DEVELOPMENT: Automatically disabled when RATE_LIMIT_MAX_REQUESTS >= 1000
  */
 export const createRateLimiter = (options: {
   windowMs: number;
@@ -113,5 +114,9 @@ export const createRateLimiter = (options: {
     standardHeaders: true,
     legacyHeaders: false,
     validate: { trustProxy: false },  // Disable trust proxy validation
+    // Skip rate limiting in development if general rate limit is disabled
+    skip: (req) => {
+      return env.NODE_ENV === 'development' && env.RATE_LIMIT_MAX_REQUESTS >= 1000;
+    },
   });
 };
