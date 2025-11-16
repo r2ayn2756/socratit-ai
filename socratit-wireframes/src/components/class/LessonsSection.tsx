@@ -79,7 +79,7 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
               <BookOpen className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900">Lesson Notes</h3>
+              <h3 className="text-lg font-semibold text-neutral-900">Class Materials</h3>
               <p className="text-sm text-neutral-600">
                 {lessons.length} {lessons.length === 1 ? 'lesson' : 'lessons'} recorded
               </p>
@@ -116,8 +116,8 @@ export const LessonsSection: React.FC<LessonsSectionProps> = ({
               title="No Lessons Yet"
               message={
                 userRole === 'teacher'
-                  ? 'Start recording your class sessions to automatically generate structured lesson notes.'
-                  : 'Your teacher will record lessons and share notes here.'
+                  ? 'Start recording your class sessions to automatically generate structured class materials.'
+                  : 'Your teacher will record lessons and share materials here.'
               }
               variant="subtle"
             />

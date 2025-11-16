@@ -165,7 +165,7 @@ export const TeacherClasses: React.FC = () => {
               Manage your classes and track student progress
             </p>
           </div>
-          <Button variant="primary" size="md" onClick={() => setShowWizard(true)}>
+          <Button variant="gradient" size="md" onClick={() => setShowWizard(true)}>
             <PlusCircle className="w-5 h-5 mr-2" />
             Create Class
           </Button>
@@ -176,12 +176,14 @@ export const TeacherClasses: React.FC = () => {
           {/* Left Column - Class Cards */}
           <div className="lg:col-span-2 space-y-6">
             {!classes || classes.length === 0 ? (
-              <Card>
+              <Card variant="glassElevated" padding="xl">
                 <div className="text-center py-12">
-                  <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                    <BookOpen className="w-10 h-10" />
+                  </div>
                   <h3 className="text-lg font-semibold text-slate-900 mb-2">No classes yet</h3>
                   <p className="text-slate-600 mb-4">Create your first class to get started</p>
-                  <Button variant="primary" onClick={() => setShowWizard(true)}>
+                  <Button variant="gradient" onClick={() => setShowWizard(true)}>
                     <PlusCircle className="w-5 h-5 mr-2" />
                     Create Class
                   </Button>
@@ -196,11 +198,11 @@ export const TeacherClasses: React.FC = () => {
                   <motion.div
                     key={classItem.id}
                     variants={fadeInUp}
-                    whileHover={{ scale: 1.01 }}
+                    whileHover={{ scale: 1.02, y: -4 }}
                     className="cursor-pointer"
                     onClick={() => navigate(`/teacher/classes/${classItem.id}`)}
                   >
-                    <Card padding="none" className="overflow-hidden">
+                    <Card variant="glassElevated" padding="none" className="overflow-hidden">
                       {/* Header */}
                       <div className={`p-6 bg-gradient-to-r ${colors.gradient} text-white`}>
                         <div className="flex items-start justify-between mb-4">
@@ -251,7 +253,7 @@ export const TeacherClasses: React.FC = () => {
                       </div>
 
                       {/* Quick Stats */}
-                      <div className="grid grid-cols-4 gap-4 p-6 bg-slate-50 border-b border-slate-200">
+                      <div className="grid grid-cols-4 gap-4 p-6 bg-white/50 backdrop-blur-sm border-b border-white/20">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-slate-900">{totalActiveAssignments}</div>
                           <div className="text-xs text-slate-600 mt-1">Active Assignments</div>
@@ -311,7 +313,7 @@ export const TeacherClasses: React.FC = () => {
                             </h3>
                             <div className="space-y-2">
                               {classItem.enrollmentCounts.pending > 0 && (
-                                <div className={`p-3 rounded-lg ${colors.bg} border ${colors.border}`}>
+                                <div className={`p-3 rounded-xl ${colors.bg}/70 backdrop-blur-md border ${colors.border}/50`}>
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-slate-900">
                                       {classItem.enrollmentCounts.pending} Pending Request{classItem.enrollmentCounts.pending !== 1 ? 's' : ''}
@@ -330,17 +332,17 @@ export const TeacherClasses: React.FC = () => {
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="mt-6 pt-6 border-t border-slate-200">
+                        <div className="mt-6 pt-6 border-t border-white/20">
                           <div className="flex items-center gap-3">
-                            <Button variant="primary" size="sm" onClick={(e) => { e?.stopPropagation(); navigate(`/teacher/assignments/new?classId=${classItem.id}`); }}>
+                            <Button variant="gradient" size="sm" onClick={(e) => { e?.stopPropagation(); navigate(`/teacher/assignments/new?classId=${classItem.id}`); }}>
                               <PlusCircle className="w-4 h-4 mr-2" />
                               Create Assignment
                             </Button>
-                            <Button variant="secondary" size="sm" onClick={(e) => { e?.stopPropagation(); navigate(`/teacher/classes/${classItem.id}/roster`); }}>
+                            <Button variant="glass" glow={false} size="sm" onClick={(e) => { e?.stopPropagation(); navigate(`/teacher/classes/${classItem.id}/roster`); }}>
                               <Users className="w-4 h-4 mr-2" />
                               View Roster
                             </Button>
-                            <Button variant="secondary" size="sm" onClick={(e) => { e?.stopPropagation(); navigate(`/teacher/classes/${classItem.id}/analytics`); }}>
+                            <Button variant="glass" glow={false} size="sm" onClick={(e) => { e?.stopPropagation(); navigate(`/teacher/classes/${classItem.id}/analytics`); }}>
                               <BarChart3 className="w-4 h-4 mr-2" />
                               Analytics
                             </Button>
@@ -357,15 +359,15 @@ export const TeacherClasses: React.FC = () => {
           {/* Right Column - SocratIt */}
           <div className="space-y-6">
             <motion.div variants={fadeInUp}>
-              <Card padding="none" className="overflow-hidden sticky top-6">
-                <div className="p-6 bg-white">
+              <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
+                <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-brand-purple to-purple-600 rounded-full flex items-center justify-center">
-                      <Brain className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                      <Brain className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-brand-purple">SocratIt</h3>
-                      <p className="text-sm text-slate-600">AI-powered teaching assistant</p>
+                      <h3 className="font-bold text-lg">SocratIt</h3>
+                      <p className="text-sm opacity-90">AI-powered teaching assistant</p>
                     </div>
                   </div>
 
@@ -377,12 +379,12 @@ export const TeacherClasses: React.FC = () => {
                           value={socratitMessage}
                           onChange={(e) => setSocratitMessage(e.target.value)}
                           placeholder="Hi! I can help you create assignments, generate quizzes, plan lessons, and more. What would you like to work on today?"
-                          className="w-full bg-purple-50 border border-purple-200 rounded-lg p-4 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent"
+                          className="w-full bg-white/90 backdrop-blur-md border border-white/30 rounded-xl p-4 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                         />
                         {socratitMessage && (
                           <button
                             type="submit"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-purple hover:text-purple-700"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-600 hover:text-purple-700"
                           >
                             <Brain className="w-5 h-5" />
                           </button>
@@ -391,8 +393,8 @@ export const TeacherClasses: React.FC = () => {
                     </form>
                   </div>
 
-                  <div className="space-y-2 mb-6">
-                    <h4 className="font-semibold text-sm text-slate-900 mb-3">Quick Actions</h4>
+                  <div className="space-y-2 mb-6 pt-6 border-t border-white/20">
+                    <h4 className="font-semibold text-sm mb-3 opacity-90">Quick Actions</h4>
 
                     {classes && classes.length > 0 && (
                       <div className="space-y-2">
@@ -403,11 +405,11 @@ export const TeacherClasses: React.FC = () => {
                               // TODO: Open SocratIt chat modal with assignment creation context
                               navigate(`/teacher/ai-assistant?action=create-assignment&classId=${classItem.id}`);
                             }}
-                            className="w-full text-left bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 rounded-lg p-3 transition-all group"
+                            className="w-full text-left bg-white/90 backdrop-blur-md border border-white/30 hover:border-white hover:bg-white rounded-xl p-3 transition-all group"
                           >
                             <div className="flex items-center gap-2">
-                              <FileText className="w-4 h-4 text-brand-purple" />
-                              <span className="text-sm font-medium text-slate-900 group-hover:text-brand-purple">
+                              <FileText className="w-4 h-4 text-purple-600" />
+                              <span className="text-sm font-medium text-slate-900 group-hover:text-purple-600">
                                 Create assignment for {classItem.name}
                               </span>
                             </div>
@@ -421,11 +423,11 @@ export const TeacherClasses: React.FC = () => {
                         // TODO: Open SocratIt chat modal
                         navigate('/teacher/ai-assistant');
                       }}
-                      className="w-full text-left bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 rounded-lg p-3 transition-all group"
+                      className="w-full text-left bg-white/90 backdrop-blur-md border border-white/30 hover:border-white hover:bg-white rounded-xl p-3 transition-all group"
                     >
                       <div className="flex items-center gap-2">
-                        <Brain className="w-4 h-4 text-brand-purple" />
-                        <span className="text-sm font-medium text-slate-900 group-hover:text-brand-purple">
+                        <Brain className="w-4 h-4 text-purple-600" />
+                        <span className="text-sm font-medium text-slate-900 group-hover:text-purple-600">
                           Open SocratIt Chat
                         </span>
                       </div>
@@ -433,8 +435,8 @@ export const TeacherClasses: React.FC = () => {
                   </div>
 
                   {classes && classes.some(c => c.enrollmentCounts.pending > 0) && (
-                    <div className="pt-6 border-t border-slate-200">
-                      <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
+                    <div className="pt-6 border-t border-white/20">
+                      <div className="bg-orange-50/70 backdrop-blur-md border border-orange-300/50 rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <AlertCircle className="w-4 h-4 text-orange-600" />
                           <p className="text-sm font-semibold text-orange-900">Needs Attention</p>
