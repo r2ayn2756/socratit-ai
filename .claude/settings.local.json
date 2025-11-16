@@ -64,7 +64,8 @@
       "Bash(node:*)",
       "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT COUNT(*) FROM \"\"AIMessage\"\";\")",
       "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, \"\"conversationId\"\", role, LEFT(content, 50) as content_preview FROM \"\"AIMessage\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 10;\")",
-      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT COUNT(*) FROM \"\"AIMessage\"\";\")"
+      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT COUNT(*) FROM \"\"AIMessage\"\";\")",
+      "Bash(./node_modules/.bin/tsc:*)"
     ],
     "deny": [],
     "ask": []

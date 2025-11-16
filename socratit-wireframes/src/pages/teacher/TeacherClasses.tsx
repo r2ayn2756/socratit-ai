@@ -49,6 +49,7 @@ export const TeacherClasses: React.FC = () => {
   const [showWizard, setShowWizard] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [classToDelete, setClassToDelete] = useState<ClassWithStats | null>(null);
+  const [socratitMessage, setSocratitMessage] = useState('');
 
   // Fetch classes from backend
   const { data: classes, isLoading, error } = useQuery({
@@ -86,6 +87,13 @@ export const TeacherClasses: React.FC = () => {
   const handleDeleteConfirm = () => {
     if (classToDelete) {
       deleteClassMutation.mutate(classToDelete.id);
+    }
+  };
+
+  const handleSocratitSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (socratitMessage.trim()) {
+      navigate(`/teacher/ai-tutor?message=${encodeURIComponent(socratitMessage)}`);
     }
   };
 
@@ -362,11 +370,25 @@ export const TeacherClasses: React.FC = () => {
                   </div>
 
                   <div className="mb-6">
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                      <p className="text-sm text-slate-700 leading-relaxed">
-                        Hi! I can help you create assignments, generate quizzes, plan lessons, and more. What would you like to work on today?
-                      </p>
-                    </div>
+                    <form onSubmit={handleSocratitSubmit}>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={socratitMessage}
+                          onChange={(e) => setSocratitMessage(e.target.value)}
+                          placeholder="Hi! I can help you create assignments, generate quizzes, plan lessons, and more. What would you like to work on today?"
+                          className="w-full bg-purple-50 border border-purple-200 rounded-lg p-4 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-transparent"
+                        />
+                        {socratitMessage && (
+                          <button
+                            type="submit"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-purple hover:text-purple-700"
+                          >
+                            <Brain className="w-5 h-5" />
+                          </button>
+                        )}
+                      </div>
+                    </form>
                   </div>
 
                   <div className="space-y-2 mb-6">
