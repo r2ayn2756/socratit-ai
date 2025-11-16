@@ -350,11 +350,11 @@ export const CreateAssignment: React.FC = () => {
                 </label>
                 <div className="grid grid-cols-5 gap-2">
                   {[
-                    { value: 'PRACTICE', label: 'Practice', color: 'blue' },
-                    { value: 'QUIZ', label: 'Quiz', color: 'purple' },
-                    { value: 'TEST', label: 'Test', color: 'red' },
-                    { value: 'HOMEWORK', label: 'Homework', color: 'green' },
-                    { value: 'CHALLENGE', label: 'Challenge', color: 'orange' },
+                    { value: 'PRACTICE', label: 'Practice', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
+                    { value: 'QUIZ', label: 'Quiz', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
+                    { value: 'TEST', label: 'Test', activeClass: 'border-red-500 bg-red-50 text-red-700' },
+                    { value: 'HOMEWORK', label: 'Homework', activeClass: 'border-green-500 bg-green-50 text-green-700' },
+                    { value: 'CHALLENGE', label: 'Challenge', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
                   ].map((type) => (
                     <motion.button
                       key={type.value}
@@ -364,7 +364,7 @@ export const CreateAssignment: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       className={`px-4 py-2.5 rounded-lg border-2 transition-all duration-200 font-medium text-sm ${
                         formData.type === type.value
-                          ? `border-${type.color}-500 bg-${type.color}-50 text-${type.color}-700`
+                          ? type.activeClass
                           : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
