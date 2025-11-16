@@ -256,7 +256,7 @@ export const PersistentAIChat: React.FC<PersistentAIChatProps> = ({
               <MessageSquare className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold">AI Tutor</h3>
+              <h3 className="font-semibold">Socrat It</h3>
               <p className="text-xs text-white text-opacity-80">Assignment Help</p>
             </div>
           </div>

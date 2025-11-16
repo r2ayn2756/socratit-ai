@@ -117,15 +117,17 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
       // Step 3: If AI generation was requested and we have a schedule, generate it
       let aiGenerationFailed = false;
-      if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialId) {
+      if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialIds.length > 0) {
         console.log('Starting AI schedule generation for schedule:', newClass.scheduleId);
         setLoadingMessage('Analyzing curriculum and generating units with AI... This may take up to 2 minutes.');
 
         try {
+          // Use the first curriculum material for AI generation
+          // In the future, AI could potentially analyze multiple files
           const aiResult = await curriculumApi.schedules.generateScheduleFromAI(
             newClass.scheduleId,
             {
-              curriculumMaterialId,
+              curriculumMaterialId: curriculumMaterialIds[0],
               preferences: {
                 targetUnits: wizardState.aiPreferences.targetUnits || 8,
                 pacingPreference: (wizardState.aiPreferences.pacingPreference || 'standard') as 'standard' | 'accelerated' | 'extended',
@@ -272,9 +274,9 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         <div className="p-6 space-y-4">
           <div className="flex items-center gap-3 mb-4">
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              wizardState.curriculumFile ? 'bg-green-100' : 'bg-gray-100'
+              wizardState.curriculumFiles.length > 0 ? 'bg-green-100' : 'bg-gray-100'
             }`}>
-              {wizardState.curriculumFile ? (
+              {wizardState.curriculumFiles.length > 0 ? (
                 <Sparkles className="w-5 h-5 text-green-600" />
               ) : (
                 <FileText className="w-5 h-5 text-gray-400" />
@@ -283,7 +285,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
             <h3 className="text-lg font-semibold text-gray-900">Curriculum</h3>
           </div>
 
-          {wizardState.curriculumFile ? (
+          {wizardState.curriculumFiles.length > 0 ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-600" />
@@ -292,12 +294,18 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
                 </p>
               </div>
 
-              <div className="pl-7">
-                <p className="text-sm text-gray-600 mb-2">
-                  Uploaded: {wizardState.curriculumFile.name}
+              <div className="pl-7 space-y-2">
+                <p className="text-sm text-gray-600 font-medium">
+                  Uploaded Files ({wizardState.curriculumFiles.length}):
                 </p>
+                {wizardState.curriculumFiles.map((file, index) => (
+                  <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                    <FileText className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span className="truncate">{file.name}</span>
+                  </div>
+                ))}
                 {wizardState.aiPreferences.targetUnits && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 mt-3">
                     {wizardState.aiPreferences.targetUnits} units •{' '}
                     {wizardState.aiPreferences.pacingPreference} pacing
                   </p>

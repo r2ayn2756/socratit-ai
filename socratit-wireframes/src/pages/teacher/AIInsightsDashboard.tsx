@@ -56,7 +56,7 @@ export const AIInsightsDashboard: React.FC<{ classId: string }> = ({ classId }) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-slate-800 mb-2">AI Tutor Insights</h2>
+          <h2 className="text-3xl font-bold text-slate-800 mb-2">Socrat It Insights</h2>
           <p className="text-slate-600">Analytics from AI Teaching Assistant usage</p>
         </div>
         <div className="flex gap-2">

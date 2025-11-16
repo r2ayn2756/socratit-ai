@@ -222,7 +222,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                 </svg>
               </div>
               <div>
-                <h2 className="text-2xl font-bold">AI Tutor</h2>
+                <h2 className="text-2xl font-bold">Socrat It</h2>
                 <p className="text-white text-opacity-80 text-sm">
                   {assignmentId ? 'Assignment Help' : 'General Help'}
                 </p>

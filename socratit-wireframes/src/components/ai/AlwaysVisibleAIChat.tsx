@@ -90,7 +90,7 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
       const welcomeMessage: Message = {
         id: 'welcome',
         role: 'ASSISTANT',
-        content: `Hey! 👋 I'm your AI tutor. I'm here to help you understand this assignment.\n\nAsk me anything! I'll guide you through the concepts without giving you direct answers.`,
+        content: `Hey! 👋 I'm Socrat It, your learning companion. I'm here to help you understand this assignment.\n\nAsk me anything! I'll guide you through the concepts without giving you direct answers.`,
         createdAt: new Date(),
       };
       setMessages([welcomeMessage]);
@@ -183,7 +183,7 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="font-bold text-lg">AI Tutor</h3>
+            <h3 className="font-bold text-lg">Socrat It</h3>
             <p className="text-xs text-white text-opacity-90">Always here to help</p>
           </div>
         </div>
@@ -191,12 +191,6 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
           <div className="bg-white bg-opacity-10 rounded-lg px-3 py-2 mt-3">
             <p className="text-xs text-white text-opacity-80">Helping with:</p>
             <p className="text-sm font-medium truncate">{assignmentTitle}</p>
-          </div>
-        )}
-        {currentQuestionText && (
-          <div className="bg-white bg-opacity-10 rounded-lg px-3 py-2 mt-2">
-            <p className="text-xs text-white text-opacity-80">Current question:</p>
-            <p className="text-sm font-medium line-clamp-2">{currentQuestionText}</p>
           </div>
         )}
       </div>
@@ -218,7 +212,7 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
                     <div className="w-6 h-6 bg-gradient-to-r from-brand-blue to-brand-purple rounded-full flex items-center justify-center">
                       <Sparkles className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="text-xs font-medium text-slate-600">AI Tutor</span>
+                    <span className="text-xs font-medium text-slate-600">Socrat It</span>
                   </div>
                 )}
 
@@ -287,7 +281,7 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
                 <div className="w-6 h-6 bg-gradient-to-r from-brand-blue to-brand-purple rounded-full flex items-center justify-center">
                   <Sparkles className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="text-xs font-medium text-slate-600">AI Tutor</span>
+                <span className="text-xs font-medium text-slate-600">Socrat It</span>
               </div>
               <div className="bg-white text-slate-800 border border-slate-200 rounded-2xl px-4 py-3 shadow-sm">
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{streamingMessage}</p>
@@ -309,7 +303,7 @@ export const AlwaysVisibleAIChat: React.FC<AlwaysVisibleAIChatProps> = ({
                 <div className="w-6 h-6 bg-gradient-to-r from-brand-blue to-brand-purple rounded-full flex items-center justify-center">
                   <Sparkles className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="text-xs font-medium text-slate-600">AI Tutor</span>
+                <span className="text-xs font-medium text-slate-600">Socrat It</span>
               </div>
               <div className="bg-white border border-slate-200 rounded-2xl px-4 py-3">
                 <div className="flex gap-1.5">

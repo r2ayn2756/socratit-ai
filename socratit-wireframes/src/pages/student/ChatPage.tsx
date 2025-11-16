@@ -16,12 +16,20 @@ import {
   Share2,
   Menu,
   X,
+  Copy,
+  Check,
+  Trash2,
+  MoreVertical,
+  Edit2,
+  Search,
+  Clock,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { aiTAService } from '../../services/aiTA.service';
 import { websocketService } from '../../services/websocket.service';
 import { Button } from '../../components/common/Button';
 import { DashboardLayout } from '../../components/layout';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Message {
   id: string;
@@ -43,6 +51,7 @@ interface Conversation {
 export const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -51,6 +60,9 @@ export const ChatPage: React.FC = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [hasAutoSent, setHasAutoSent] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [showConvOptions, setShowConvOptions] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -85,6 +97,13 @@ export const ChatPage: React.FC = () => {
   });
 
   const conversations = (data?.conversations || []) as Conversation[];
+
+  // Filter conversations based on search
+  const filteredConversations = conversations.filter((conv) =>
+    (conv.title || 'Untitled Conversation')
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
 
   // Initialize WebSocket connection when conversation is selected
   useEffect(() => {
@@ -243,6 +262,47 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  const handleCopyMessage = async (content: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
+  };
+
+  const handleDeleteConversation = async (convId: string) => {
+    if (window.confirm('Delete this conversation? This cannot be undone.')) {
+      try {
+        await aiTAService.closeConversation(convId);
+        if (selectedConversation === convId) {
+          setSelectedConversation(null);
+          setMessages([]);
+        }
+        refetch();
+      } catch (error) {
+        console.error('Error deleting conversation:', error);
+        alert('Failed to delete conversation. Please try again.');
+      }
+    }
+  };
+
+  const formatTimestamp = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -251,8 +311,30 @@ export const ChatPage: React.FC = () => {
     }
   }, [inputValue]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + K to focus search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('conversation-search')?.focus();
+      }
+      // Cmd/Ctrl + / to toggle sidebar
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        setSidebarOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Determine user role, defaulting to 'student' for backwards compatibility
+  const userRole = (user?.role === 'teacher' || user?.role === 'admin') ? user.role : 'student';
+
   return (
-    <DashboardLayout userRole="student">
+    <DashboardLayout userRole={userRole}>
       <div className="flex h-full -m-6 overflow-hidden bg-white">
         {/* Sidebar - Conversation History */}
         <AnimatePresence>
@@ -265,7 +347,7 @@ export const ChatPage: React.FC = () => {
               className="bg-slate-50 border-r border-slate-200 flex flex-col overflow-hidden"
             >
               {/* Sidebar Header */}
-              <div className="p-4 border-b border-slate-200">
+              <div className="p-4 border-b border-slate-200 space-y-3">
                 <Button
                   variant="primary"
                   size="sm"
@@ -275,46 +357,91 @@ export const ChatPage: React.FC = () => {
                   <Plus className="w-4 h-4" />
                   New Conversation
                 </Button>
+
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    id="conversation-search"
+                    type="text"
+                    placeholder="Search... (Ctrl+K)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
               </div>
 
               {/* Conversations List */}
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {isLoading ? (
                   <div className="text-slate-500 text-sm text-center py-8">Loading...</div>
-                ) : conversations.length === 0 ? (
+                ) : filteredConversations.length === 0 ? (
                   <div className="text-slate-500 text-sm text-center py-8">
-                    No conversations yet
+                    {searchQuery ? 'No conversations found' : 'No conversations yet'}
                   </div>
                 ) : (
-                  conversations.map((conv) => (
-                    <motion.button
-                      key={conv.id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setSelectedConversation(conv.id);
-                        setMessages([]);
-                        setStreamingMessage('');
-                        setHasAutoSent(false);
-                      }}
-                      className={`w-full text-left px-3 py-3 rounded-lg transition-all group ${
-                        selectedConversation === conv.id
-                          ? 'bg-purple-100 border border-purple-200 text-slate-900'
-                          : 'text-slate-700 hover:bg-slate-100 border border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-start gap-2">
-                        <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {conv.title || 'Untitled Conversation'}
-                          </p>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            {conv.messageCount} messages
-                          </p>
+                  filteredConversations.map((conv) => (
+                    <div key={conv.id} className="relative group">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          setSelectedConversation(conv.id);
+                          setMessages([]);
+                          setStreamingMessage('');
+                          setHasAutoSent(false);
+                          setShowConvOptions(null);
+                        }}
+                        className={`w-full text-left px-3 py-3 rounded-lg transition-all ${
+                          selectedConversation === conv.id
+                            ? 'bg-purple-100 border border-purple-200 text-slate-900'
+                            : 'text-slate-700 hover:bg-slate-100 border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2 pr-6">
+                          <MessageSquare className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {conv.title || 'Untitled Conversation'}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              {conv.messageCount} messages
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </motion.button>
+                      </motion.button>
+
+                      {/* Options Menu */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowConvOptions(showConvOptions === conv.id ? null : conv.id);
+                        }}
+                        className="absolute right-2 top-3 p-1 opacity-0 group-hover:opacity-100 hover:bg-slate-200 rounded transition-all"
+                      >
+                        <MoreVertical className="w-4 h-4 text-slate-600" />
+                      </button>
+
+                      {showConvOptions === conv.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="absolute right-2 top-10 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]"
+                        >
+                          <button
+                            onClick={() => {
+                              handleDeleteConversation(conv.id);
+                              setShowConvOptions(null);
+                            }}
+                            className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </motion.div>
+                      )}
+                    </div>
                   ))
                 )}
               </div>
@@ -330,6 +457,7 @@ export const ChatPage: React.FC = () => {
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                title={sidebarOpen ? 'Close sidebar (Ctrl+/)' : 'Open sidebar (Ctrl+/)'}
               >
                 {sidebarOpen ? (
                   <X className="w-5 h-5 text-slate-600" />
@@ -484,44 +612,71 @@ export const ChatPage: React.FC = () => {
                         }`}
                       >
                         {/* Message Bubble */}
-                        <div
-                          className={`rounded-2xl px-5 py-3.5 ${
-                            message.role === 'USER'
-                              ? 'bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg shadow-purple-500/20'
-                              : 'bg-slate-50 text-slate-900 border border-slate-200'
-                          }`}
-                        >
-                          <p className="leading-relaxed whitespace-pre-wrap">
-                            {message.content}
-                          </p>
+                        <div className="group relative">
+                          <div
+                            className={`rounded-2xl px-5 py-3.5 ${
+                              message.role === 'USER'
+                                ? 'bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-lg shadow-purple-500/20'
+                                : 'bg-slate-50 text-slate-900 border border-slate-200'
+                            }`}
+                          >
+                            <p className="leading-relaxed whitespace-pre-wrap">
+                              {message.content}
+                            </p>
+                          </div>
+
+                          {/* Copy button */}
+                          <button
+                            onClick={() => handleCopyMessage(message.content, message.id)}
+                            className={`absolute top-2 right-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${
+                              message.role === 'USER'
+                                ? 'bg-white/20 hover:bg-white/30 text-white'
+                                : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                            }`}
+                            title="Copy message"
+                          >
+                            {copiedMessageId === message.id ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </button>
                         </div>
 
-                        {/* Feedback for AI messages */}
-                        {message.role === 'ASSISTANT' && (
-                          <div className="flex items-center gap-3 mt-2 pl-2">
-                            <span className="text-xs text-slate-500">Was this helpful?</span>
-                            <button
-                              onClick={() => handleRateMessage(message.id, true)}
-                              className={`p-1.5 rounded-lg transition-all ${
-                                message.wasHelpful === true
-                                  ? 'text-green-600 bg-green-50'
-                                  : 'text-slate-400 hover:text-green-600 hover:bg-green-50'
-                              }`}
-                            >
-                              <ThumbsUp className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleRateMessage(message.id, false)}
-                              className={`p-1.5 rounded-lg transition-all ${
-                                message.wasHelpful === false
-                                  ? 'text-red-600 bg-red-50'
-                                  : 'text-slate-400 hover:text-red-600 hover:bg-red-50'
-                              }`}
-                            >
-                              <ThumbsDown className="w-4 h-4" />
-                            </button>
+                        {/* Timestamp and Feedback */}
+                        <div className="flex items-center gap-3 mt-2 pl-2">
+                          <div className="flex items-center gap-1 text-xs text-slate-400">
+                            <Clock className="w-3 h-3" />
+                            {formatTimestamp(message.createdAt)}
                           </div>
-                        )}
+
+                          {message.role === 'ASSISTANT' && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <span className="text-xs text-slate-500">Was this helpful?</span>
+                              <button
+                                onClick={() => handleRateMessage(message.id, true)}
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  message.wasHelpful === true
+                                    ? 'text-green-600 bg-green-50'
+                                    : 'text-slate-400 hover:text-green-600 hover:bg-green-50'
+                                }`}
+                              >
+                                <ThumbsUp className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleRateMessage(message.id, false)}
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  message.wasHelpful === false
+                                    ? 'text-red-600 bg-red-50'
+                                    : 'text-slate-400 hover:text-red-600 hover:bg-red-50'
+                                }`}
+                              >
+                                <ThumbsDown className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   ))}
