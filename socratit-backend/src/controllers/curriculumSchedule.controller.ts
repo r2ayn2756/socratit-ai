@@ -129,6 +129,12 @@ export async function getClassSchedulesHandler(
         units: {
           where: { deletedAt: null },
           orderBy: { orderIndex: 'asc' },
+          include: {
+            subUnits: {
+              where: { deletedAt: null },
+              orderBy: { orderIndex: 'asc' },
+            },
+          },
         },
       },
     });
