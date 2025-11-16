@@ -27,6 +27,7 @@ import { aiTAService } from '../../services/aiTA.service';
 import { websocketService } from '../../services/websocket.service';
 import { Button } from '../../components/common/Button';
 import { DashboardLayout } from '../../components/layout';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface Message {
   id: string;
@@ -46,6 +47,7 @@ interface Conversation {
 }
 
 export const TeacherChatPage: React.FC = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -291,7 +293,7 @@ export const TeacherChatPage: React.FC = () => {
   };
 
   const handleDeleteConversation = async (convId: string) => {
-    if (window.confirm('Delete this conversation? This cannot be undone.')) {
+    if (window.confirm(t('chat.confirmDelete'))) {
       try {
         await aiTAService.closeConversation(convId);
         if (selectedConversation === convId) {
@@ -370,7 +372,7 @@ export const TeacherChatPage: React.FC = () => {
                   className="w-full justify-start gap-2"
                 >
                   <Plus className="w-4 h-4" />
-                  New Conversation
+                  {t('chat.newConversation')}
                 </Button>
 
                 {/* Search */}
@@ -379,7 +381,7 @@ export const TeacherChatPage: React.FC = () => {
                   <input
                     id="conversation-search"
                     type="text"
-                    placeholder="Search... (Ctrl+K)"
+                    placeholder={`${t('chat.searchConversations')} (Ctrl+K)`}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -390,10 +392,10 @@ export const TeacherChatPage: React.FC = () => {
               {/* Conversations List */}
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {isLoading ? (
-                  <div className="text-slate-500 text-sm text-center py-8">Loading...</div>
+                  <div className="text-slate-500 text-sm text-center py-8">{t('common.loading')}</div>
                 ) : filteredConversations.length === 0 ? (
                   <div className="text-slate-500 text-sm text-center py-8">
-                    {searchQuery ? 'No conversations found' : 'No conversations yet'}
+                    {searchQuery ? t('chat.noConversations') : t('chat.noConversations')}
                   </div>
                 ) : (
                   filteredConversations.map((conv) => (
@@ -452,7 +454,7 @@ export const TeacherChatPage: React.FC = () => {
                             className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                           >
                             <Trash2 className="w-4 h-4" />
-                            Delete
+                            {t('chat.delete')}
                           </button>
                         </motion.div>
                       )}
@@ -506,10 +508,10 @@ export const TeacherChatPage: React.FC = () => {
                     />
                   </motion.div>
                   <h2 className="text-4xl font-bold text-slate-900 mb-4">
-                    Hi, I'm SocratIt
+                    {t('chat.welcome')}
                   </h2>
                   <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                    Your AI assistant for lesson planning, curriculum design, and teaching support.
+                    {t('sidebar.aiTutor')}
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto mb-8">
                     {[
@@ -554,7 +556,7 @@ export const TeacherChatPage: React.FC = () => {
                     className="shadow-lg shadow-purple-500/30"
                   >
                     <Plus className="w-5 h-5 mr-2" />
-                    Start Your First Conversation
+                    {t('chat.startConversation')}
                   </Button>
                 </div>
               </div>
@@ -634,7 +636,7 @@ export const TeacherChatPage: React.FC = () => {
                                 ? 'bg-white/20 hover:bg-white/30 text-white'
                                 : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
                             }`}
-                            title="Copy message"
+                            title={copiedMessageId === message.id ? t('chat.copied') : t('chat.copy')}
                           >
                             {copiedMessageId === message.id ? (
                               <Check className="w-4 h-4" />
@@ -654,7 +656,7 @@ export const TeacherChatPage: React.FC = () => {
                           {message.role === 'ASSISTANT' && (
                             <>
                               <span className="text-slate-300">•</span>
-                              <span className="text-xs text-slate-500">Was this helpful?</span>
+                              <span className="text-xs text-slate-500">{t('chat.helpful')}</span>
                               <button
                                 onClick={() => handleRateMessage(message.id, true)}
                                 className={`p-1.5 rounded-lg transition-all ${
@@ -746,7 +748,7 @@ export const TeacherChatPage: React.FC = () => {
                           handleSendMessage();
                         }
                       }}
-                      placeholder="Ask me anything..."
+                      placeholder={t('chat.typeMessage')}
                       className="w-full resize-none rounded-2xl border border-slate-300 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent max-h-32 overflow-y-auto"
                       rows={1}
                       disabled={isStreaming}

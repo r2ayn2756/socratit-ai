@@ -61,7 +61,10 @@
       "Bash(git rev-parse:*)",
       "Bash(test:*)",
       "Bash(python:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT COUNT(*) FROM \"\"AIMessage\"\";\")",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, \"\"conversationId\"\", role, LEFT(content, 50) as content_preview FROM \"\"AIMessage\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 10;\")",
+      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT COUNT(*) FROM \"\"AIMessage\"\";\")"
     ],
     "deny": [],
     "ask": []

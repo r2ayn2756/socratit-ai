@@ -7,6 +7,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, GraduationCap, FileText } from 'lucide-react';
 import { Button } from '../../../../components/curriculum/Button';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import type { ClassCreationState } from '../ClassCreationWizard';
 
 interface ClassDetailsStepProps {
@@ -50,6 +51,8 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
   onUpdate,
   onNext,
 }) => {
+  const { t } = useLanguage();
+
   const isValid =
     wizardState.className.trim().length > 0 &&
     wizardState.subject.length > 0 &&
@@ -71,14 +74,14 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
           onClick={handleNext}
           disabled={!isValid}
         >
-          Continue
+          {t('common.buttons.continue')}
         </Button>
       </div>
 
       {/* Class Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Class Name <span className="text-red-500">*</span>
+          {t('classWizard.details.className')} <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -88,7 +91,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
             type="text"
             value={wizardState.className}
             onChange={(e) => onUpdate({ className: e.target.value })}
-            placeholder="e.g., Algebra I - Period 2"
+            placeholder={t('classWizard.details.classNamePlaceholder')}
             className="
               w-full pl-12 pr-4 py-3 rounded-xl
               bg-white/70 backdrop-blur-xl border border-gray-200
@@ -103,7 +106,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
       {/* Subject */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Subject <span className="text-red-500">*</span>
+          {t('classWizard.details.subject')} <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-2 gap-3">
           {SUBJECTS.map((subject) => (
@@ -131,7 +134,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
       {/* Grade Level */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Grade Level <span className="text-red-500">*</span>
+          {t('classWizard.details.gradeLevel')} <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -149,7 +152,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
               appearance-none cursor-pointer
             "
           >
-            <option value="">Select grade level</option>
+            <option value="">{t('classWizard.details.gradeLevelPlaceholder')}</option>
             {GRADE_LEVELS.map((grade) => (
               <option key={grade} value={grade}>
                 {grade}
@@ -162,7 +165,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
       {/* Description (Optional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Description <span className="text-gray-400 text-xs">(Optional)</span>
+          {t('classWizard.details.description')} <span className="text-gray-400 text-xs">(Optional)</span>
         </label>
         <div className="relative">
           <div className="absolute left-4 top-4 text-gray-400">
@@ -171,7 +174,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
           <textarea
             value={wizardState.description}
             onChange={(e) => onUpdate({ description: e.target.value })}
-            placeholder="Add any additional details about this class..."
+            placeholder={t('classWizard.details.descriptionPlaceholder')}
             rows={4}
             className="
               w-full pl-12 pr-4 py-3 rounded-xl

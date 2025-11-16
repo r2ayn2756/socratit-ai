@@ -346,65 +346,55 @@ export const TeacherClasses: React.FC = () => {
             )}
           </div>
 
-          {/* Right Column - AI Teaching Assistant */}
+          {/* Right Column - SocratIt */}
           <div className="space-y-6">
             <motion.div variants={fadeInUp}>
               <Card padding="none" className="overflow-hidden sticky top-6">
-                <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
+                <div className="p-6 bg-white">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                      <Brain className="w-6 h-6" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-brand-purple to-purple-600 rounded-full flex items-center justify-center">
+                      <Brain className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg">AI Teaching Assistant</h3>
-                      <p className="text-sm opacity-90">Your classroom insights</p>
+                      <h3 className="font-bold text-lg text-brand-purple">SocratIt</h3>
+                      <p className="text-sm text-slate-600">Your classroom insights</p>
                     </div>
                   </div>
 
                   <div className="space-y-3 mb-6">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                      <p className="text-sm opacity-90 mb-1">Total Students</p>
-                      <p className="text-2xl font-bold">{totalStudents}</p>
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <p className="text-sm text-slate-600 mb-1">Total Students</p>
+                      <p className="text-2xl font-bold text-brand-purple">{totalStudents}</p>
                     </div>
 
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                      <p className="text-sm opacity-90 mb-1">Total Classes</p>
-                      <p className="text-2xl font-bold">{classes?.length || 0}</p>
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                      <p className="text-sm text-slate-600 mb-1">Total Classes</p>
+                      <p className="text-2xl font-bold text-brand-purple">{classes?.length || 0}</p>
                     </div>
 
                     {classes && classes.some(c => c.enrollmentCounts.pending > 0) && (
-                      <div className="bg-orange-500/20 backdrop-blur-sm rounded-lg p-3 border border-orange-300/30">
+                      <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
                         <div className="flex items-center gap-2 mb-1">
-                          <AlertCircle className="w-4 h-4" />
-                          <p className="text-sm font-semibold">Needs Attention</p>
+                          <AlertCircle className="w-4 h-4 text-orange-600" />
+                          <p className="text-sm font-semibold text-orange-900">Needs Attention</p>
                         </div>
-                        <p className="text-2xl font-bold">
+                        <p className="text-2xl font-bold text-orange-600">
                           {classes.reduce((sum, c) => sum + c.enrollmentCounts.pending, 0)} pending requests
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full bg-white text-brand-purple hover:bg-white/90 mb-4"
-                    onClick={() => setShowWizard(true)}
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    Create New Class
-                  </Button>
-
-                  <div className="pt-6 border-t border-white/20">
-                    <h4 className="font-semibold mb-3 text-sm">Quick Tips</h4>
+                  <div className="pt-6 border-t border-slate-200">
+                    <h4 className="font-semibold mb-3 text-sm text-slate-900">Quick Tips</h4>
                     <div className="space-y-2">
-                      <div className="text-sm bg-white/10 rounded-lg p-3">
-                        <p className="opacity-90">
+                      <div className="text-sm bg-purple-50 border border-purple-100 rounded-lg p-3">
+                        <p className="text-slate-700">
                           Share your class codes with students to let them enroll
                         </p>
                       </div>
-                      <div className="text-sm bg-white/10 rounded-lg p-3">
-                        <p className="opacity-90">
+                      <div className="text-sm bg-purple-50 border border-purple-100 rounded-lg p-3">
+                        <p className="text-slate-700">
                           Review pending enrollment requests regularly
                         </p>
                       </div>

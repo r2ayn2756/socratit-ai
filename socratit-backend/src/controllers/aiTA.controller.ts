@@ -58,7 +58,10 @@ export async function listConversations(req: AuthRequest, res: Response) {
 
     res.json({
       success: true,
-      data: conversations,
+      data: {
+        conversations,
+        total: conversations.length,
+      },
     });
   } catch (error: any) {
     res.status(400).json({

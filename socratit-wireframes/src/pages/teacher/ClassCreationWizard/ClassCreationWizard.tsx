@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { Modal, ModalFooter } from '../../../components/shared/Modal';
 import { Button } from '../../../components/curriculum/Button';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 // Step Components
 import { ClassDetailsStep } from './steps/ClassDetailsStep';
@@ -73,29 +74,7 @@ interface StepProps {
 // WIZARD CONFIGURATION
 // ============================================================================
 
-const STEPS: Step[] = [
-  {
-    id: 1,
-    title: 'Class Details',
-    subtitle: 'Basic information about your class',
-    component: ClassDetailsStep,
-    canSkip: false,
-  },
-  {
-    id: 2,
-    title: 'Curriculum Upload',
-    subtitle: 'Upload curriculum materials (optional)',
-    component: CurriculumUploadStep,
-    canSkip: true,
-  },
-  {
-    id: 3,
-    title: 'Review & Finalize',
-    subtitle: 'Review and create your class',
-    component: ReviewClassStep,
-    canSkip: false,
-  },
-];
+// Note: STEPS array is now created inside component to use t() function
 
 // ============================================================================
 // MAIN WIZARD COMPONENT
@@ -112,6 +91,32 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
   onClose,
   onComplete,
 }) => {
+  const { t } = useLanguage();
+
+  const STEPS: Step[] = [
+    {
+      id: 1,
+      title: t('classWizard.step1.title'),
+      subtitle: t('classWizard.step1.subtitle'),
+      component: ClassDetailsStep,
+      canSkip: false,
+    },
+    {
+      id: 2,
+      title: t('classWizard.step2.title'),
+      subtitle: t('classWizard.step2.subtitle'),
+      component: CurriculumUploadStep,
+      canSkip: true,
+    },
+    {
+      id: 3,
+      title: t('classWizard.step3.title'),
+      subtitle: t('classWizard.step3.subtitle'),
+      component: ReviewClassStep,
+      canSkip: false,
+    },
+  ];
+
   const [wizardState, setWizardState] = useState<ClassCreationState>({
     currentStep: 1,
     completedSteps: new Set(),
@@ -291,7 +296,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
             variant="ghost"
             onClick={wizardState.currentStep === 1 ? handleCancel : handleBack}
           >
-            {wizardState.currentStep === 1 ? 'Cancel' : 'Back'}
+            {wizardState.currentStep === 1 ? t('common.buttons.cancel') : t('common.buttons.back')}
           </Button>
 
           <div className="flex items-center gap-3">
@@ -300,7 +305,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
                 variant="ghost"
                 onClick={handleNext}
               >
-                Skip
+                {t('classWizard.curriculum.skipCurriculum')}
               </Button>
             )}
           </div>

@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Check, BookOpen, Calendar, FileText, Sparkles, AlertCircle, Edit2, Trash2, Plus } from 'lucide-react';
 import { Button } from '../../../../components/curriculum/Button';
 import { GlassCard } from '../../../../components/curriculum/GlassCard';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import type { ClassCreationState } from '../ClassCreationWizard';
 import { format } from 'date-fns';
 import { uploadService } from '../../../../services/upload.service';
@@ -28,6 +29,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
   onNext,
   onComplete,
 }) => {
+  const { t } = useLanguage();
   const [isCreating, setIsCreating] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -265,7 +267,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           disabled={isCreating}
           icon={!isCreating ? <Check className="w-5 h-5" /> : undefined}
         >
-          {isCreating ? (loadingMessage || 'Creating Class...') : wizardState.classId ? 'Continue to Class' : 'Create Class'}
+          {isCreating ? (loadingMessage || t('classWizard.review.creating')) : wizardState.classId ? t('common.buttons.continue') : t('classWizard.review.createClass')}
         </Button>
       </div>
 
@@ -276,28 +278,28 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
             <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
               <BookOpen className="w-4 h-4 text-blue-600" />
             </div>
-            <h3 className="text-base font-semibold text-gray-900">Class Details</h3>
+            <h3 className="text-base font-semibold text-gray-900">{t('classWizard.review.classInfo')}</h3>
           </div>
 
           <div className="space-y-2">
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <p className="text-xs text-gray-600">Class Name</p>
+                <p className="text-xs text-gray-600">{t('classWizard.details.className')}</p>
                 <p className="text-sm font-medium text-gray-900">{wizardState.className}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Subject</p>
+                <p className="text-xs text-gray-600">{t('classWizard.details.subject')}</p>
                 <p className="text-sm font-medium text-gray-900">{wizardState.subject}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Grade Level</p>
+                <p className="text-xs text-gray-600">{t('classWizard.details.gradeLevel')}</p>
                 <p className="text-sm font-medium text-gray-900">{wizardState.gradeLevel}</p>
               </div>
             </div>
 
             {wizardState.description && (
               <div>
-                <p className="text-xs text-gray-600">Description</p>
+                <p className="text-xs text-gray-600">{t('classWizard.details.description')}</p>
                 <p className="text-gray-700 text-xs">{wizardState.description}</p>
               </div>
             )}
@@ -315,8 +317,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
                   <Sparkles className="w-4 h-4 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">AI-Generated Curriculum ({wizardState.generatedUnits.length} Units)</h3>
-                  <p className="text-xs text-gray-600">Extracted from {wizardState.curriculumFiles.length} file(s)</p>
+                  <h3 className="text-base font-semibold text-gray-900">{t('classWizard.review.curriculum')} ({wizardState.generatedUnits.length} Units)</h3>
+                  <p className="text-xs text-gray-600">{t('classWizard.curriculum.filesUploaded').replace('{count}', wizardState.curriculumFiles.length.toString())}</p>
                 </div>
               </div>
             </div>
@@ -399,10 +401,10 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
                         {/* Action Buttons */}
                         <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
                           <Button variant="primary" size="sm" onClick={handleSaveUnit}>
-                            Save Changes
+                            {t('common.buttons.save')}
                           </Button>
                           <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
-                            Cancel
+                            {t('common.buttons.cancel')}
                           </Button>
                         </div>
                       </div>
@@ -492,34 +494,34 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       {/* Curriculum Status (if no AI-generated units) */}
       {(!wizardState.generatedUnits || wizardState.generatedUnits.length === 0) && wizardState.curriculumFiles.length > 0 && (
         <GlassCard variant="elevated">
-          <div className="p-6 space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-green-600" />
+          <div className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Curriculum</h3>
+              <h3 className="text-base font-semibold text-gray-900">{t('classWizard.review.curriculum')}</h3>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-600" />
-                <p className="font-medium text-gray-900">
-                  AI-Generated Curriculum Schedule
+                <Check className="w-4 h-4 text-green-600" />
+                <p className="text-sm font-medium text-gray-900">
+                  {t('classWizard.review.curriculum')}
                 </p>
               </div>
 
-              <div className="pl-7 space-y-2">
-                <p className="text-sm text-gray-600 font-medium">
-                  Uploaded Files ({wizardState.curriculumFiles.length}):
+              <div className="pl-6 space-y-1.5">
+                <p className="text-xs text-gray-600 font-medium">
+                  {t('classWizard.curriculum.filesUploaded').replace('{count}', wizardState.curriculumFiles.length.toString())}:
                 </p>
                 {wizardState.curriculumFiles.map((file, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                    <FileText className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <div key={index} className="flex items-center gap-1.5 text-xs text-gray-600">
+                    <FileText className="w-3 h-3 text-blue-500 flex-shrink-0" />
                     <span className="truncate">{file.name}</span>
                   </div>
                 ))}
                 {wizardState.aiPreferences.targetUnits && (
-                  <p className="text-sm text-gray-600 mt-3">
+                  <p className="text-xs text-gray-600 mt-2">
                     {wizardState.aiPreferences.targetUnits} units •{' '}
                     {wizardState.aiPreferences.pacingPreference} pacing
                   </p>

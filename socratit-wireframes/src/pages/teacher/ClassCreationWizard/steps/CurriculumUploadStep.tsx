@@ -10,6 +10,7 @@ import { MultiFileUpload } from '../../../../components/shared/FileUpload';
 import { Button } from '../../../../components/curriculum/Button';
 import { GlassCard } from '../../../../components/curriculum/GlassCard';
 import { CircularProgress } from '../../../../components/curriculum/ProgressBar';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import type { ClassCreationState } from '../ClassCreationWizard';
 import { uploadService } from '../../../../services/upload.service';
 import { curriculumApi } from '../../../../services/curriculumApi.service';
@@ -26,6 +27,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
   onUpdate,
   onNext,
 }) => {
+  const { t } = useLanguage();
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -146,7 +148,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
                 onClick={handleContinue}
                 icon={<Sparkles className="w-4 h-4" />}
               >
-                Continue
+                {t('common.buttons.continue')}
               </Button>
             ) : (
               <Button
@@ -154,7 +156,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
                 size="lg"
                 onClick={handleSkip}
               >
-                Skip This Step
+                {t('classWizard.curriculum.skipCurriculum')}
               </Button>
             )}
           </div>
@@ -162,13 +164,13 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
           {/* Upload Section */}
           <div>
             <MultiFileUpload
-              label="Curriculum Materials"
+              label={t('classWizard.curriculum.uploadTitle')}
               accept=".pdf,.doc,.docx"
               maxSize={100}
               maxFiles={10}
               onFilesSelect={handleFilesSelect}
               currentFiles={wizardState.curriculumFiles}
-              helperText="Upload your curriculum guides, syllabi, or course materials (PDF or Word)"
+              helperText={t('classWizard.curriculum.uploadDesc')}
               disabled={false}
             />
           </div>
