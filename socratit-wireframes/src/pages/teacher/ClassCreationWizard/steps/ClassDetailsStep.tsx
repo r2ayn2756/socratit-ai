@@ -63,6 +63,18 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Next Button - Top */}
+      <div className="flex justify-end pb-2">
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={handleNext}
+          disabled={!isValid}
+        >
+          Continue
+        </Button>
+      </div>
+
       {/* Class Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -173,17 +185,6 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
         </div>
       </div>
 
-      {/* Next Button */}
-      <div className="flex justify-end pt-4">
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={handleNext}
-          disabled={!isValid}
-        >
-          Continue
-        </Button>
-      </div>
     </div>
   );
 };

@@ -181,6 +181,20 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Create Button - Top */}
+      <div className="flex justify-end pb-2">
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={wizardState.classId ? () => onComplete?.(wizardState.classId!) : handleCreate}
+          loading={isCreating}
+          disabled={isCreating}
+          icon={!isCreating ? <Check className="w-5 h-5" /> : undefined}
+        >
+          {isCreating ? (loadingMessage || 'Creating Class...') : wizardState.classId ? 'Continue to Class' : 'Create Class'}
+        </Button>
+      </div>
+
       {/* Class Details */}
       <GlassCard variant="elevated">
         <div className="p-6 space-y-4">
@@ -310,19 +324,6 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         </motion.div>
       )}
 
-      {/* Create Button */}
-      <div className="flex justify-end pt-4">
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={wizardState.classId ? () => onComplete?.(wizardState.classId!) : handleCreate}
-          loading={isCreating}
-          disabled={isCreating}
-          icon={!isCreating ? <Check className="w-5 h-5" /> : undefined}
-        >
-          {isCreating ? (loadingMessage || 'Creating Class...') : wizardState.classId ? 'Continue to Class' : 'Create Class'}
-        </Button>
-      </div>
     </div>
   );
 };

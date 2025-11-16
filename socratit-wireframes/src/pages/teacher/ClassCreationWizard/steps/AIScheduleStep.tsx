@@ -127,6 +127,18 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
             exit={{ opacity: 0, y: -20 }}
             className="space-y-6"
           >
+            {/* Generate Button - Top */}
+            <div className="flex justify-end pb-2">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleStartGeneration}
+                icon={<Sparkles className="w-5 h-5" />}
+              >
+                Generate Schedule with AI
+              </Button>
+            </div>
+
             {/* Pacing Preference */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -222,17 +234,6 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
               </p>
             </div>
 
-            {/* Generate Button */}
-            <div className="flex justify-end pt-4">
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleStartGeneration}
-                icon={<Sparkles className="w-5 h-5" />}
-              >
-                Generate Schedule with AI
-              </Button>
-            </div>
           </motion.div>
         )}
 
@@ -328,6 +329,17 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
               </div>
             </div>
 
+            {/* Continue Button - Top */}
+            <div className="flex justify-end pb-2 -mt-6">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleContinue}
+              >
+                Continue
+              </Button>
+            </div>
+
             {/* Actions */}
             <div className="flex items-center gap-3 pt-4">
               <Button
@@ -335,14 +347,6 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
                 onClick={handleRegenerate}
               >
                 Regenerate
-              </Button>
-              <div className="flex-1" />
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleContinue}
-              >
-                Continue
               </Button>
             </div>
           </motion.div>

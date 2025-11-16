@@ -11,7 +11,6 @@ import { Button } from '../../../components/curriculum/Button';
 
 // Step Components
 import { ClassDetailsStep } from './steps/ClassDetailsStep';
-import { SchoolYearStep } from './steps/SchoolYearStep';
 import { CurriculumUploadStep } from './steps/CurriculumUploadStep';
 import { AIScheduleStep } from './steps/AIScheduleStep';
 import { ReviewClassStep } from './steps/ReviewClassStep';
@@ -83,27 +82,20 @@ const STEPS: Step[] = [
   },
   {
     id: 2,
-    title: 'School Year & Schedule',
-    subtitle: 'Set your academic calendar',
-    component: SchoolYearStep,
-    canSkip: false,
-  },
-  {
-    id: 3,
     title: 'Curriculum Upload',
     subtitle: 'Upload curriculum materials (optional)',
     component: CurriculumUploadStep,
     canSkip: true,
   },
   {
-    id: 4,
+    id: 3,
     title: 'AI Schedule Generation',
     subtitle: 'Generate year-long schedule with AI',
     component: AIScheduleStep,
     canSkip: true,
   },
   {
-    id: 5,
+    id: 4,
     title: 'Review & Finalize',
     subtitle: 'Review and create your class',
     component: ReviewClassStep,
@@ -133,8 +125,8 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     subject: '',
     gradeLevel: '',
     description: '',
-    schoolYearStart: null,
-    schoolYearEnd: null,
+    schoolYearStart: new Date(new Date().getFullYear(), 7, 1), // Default to August 1st of current year
+    schoolYearEnd: new Date(new Date().getFullYear() + 1, 5, 30), // Default to June 30th of next year
     meetingPattern: 'daily',
     curriculumFile: null,
     skipCurriculum: false,
@@ -158,8 +150,8 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     let nextStep = wizardState.currentStep + 1;
 
     // Skip AI generation if no curriculum uploaded
-    if (wizardState.currentStep === 3 && wizardState.skipCurriculum) {
-      nextStep = 5; // Jump to review
+    if (wizardState.currentStep === 2 && wizardState.skipCurriculum) {
+      nextStep = 4; // Jump to review
     }
 
     setWizardState(prev => ({
@@ -173,8 +165,8 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     let previousStep = wizardState.currentStep - 1;
 
     // Skip back over AI generation if curriculum was skipped
-    if (wizardState.currentStep === 5 && wizardState.skipCurriculum) {
-      previousStep = 3;
+    if (wizardState.currentStep === 4 && wizardState.skipCurriculum) {
+      previousStep = 2;
     }
 
     setWizardState(prev => ({
@@ -202,8 +194,8 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
       subject: '',
       gradeLevel: '',
       description: '',
-      schoolYearStart: null,
-      schoolYearEnd: null,
+      schoolYearStart: new Date(new Date().getFullYear(), 7, 1),
+      schoolYearEnd: new Date(new Date().getFullYear() + 1, 5, 30),
       meetingPattern: 'daily',
       curriculumFile: null,
       skipCurriculum: false,
@@ -230,7 +222,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
               const isCompleted = wizardState.completedSteps.has(step.id);
               const isCurrent = wizardState.currentStep === step.id;
               const isClickable = isCompleted || isCurrent;
-              const isSkipped = step.id === 4 && wizardState.skipCurriculum;
+              const isSkipped = step.id === 3 && wizardState.skipCurriculum;
 
               return (
                 <React.Fragment key={step.id}>

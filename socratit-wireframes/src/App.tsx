@@ -28,7 +28,8 @@ import { TeacherAnalytics } from './pages/teacher/TeacherAnalytics';
 import { AIInsightsPage } from './pages/teacher/AIInsightsPage';
 
 // Student Pages
-import { StudentDashboard, Classes, Assignments, Grades, Messages, ChatPage } from './pages/student';
+import { StudentDashboard, Classes, Assignments, Grades, Messages } from './pages/student';
+import { ChatPage } from './pages/student/ChatPage';
 import { TakeAssignment } from './pages/student/TakeAssignment';
 import { StudentClassView } from './pages/student/StudentClassView';
 import { StudentCurriculumView } from './pages/student/StudentCurriculumView';
@@ -58,6 +59,7 @@ function App() {
             <Route path="/teacher/assignments/new" element={<CreateAssignment />} />
             <Route path="/teacher/assignments/:assignmentId/edit" element={<CreateAssignment />} />
             <Route path="/teacher/assignments/:assignmentId/submissions" element={<ViewSubmissions />} />
+            <Route path="/teacher/ai-tutor" element={<ChatPage />} />
             <Route path="/teacher/messages" element={<TeacherMessages />} />
 
             {/* DEPRECATED ROUTES - Analytics and AI Insights removed from sidebar */}

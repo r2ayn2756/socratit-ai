@@ -51,6 +51,29 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 
   return (
     <div className="space-y-8">
+      {/* Navigation - Top */}
+      <div className="flex justify-end pb-2">
+        {wizardState.curriculumFile ? (
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={handleContinue}
+            loading={isUploading}
+            icon={<Sparkles className="w-4 h-4" />}
+          >
+            Continue to AI Generation
+          </Button>
+        ) : (
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={handleSkip}
+          >
+            Skip This Step
+          </Button>
+        )}
+      </div>
+
       {/* Upload Section */}
       <div>
         <FileUpload
@@ -128,28 +151,6 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
         </motion.div>
       )}
 
-      {/* Navigation */}
-      <div className="flex justify-end pt-4">
-        {wizardState.curriculumFile ? (
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleContinue}
-            loading={isUploading}
-            icon={<Sparkles className="w-4 h-4" />}
-          >
-            Continue to AI Generation
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            size="lg"
-            onClick={handleSkip}
-          >
-            Skip This Step
-          </Button>
-        )}
-      </div>
     </div>
   );
 };
