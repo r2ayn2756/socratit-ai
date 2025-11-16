@@ -83,8 +83,7 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
     const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
       id: `preview-unit-${i + 1}`,
       title: `Unit ${i + 1}`,
-      description: 'Content will be generated from your curriculum',
-      estimatedWeeks: Math.ceil((wizardState.schoolYearEnd!.getTime() - wizardState.schoolYearStart!.getTime()) / (1000 * 60 * 60 * 24 * 7) / targetUnits),
+      description: 'Topics and content will be extracted from your uploaded curriculum materials',
       topics: 'TBD',
     }));
     setGeneratedUnits(mockUnits);
@@ -302,7 +301,7 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Schedule Preview</h4>
               <p className="text-sm text-gray-600 mb-4">
-                This is a preview of your schedule structure. Actual unit titles, topics, and learning objectives will be generated from your curriculum materials when you finalize the class.
+                AI will analyze your uploaded curriculum materials to generate {generatedUnits.length} units with specific topics, learning objectives, and content extracted from your files.
               </p>
               <div className="space-y-2">
                 {generatedUnits.slice(0, 5).map((unit, index) => (
@@ -311,13 +310,11 @@ export const AIScheduleStep: React.FC<AIScheduleStepProps> = ({
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="px-4 py-3 rounded-xl bg-white/70 backdrop-blur-xl border border-gray-200 flex items-center justify-between"
+                    className="px-4 py-3 rounded-xl bg-white/70 backdrop-blur-xl border border-gray-200"
                   >
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{unit.title}</p>
-                      <p className="text-sm text-gray-600">
-                        ~{unit.estimatedWeeks} weeks • {unit.description}
-                      </p>
+                      <p className="text-sm text-gray-600">{unit.description}</p>
                     </div>
                   </motion.div>
                 ))}

@@ -120,33 +120,6 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
         </div>
       </GlassCard>
 
-      {/* Skip Option */}
-      {wizardState.curriculumFiles.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center p-6 rounded-2xl bg-gray-50 border border-gray-200"
-        >
-          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-8 h-8 text-gray-400" />
-          </div>
-          <h4 className="font-semibold text-gray-900 mb-2">
-            Don't have curriculum materials ready?
-          </h4>
-          <p className="text-sm text-gray-600 mb-4">
-            You can skip this step and add your class without AI-generated curriculum.
-            You'll still be able to create assignments and track student progress.
-          </p>
-          <Button
-            variant="ghost"
-            onClick={handleSkip}
-            icon={<ArrowRight className="w-4 h-4" />}
-          >
-            Skip Curriculum Upload
-          </Button>
-        </motion.div>
-      )}
-
     </div>
   );
 };

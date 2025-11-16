@@ -63,12 +63,6 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-slate-700 hover:text-brand-blue transition-colors font-medium">
-                Features
-              </a>
-              <a href="#how-it-works" className="text-slate-700 hover:text-brand-blue transition-colors font-medium">
-                How It Works
-              </a>
               <Button
                 variant="ghost"
                 size="sm"
@@ -315,112 +309,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              How Socratit.ai Works
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-slate-600">
-              Three simple steps to get started
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                step: '1',
-                title: 'Create Assignments',
-                desc: 'Generate assignments in seconds using AI or upload your existing worksheets',
-                icon: Zap,
-              },
-              {
-                step: '2',
-                title: 'Students Learn',
-                desc: 'AI Teaching Assistant guides students through Socratic questioning—never giving answers',
-                icon: Brain,
-              },
-              {
-                step: '3',
-                title: 'Get Your Morning Briefing',
-                desc: 'Wake up to completed tasks, insights on struggling students, and actionable recommendations',
-                icon: TrendingUp,
-              },
-            ].map((item, idx) => (
-              <motion.div key={idx} variants={fadeInUp}>
-                <Card variant="ghost" padding="lg" className="h-full">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-blue to-brand-purple text-white font-bold text-xl flex items-center justify-center flex-shrink-0">
-                      {item.step}
-                    </div>
-                    <item.icon className="w-8 h-8 text-brand-blue" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{item.desc}</p>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* FEATURES GRID */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
-              What's Inside
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-slate-600">
-              Tools built to support teachers and students
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {[
-              { icon: Brain, title: 'AI Teaching Assistant', desc: 'Socratic tutoring for every student, 24/7' },
-              { icon: Zap, title: 'Auto-Generate Assignments', desc: 'Create homework, quizzes, and tests in seconds' },
-              { icon: CheckCircle, title: 'Instant Grading', desc: 'Automated grading with personalized feedback' },
-              { icon: TrendingUp, title: 'Proactive Insights', desc: 'Daily briefings with actionable recommendations' },
-              { icon: BarChart3, title: 'Real-Time Analytics', desc: 'Track mastery, struggles, and engagement' },
-              { icon: MessageSquare, title: 'Smart Communications', desc: 'AI-drafted emails to students and parents' },
-            ].map((feature, idx) => (
-              <motion.div key={idx} variants={fadeInUp}>
-                <Card variant="elevated" padding="lg" hover>
-                  <feature.icon className="w-10 h-10 text-brand-blue mb-4" />
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{feature.title}</h3>
-                  <p className="text-slate-600">{feature.desc}</p>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
       {/* TEACHER STRUGGLES SECTION */}
       <section className="py-20 bg-slate-50">
