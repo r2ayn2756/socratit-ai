@@ -695,6 +695,41 @@ export class AITAService {
       },
     });
   }
+
+  /**
+   * Delete AI message (hard delete)
+   */
+  async deleteMessage(messageId: string, userId: string): Promise<void> {
+    // Get the message with conversation details
+    const message = await prisma.aIMessage.findUnique({
+      where: { id: messageId },
+      include: {
+        conversation: true,
+      },
+    });
+
+    if (!message) {
+      throw new Error('Message not found');
+    }
+
+    // Check authorization - user must own the conversation
+    if (message.conversation.studentId !== userId) {
+      throw new Error('Unauthorized: Not your message');
+    }
+
+    // Delete the message
+    await prisma.aIMessage.delete({
+      where: { id: messageId },
+    });
+
+    // Update conversation message count
+    await prisma.aIConversation.update({
+      where: { id: message.conversationId },
+      data: {
+        messageCount: { decrement: 1 },
+      },
+    });
+  }
 }
 
 export default new AITAService();

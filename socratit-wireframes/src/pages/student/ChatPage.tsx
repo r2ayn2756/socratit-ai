@@ -340,6 +340,19 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  const handleDeleteMessage = async (messageId: string) => {
+    if (window.confirm(t('chat.confirmDeleteMessage'))) {
+      try {
+        await aiTAService.deleteMessage(messageId);
+        // Remove message from local state
+        setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
+      } catch (error) {
+        console.error('Error deleting message:', error);
+        alert('Failed to delete message. Please try again.');
+      }
+    }
+  };
+
   const handleDeleteConversation = async (convId: string) => {
     if (window.confirm(t('chat.confirmDelete'))) {
       try {
@@ -688,22 +701,35 @@ export const ChatPage: React.FC = () => {
                             </p>
                           </div>
 
-                          {/* Copy button */}
-                          <button
-                            onClick={() => handleCopyMessage(message.content, message.id)}
-                            className={`absolute top-2 right-2 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${
-                              message.role === 'USER'
-                                ? 'bg-white/20 hover:bg-white/30 text-white'
-                                : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
-                            }`}
-                            title={copiedMessageId === message.id ? t('chat.copied') : t('chat.copy')}
-                          >
-                            {copiedMessageId === message.id ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
-                          </button>
+                          {/* Action buttons */}
+                          <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                            <button
+                              onClick={() => handleCopyMessage(message.content, message.id)}
+                              className={`p-1.5 rounded-lg ${
+                                message.role === 'USER'
+                                  ? 'bg-white/20 hover:bg-white/30 text-white'
+                                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                              }`}
+                              title={copiedMessageId === message.id ? t('chat.copied') : t('chat.copy')}
+                            >
+                              {copiedMessageId === message.id ? (
+                                <Check className="w-4 h-4" />
+                              ) : (
+                                <Copy className="w-4 h-4" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteMessage(message.id)}
+                              className={`p-1.5 rounded-lg ${
+                                message.role === 'USER'
+                                  ? 'bg-white/20 hover:bg-white/30 text-white'
+                                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                              }`}
+                              title={t('chat.deleteMessage')}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
 
                         {/* Timestamp and Feedback */}

@@ -23,24 +23,27 @@ export interface Message {
   updatedAt: Date;
   sender: {
     id: string;
-    name: string;
-    email: string;
+    firstName: string;
+    lastName: string;
     role: string;
+    profilePhotoUrl?: string;
   };
   recipient?: {
     id: string;
-    name: string;
-    email: string;
+    firstName: string;
+    lastName: string;
     role: string;
+    profilePhotoUrl?: string;
   };
 }
 
 export interface Conversation {
   otherUser: {
     id: string;
-    name: string;
-    email: string;
+    firstName: string;
+    lastName: string;
     role: string;
+    profilePhotoUrl?: string;
   };
   lastMessage: Message;
   unreadCount: number;

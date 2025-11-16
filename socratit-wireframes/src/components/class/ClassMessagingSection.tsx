@@ -11,7 +11,6 @@ import { CollapsibleSection } from './CollapsibleSection';
 import { Button } from '../common/Button';
 import { EmptyState } from '../common/EmptyState';
 import messageService, { type Message } from '../../services/message.service';
-import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ClassMessagingSectionProps {
   classId: string;
@@ -22,7 +21,6 @@ export const ClassMessagingSection: React.FC<ClassMessagingSectionProps> = ({
   classId,
   className,
 }) => {
-  const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [messageInput, setMessageInput] = useState('');
   const [subjectInput, setSubjectInput] = useState('');
@@ -204,11 +202,11 @@ export const ClassMessagingSection: React.FC<ClassMessagingSectionProps> = ({
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                      {message.sender.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                      {`${message.sender.firstName[0]}${message.sender.lastName[0]}`.toUpperCase()}
                     </div>
                     <div>
                       <p className="font-medium text-neutral-900 text-sm">
-                        {message.sender.name}
+                        {message.sender.firstName} {message.sender.lastName}
                       </p>
                       <div className="flex items-center gap-1 text-xs text-neutral-600">
                         <Clock className="w-3 h-3" />

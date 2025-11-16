@@ -319,3 +319,26 @@ export async function updateTemplate(req: AuthRequest, res: Response) {
     });
   }
 }
+
+/**
+ * Delete AI message
+ * DELETE /api/v1/ai-ta/messages/:id
+ */
+export async function deleteMessage(req: AuthRequest, res: Response) {
+  try {
+    const { id } = req.params;
+    const userId = req.user!.id;
+
+    await aiTAService.deleteMessage(id, userId);
+
+    res.json({
+      success: true,
+      message: 'Message deleted successfully',
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}

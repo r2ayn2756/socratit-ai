@@ -108,6 +108,11 @@ export const aiTAService = {
     await apiClient.post(`/ai-ta/messages/${messageId}/feedback`, data);
   },
 
+  // Delete a message
+  deleteMessage: async (messageId: string): Promise<void> => {
+    await apiClient.delete(`/ai-ta/messages/${messageId}`);
+  },
+
   // Get class insights (teacher only)
   getClassInsights: async (
     classId: string,

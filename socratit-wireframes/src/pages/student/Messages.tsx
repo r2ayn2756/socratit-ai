@@ -100,13 +100,8 @@ export const Messages: React.FC = () => {
 
   const selectedConversation = conversations.find(c => c.otherUser.id === selectedUserId);
 
-  const getUserAvatar = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+  const getUserAvatar = (firstName: string, lastName: string) => {
+    return `${firstName[0]}${lastName[0]}`.toUpperCase();
   };
 
   const formatTimestamp = (date: Date) => {
@@ -178,7 +173,7 @@ export const Messages: React.FC = () => {
                     conversations
                       .filter(conv =>
                         searchQuery
-                          ? conv.otherUser.name.toLowerCase().includes(searchQuery.toLowerCase())
+                          ? `${conv.otherUser.firstName} ${conv.otherUser.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
                           : true
                       )
                       .map((conversation) => (
@@ -192,13 +187,13 @@ export const Messages: React.FC = () => {
                           <div className="flex items-start gap-3">
                             {/* Avatar */}
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                              {getUserAvatar(conversation.otherUser.name)}
+                              {getUserAvatar(conversation.otherUser.firstName, conversation.otherUser.lastName)}
                             </div>
 
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
                                 <h3 className="font-semibold text-slate-900 truncate">
-                                  {conversation.otherUser.name}
+                                  {conversation.otherUser.firstName} {conversation.otherUser.lastName}
                                 </h3>
                                 <span className="text-xs text-slate-500 ml-2">
                                   {formatTimestamp(conversation.lastMessage.createdAt)}
@@ -233,11 +228,11 @@ export const Messages: React.FC = () => {
                         <ChevronLeft className="w-5 h-5" />
                       </button>
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold">
-                        {getUserAvatar(selectedConversation.otherUser.name)}
+                        {getUserAvatar(selectedConversation.otherUser.firstName, selectedConversation.otherUser.lastName)}
                       </div>
                       <div>
                         <h2 className="font-semibold text-slate-900">
-                          {selectedConversation.otherUser.name}
+                          {selectedConversation.otherUser.firstName} {selectedConversation.otherUser.lastName}
                         </h2>
                         <p className="text-sm text-slate-500">
                           {selectedConversation.otherUser.role}
