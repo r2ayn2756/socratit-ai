@@ -23,6 +23,7 @@ import {
   deleteCurriculum,
   downloadCurriculum,
   generateAssignmentFromCurriculum,
+  analyzeCurriculumPreview,
 } from '../controllers/curriculum.controller';
 
 const router = express.Router();
@@ -109,5 +110,14 @@ router.get('/:id/download', downloadCurriculum);
  * Rate limited: 10 generations per 15 minutes
  */
 router.post('/:id/generate-assignment', validate(generateAssignmentSchema), generateAssignmentFromCurriculum);
+
+/**
+ * POST /api/v1/curriculum/analyze-preview
+ * Analyze curriculum material with AI and return unit structure (preview mode)
+ * Used during class creation wizard - does not create database records
+ * Protected: Teacher only
+ * Rate limited: 5 analyses per hour (AI intensive operation)
+ */
+router.post('/analyze-preview', analyzeCurriculumPreview);
 
 export default router;

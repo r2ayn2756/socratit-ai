@@ -629,3 +629,132 @@ export async function generateAssignmentFromCurriculum(req: Request, res: Respon
     });
   }
 }
+
+// ============================================================================
+// ANALYZE CURRICULUM FOR PREVIEW (Class Creation Wizard)
+// ============================================================================
+
+/**
+ * POST /api/v1/curriculum/analyze-preview
+ * Analyzes curriculum material with AI and returns unit structure without creating database records
+ * Used during class creation wizard to preview curriculum before class creation
+ */
+export async function analyzeCurriculumPreview(req: Request, res: Response): Promise<void> {
+  try {
+    const { id: userId, schoolId } = (req as any).user;
+    const {
+      curriculumMaterialId,
+      schoolYearStart,
+      schoolYearEnd,
+      meetingPattern,
+      preferences,
+    } = req.body;
+
+    console.log('[Analyze Preview] Request received:', {
+      curriculumMaterialId,
+      schoolYearStart,
+      schoolYearEnd,
+      meetingPattern,
+      preferences,
+    });
+
+    // Get curriculum material
+    const curriculum = await getCurriculumMaterial(curriculumMaterialId, userId, schoolId);
+
+    if (!curriculum.extractedText) {
+      res.status(400).json({
+        success: false,
+        message: 'Curriculum has not been processed yet. Please wait for processing to complete.',
+      });
+      return;
+    }
+
+    console.log('[Analyze Preview] Curriculum found, extracted text length:', curriculum.extractedText.length);
+
+    // Calculate weeks between dates
+    const startDate = new Date(schoolYearStart);
+    const endDate = new Date(schoolYearEnd);
+    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    const totalWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+
+    console.log('[Analyze Preview] School year:', { startDate, endDate, totalWeeks });
+
+    // Call AI service to analyze curriculum
+    const { analyzeCurriculumForScheduling } = await import('../services/ai.service');
+
+    const aiResult = await analyzeCurriculumForScheduling(curriculum.extractedText, {
+      gradeLevel: 'High School', // Default, can be enhanced later
+      subject: curriculum.title,
+      schoolYearStart: startDate,
+      schoolYearEnd: endDate,
+      totalWeeks,
+      targetUnits: preferences?.targetUnits || 8,
+      pacingPreference: preferences?.pacingPreference || 'standard',
+    });
+
+    console.log('[Analyze Preview] AI analysis complete, units generated:', aiResult.units.length);
+
+    // Transform AI result to match frontend expectations
+    const transformedUnits = aiResult.units.map((unit, index) => ({
+      id: `preview-unit-${index + 1}`,
+      title: unit.title,
+      description: unit.description,
+      topics: unit.subUnits.map((su) => su.name), // Extract topic names from sub-units
+      learningObjectives: unit.subUnits.flatMap((su) => su.learningObjectives),
+      estimatedWeeks: unit.estimatedWeeks,
+      difficultyLevel: unit.difficultyLevel,
+      subUnits: unit.subUnits,
+    }));
+
+    // Log usage
+    await prisma.curriculumMaterial.update({
+      where: { id: curriculumMaterialId },
+      data: {
+        usageCount: { increment: 1 },
+        lastUsedAt: new Date(),
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Curriculum analyzed successfully',
+      data: {
+        units: transformedUnits,
+        metadata: aiResult.metadata,
+      },
+    });
+  } catch (error: any) {
+    console.error('[Analyze Preview] Error:', error);
+
+    if (error.message.includes('not found')) {
+      res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+      return;
+    }
+
+    if (error.message.includes('not yet processed')) {
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+      return;
+    }
+
+    if (error.message.includes('AI') || error.message.includes('Gemini')) {
+      res.status(503).json({
+        success: false,
+        message: 'AI analysis failed. Please try again.',
+        errors: [error.message],
+      });
+      return;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to analyze curriculum',
+      errors: [error.message],
+    });
+  }
+}
