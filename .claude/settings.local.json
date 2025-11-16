@@ -55,7 +55,8 @@
       "Bash(touch:*)",
       "Bash(git ls-tree:*)",
       "Bash(git rm:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []

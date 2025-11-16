@@ -28,7 +28,7 @@ import { TeacherAnalytics } from './pages/teacher/TeacherAnalytics';
 import { AIInsightsPage } from './pages/teacher/AIInsightsPage';
 
 // Student Pages
-import { StudentDashboard, Classes, Assignments, Grades, Messages } from './pages/student';
+import { StudentDashboard, Classes, Assignments, Grades, Messages, ChatPage } from './pages/student';
 import { TakeAssignment } from './pages/student/TakeAssignment';
 import { StudentClassView } from './pages/student/StudentClassView';
 import { StudentCurriculumView } from './pages/student/StudentCurriculumView';
@@ -77,6 +77,7 @@ function App() {
             <Route path="/student/assignments/:assignmentId" element={<TakeAssignment />} />
             <Route path="/student/grades" element={<Grades />} />
             <Route path="/student/messages" element={<Messages />} />
+            <Route path="/student/ai-tutor" element={<ChatPage />} />
 
             {/* ADMIN ROUTES */}
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
