@@ -51,7 +51,7 @@ interface Conversation {
 export const ChatPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -133,7 +133,9 @@ export const ChatPage: React.FC = () => {
 
     const loadConversation = async () => {
       try {
+        console.log('📥 Loading conversation:', selectedConversation);
         const data = await aiTAService.getConversation(selectedConversation);
+        console.log('📥 Loaded messages:', data.messages.length);
         setMessages(
           data.messages.map((msg: any) => ({
             ...msg,
@@ -141,7 +143,7 @@ export const ChatPage: React.FC = () => {
           }))
         );
       } catch (error) {
-        console.error('Error loading conversation:', error);
+        console.error('❌ Error loading conversation:', error);
       }
     };
 
@@ -194,7 +196,7 @@ export const ChatPage: React.FC = () => {
       onToken: (token: string) => {
         setStreamingMessage((prev) => prev + token);
       },
-      onComplete: (fullResponse: string) => {
+      onComplete: async (fullResponse: string) => {
         const newMessage: Message = {
           id: Math.random().toString(),
           role: 'ASSISTANT',
@@ -205,7 +207,23 @@ export const ChatPage: React.FC = () => {
         setStreamingMessage('');
         setIsStreaming(false);
         setIsTyping(false);
-        refetch(); // Update conversation list
+
+        // Refetch conversation list to update message count
+        refetch();
+
+        // Reload conversation to ensure we have all messages from backend
+        try {
+          const data = await aiTAService.getConversation(selectedConversation!);
+          console.log('🔄 Reloaded conversation after message, total messages:', data.messages.length);
+          setMessages(
+            data.messages.map((msg: any) => ({
+              ...msg,
+              createdAt: new Date(msg.createdAt),
+            }))
+          );
+        } catch (error) {
+          console.error('❌ Error reloading conversation:', error);
+        }
       },
       onError: (error: string) => {
         alert(`Error: ${error}`);
@@ -574,10 +592,10 @@ export const ChatPage: React.FC = () => {
                   </p>
                   <div className="grid grid-cols-1 gap-2">
                     {[
-                      'Help me understand quadratic equations',
-                      'What are the causes of World War I?',
-                      'Explain photosynthesis step by step',
-                      'How do I solve this calculus problem?',
+                      'Help me with question explanations',
+                      'I need help writing an essay',
+                      'Let\'s play an educational game',
+                      'Help me create something cool',
                     ].map((prompt, index) => (
                       <button
                         key={index}

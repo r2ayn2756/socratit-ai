@@ -21,6 +21,7 @@
 4. Understand the existing pattern COMPLETELY
 5. Make minimal, surgical changes
 6. Test immediately after the change
+7. After finishing all changes before you complete add everything, commit it, and push it to main
 
 **TYPE SAFETY IS MANDATORY:**
 - Every component must have proper TypeScript types
