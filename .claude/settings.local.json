@@ -72,7 +72,8 @@
       "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"\\dt messages\")",
       "Bash(git stash:*)",
       "Bash(DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\" npx prisma migrate dev:*)",
-      "Bash(export DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\")"
+      "Bash(export DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\")",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

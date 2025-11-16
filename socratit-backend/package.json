@@ -11,7 +11,7 @@
     "test:coverage": "jest --coverage",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:prod": "prisma migrate deploy",
+    "prisma:migrate:prod": "bash scripts/resolve-migration.sh && prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "db:setup": "npm run prisma:migrate && npm run prisma:seed",
