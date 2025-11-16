@@ -22,6 +22,12 @@ export const requireAuth = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Skip authentication for OPTIONS requests (CORS preflight)
+    if (req.method === 'OPTIONS') {
+      next();
+      return;
+    }
+
     const authHeader = req.headers.authorization;
     const token = extractTokenFromHeader(authHeader);
 
@@ -73,6 +79,12 @@ export const requireRole = (...roles: UserRole[]) => {
     res: Response,
     next: NextFunction
   ): void => {
+    // Skip role check for OPTIONS requests (CORS preflight)
+    if (req.method === 'OPTIONS') {
+      next();
+      return;
+    }
+
     if (!req.user) {
       const response: ApiResponse = {
         success: false,
