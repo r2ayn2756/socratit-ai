@@ -115,7 +115,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           <Button
-            variant="primary"
+            variant="gradient"
             size="lg"
             icon={<ArrowRight className="w-5 h-5" />}
             iconPosition="right"
@@ -171,7 +171,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top Performing Classes */}
           <motion.div variants={fadeInUp}>
-            <Card>
+            <Card variant="glassElevated" padding="lg">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 mb-1">
@@ -191,7 +191,7 @@ export const AdminDashboard: React.FC = () => {
                   {topPerformingClasses.map((cls: any, index: number) => (
                     <div
                       key={cls.id}
-                      className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200"
+                      className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-50/70 to-emerald-50/70 backdrop-blur-md border border-green-200/50"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
@@ -216,7 +216,7 @@ export const AdminDashboard: React.FC = () => {
 
           {/* Classes Needing Attention */}
           <motion.div variants={fadeInUp}>
-            <Card>
+            <Card variant="glassElevated" padding="lg">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 mb-1">
@@ -229,8 +229,8 @@ export const AdminDashboard: React.FC = () => {
 
               {lowPerformingClasses.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                    <TrendingUp className="w-8 h-8 text-green-600" />
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/30">
+                    <TrendingUp className="w-10 h-10 text-white" />
                   </div>
                   <p className="font-semibold text-slate-900 mb-2">All classes performing well!</p>
                   <p className="text-sm text-slate-600">{t('admin.dashboard.noClassesBelowThreshold')}</p>
@@ -240,7 +240,7 @@ export const AdminDashboard: React.FC = () => {
                   {lowPerformingClasses.map((cls: any) => (
                     <div
                       key={cls.id}
-                      className="p-4 rounded-lg bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200"
+                      className="p-4 rounded-xl bg-gradient-to-r from-orange-50/70 to-red-50/70 backdrop-blur-md border border-orange-200/50"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="font-semibold text-slate-900">{cls.name}</div>
@@ -267,11 +267,11 @@ export const AdminDashboard: React.FC = () => {
 
         {/* School Statistics */}
         <motion.div variants={fadeInUp}>
-          <Card>
+          <Card variant="glassElevated" padding="lg">
             <h2 className="text-xl font-bold text-slate-900 mb-6">School Statistics</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50/70 to-blue-100/70 backdrop-blur-md border border-blue-200/50">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-lg bg-blue-500 text-white flex items-center justify-center">
                     <Users className="w-6 h-6" />
@@ -285,7 +285,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-purple-50/70 to-purple-100/70 backdrop-blur-md border border-purple-200/50">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-lg bg-purple-500 text-white flex items-center justify-center">
                     <FileText className="w-6 h-6" />
@@ -299,7 +299,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-green-50/70 to-green-100/70 backdrop-blur-md border border-green-200/50">
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-lg bg-green-500 text-white flex items-center justify-center">
                     <BarChart3 className="w-6 h-6" />
@@ -318,12 +318,13 @@ export const AdminDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <motion.div variants={fadeInUp}>
-          <Card>
+          <Card variant="glassElevated" padding="lg">
             <h2 className="text-xl font-bold text-slate-900 mb-4">{t('admin.dashboard.quickActions')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Button
-                variant="ghost"
-                className="p-6 h-auto justify-start"
+                variant="glass"
+                glow={false}
+                className="p-6 h-auto justify-start hover:scale-105"
                 onClick={() => alert('User management coming soon')}
               >
                 <div className="text-left">
@@ -335,8 +336,9 @@ export const AdminDashboard: React.FC = () => {
               </Button>
 
               <Button
-                variant="ghost"
-                className="p-6 h-auto justify-start"
+                variant="glass"
+                glow={false}
+                className="p-6 h-auto justify-start hover:scale-105"
                 onClick={() => alert('Reports coming soon')}
               >
                 <div className="text-left">
