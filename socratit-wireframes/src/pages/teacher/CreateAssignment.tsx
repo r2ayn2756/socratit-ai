@@ -4,12 +4,12 @@
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '../../components/layout';
-import { Card, Button } from '../../components/common';
-import { ArrowLeft, Save, Sparkles, Plus, Trash2, BookOpen } from 'lucide-react';
+import { Card, Button, Input } from '../../components/common';
+import { ArrowLeft, Save, Sparkles, Plus, Trash2, BookOpen, Calendar, Award, Settings } from 'lucide-react';
 import { assignmentService, CreateAssignmentDTO, Question } from '../../services/assignment.service';
 import { classService } from '../../services/class.service';
 import { AIAssignmentModal } from '../../components/teacher/AIAssignmentModal';
@@ -17,10 +17,14 @@ import { AIAssignmentModal } from '../../components/teacher/AIAssignmentModal';
 export const CreateAssignment: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { assignmentId } = useParams<{ assignmentId: string }>();
   const isEditMode = !!assignmentId;
   const [showAIModal, setShowAIModal] = useState(false);
+
+  // Get classId from URL params if navigating from a class page
+  const classIdFromUrl = searchParams.get('classId');
 
   // Extract curriculum subunit context from navigation state
   const subUnitContext = location.state as {
@@ -34,7 +38,7 @@ export const CreateAssignment: React.FC = () => {
 
   // Form state
   const [formData, setFormData] = useState<CreateAssignmentDTO>({
-    classId: '',
+    classId: classIdFromUrl || '',
     title: '',
     description: '',
     instructions: '',
@@ -296,20 +300,20 @@ export const CreateAssignment: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
           <Card variant="glassElevated">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Basic Information</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">Basic Information</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Class Selection */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Class *
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Class <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
                   value={formData.classId}
                   onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
                   disabled={isEditMode}
-                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:cursor-not-allowed"
                 >
                   <option value="">Select a class</option>
                   {classesData?.map((cls) => (
@@ -318,50 +322,61 @@ export const CreateAssignment: React.FC = () => {
                     </option>
                   ))}
                 </select>
-                {isEditMode && (
-                  <p className="text-xs text-slate-500 mt-1">
+                {isEditMode ? (
+                  <p className="mt-1.5 text-sm text-slate-500">
                     Class cannot be changed after assignment creation
+                  </p>
+                ) : classIdFromUrl && (
+                  <p className="mt-1.5 text-sm text-blue-600">
+                    Class pre-selected from navigation
                   </p>
                 )}
               </div>
 
               {/* Title */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="e.g., Triangle Properties Quiz"
-                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+              <Input
+                label="Title"
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="e.g., Triangle Properties Quiz"
+              />
 
-              {/* Type */}
+              {/* Type - Interactive Button Group */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Type *
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Assignment Type <span className="text-red-500">*</span>
                 </label>
-                <select
-                  required
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="PRACTICE">Practice</option>
-                  <option value="QUIZ">Quiz</option>
-                  <option value="TEST">Test</option>
-                  <option value="HOMEWORK">Homework</option>
-                  <option value="CHALLENGE">Challenge</option>
-                </select>
+                <div className="grid grid-cols-5 gap-2">
+                  {[
+                    { value: 'PRACTICE', label: 'Practice', color: 'blue' },
+                    { value: 'QUIZ', label: 'Quiz', color: 'purple' },
+                    { value: 'TEST', label: 'Test', color: 'red' },
+                    { value: 'HOMEWORK', label: 'Homework', color: 'green' },
+                    { value: 'CHALLENGE', label: 'Challenge', color: 'orange' },
+                  ].map((type) => (
+                    <motion.button
+                      key={type.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: type.value as any })}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`px-4 py-2.5 rounded-lg border-2 transition-all duration-200 font-medium text-sm ${
+                        formData.type === type.value
+                          ? `border-${type.color}-500 bg-${type.color}-50 text-${type.color}-700`
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                      }`}
+                    >
+                      {type.label}
+                    </motion.button>
+                  ))}
+                </div>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Description
                 </label>
                 <textarea
@@ -369,13 +384,13 @@ export const CreateAssignment: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Brief description of this assignment..."
                   rows={3}
-                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20"
                 />
               </div>
 
               {/* Instructions */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
                   Instructions
                 </label>
                 <textarea
@@ -383,15 +398,16 @@ export const CreateAssignment: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
                   placeholder="Detailed instructions for students..."
                   rows={4}
-                  className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20"
                 />
               </div>
 
               {/* Points and Due Date */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Total Points *
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <Award className="w-4 h-4 inline mr-1.5 text-slate-500" />
+                    Total Points <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -399,58 +415,65 @@ export const CreateAssignment: React.FC = () => {
                     min="1"
                     value={formData.totalPoints}
                     onChange={(e) => setFormData({ ...formData, totalPoints: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <Calendar className="w-4 h-4 inline mr-1.5 text-slate-500" />
                     Due Date
                   </label>
                   <input
                     type="datetime-local"
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20"
                   />
                 </div>
               </div>
 
               {/* Settings */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.allowLateSubmission}
-                    onChange={(e) => setFormData({ ...formData, allowLateSubmission: e.target.checked })}
-                    className="rounded border-slate-300"
-                  />
-                  <span className="text-sm text-slate-700">Allow late submissions</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.showCorrectAnswers}
-                    onChange={(e) => setFormData({ ...formData, showCorrectAnswers: e.target.checked })}
-                    className="rounded border-slate-300"
-                  />
-                  <span className="text-sm text-slate-700">Show correct answers after submission</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.shuffleQuestions}
-                    onChange={(e) => setFormData({ ...formData, shuffleQuestions: e.target.checked })}
-                    className="rounded border-slate-300"
-                  />
-                  <span className="text-sm text-slate-700">Shuffle question order</span>
-                </label>
+              <div className="pt-4 border-t border-slate-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <Settings className="w-4 h-4 text-slate-700" />
+                  <label className="text-sm font-medium text-slate-700">Assignment Settings</label>
+                </div>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.allowLateSubmission}
+                      onChange={(e) => setFormData({ ...formData, allowLateSubmission: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700 font-medium">Allow late submissions</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.showCorrectAnswers}
+                      onChange={(e) => setFormData({ ...formData, showCorrectAnswers: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700 font-medium">Show correct answers after submission</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.shuffleQuestions}
+                      onChange={(e) => setFormData({ ...formData, shuffleQuestions: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-slate-700 font-medium">Shuffle question order</span>
+                  </label>
+                </div>
               </div>
             </div>
           </Card>
 
           {/* Questions */}
           <Card variant="glassElevated">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Questions</h2>
                 {isEditMode && existingAssignment?.status !== 'DRAFT' && (
@@ -477,11 +500,23 @@ export const CreateAssignment: React.FC = () => {
                 {formData.questions.map((question, index) => {
                   const isReadOnly = isEditMode && existingAssignment?.status !== 'DRAFT';
                   return (
-                  <div key={index} className="p-4 bg-white/50 backdrop-blur-md border border-white/30 rounded-xl">
-                    <div className="flex items-start justify-between mb-3">
-                      <span className="text-sm font-medium text-slate-700">
-                        Question {index + 1}
-                      </span>
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-5 bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-xl shadow-sm"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                          <span className="text-sm font-bold text-blue-600">
+                            {index + 1}
+                          </span>
+                        </div>
+                        <span className="text-sm font-semibold text-slate-900">
+                          Question {index + 1}
+                        </span>
+                      </div>
                       {!isReadOnly && (
                         <Button
                           type="button"
@@ -494,85 +529,107 @@ export const CreateAssignment: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {/* Question Type */}
-                      <select
-                        value={question.type}
-                        onChange={(e) => updateQuestion(index, 'type', e.target.value)}
-                        disabled={isReadOnly}
-                        className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
-                      >
-                        <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                        <option value="FREE_RESPONSE">Free Response</option>
-                      </select>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1.5">Type</label>
+                        <select
+                          value={question.type}
+                          onChange={(e) => updateQuestion(index, 'type', e.target.value)}
+                          disabled={isReadOnly}
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        >
+                          <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+                          <option value="FREE_RESPONSE">Free Response</option>
+                        </select>
+                      </div>
 
                       {/* Question Text */}
-                      <textarea
-                        value={question.questionText}
-                        onChange={(e) => updateQuestion(index, 'questionText', e.target.value)}
-                        placeholder="Enter question text..."
-                        rows={2}
-                        disabled={isReadOnly}
-                        className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
-                      />
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1.5">Question Text</label>
+                        <textarea
+                          value={question.questionText}
+                          onChange={(e) => updateQuestion(index, 'questionText', e.target.value)}
+                          placeholder="Enter question text..."
+                          rows={2}
+                          disabled={isReadOnly}
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        />
+                      </div>
 
                       {/* Points */}
-                      <input
-                        type="number"
-                        min="1"
-                        value={question.points}
-                        onChange={(e) => updateQuestion(index, 'points', parseInt(e.target.value))}
-                        placeholder="Points"
-                        disabled={isReadOnly}
-                        className="w-24 px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
-                      />
+                      <div>
+                        <label className="block text-xs font-medium text-slate-600 mb-1.5">Points</label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={question.points}
+                          onChange={(e) => updateQuestion(index, 'points', parseInt(e.target.value))}
+                          placeholder="Points"
+                          disabled={isReadOnly}
+                          className="w-32 px-3 py-2 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                        />
+                      </div>
 
                       {/* Multiple Choice Options */}
                       {question.type === 'MULTIPLE_CHOICE' && (
-                        <div className="space-y-2 mt-3">
-                          {['A', 'B', 'C', 'D'].map((option) => (
-                            <div key={option} className="flex items-center gap-2">
-                              <input
-                                type="radio"
-                                name={`correct-${index}`}
-                                checked={question.correctOption === option}
-                                onChange={() => updateQuestion(index, 'correctOption', option)}
-                                disabled={isReadOnly}
-                                className="text-blue-600"
-                              />
-                              <input
-                                type="text"
-                                value={(question as any)[`option${option}`] || ''}
-                                onChange={(e) => updateQuestion(index, `option${option}`, e.target.value)}
-                                placeholder={`Option ${option}`}
-                                disabled={isReadOnly}
-                                className="flex-1 px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
-                              />
-                            </div>
-                          ))}
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-2">Answer Options</label>
+                          <div className="space-y-2">
+                            {['A', 'B', 'C', 'D'].map((option) => (
+                              <div key={option} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors">
+                                <input
+                                  type="radio"
+                                  name={`correct-${index}`}
+                                  checked={question.correctOption === option}
+                                  onChange={() => updateQuestion(index, 'correctOption', option)}
+                                  disabled={isReadOnly}
+                                  className="w-4 h-4 text-green-600 border-slate-300 focus:ring-2 focus:ring-green-500"
+                                />
+                                <div className="flex items-center gap-2 flex-1">
+                                  <span className="text-sm font-semibold text-slate-600 w-6">{option}.</span>
+                                  <input
+                                    type="text"
+                                    value={(question as any)[`option${option}`] || ''}
+                                    onChange={(e) => updateQuestion(index, `option${option}`, e.target.value)}
+                                    placeholder={`Option ${option}`}
+                                    disabled={isReadOnly}
+                                    className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-xs text-slate-500 mt-2">Select the correct answer</p>
                         </div>
                       )}
 
                       {/* Free Response Answer */}
                       {question.type === 'FREE_RESPONSE' && (
-                        <textarea
-                          value={question.correctAnswer || ''}
-                          onChange={(e) => updateQuestion(index, 'correctAnswer', e.target.value)}
-                          placeholder="Sample correct answer (for AI grading)..."
-                          rows={3}
-                          disabled={isReadOnly}
-                          className="w-full px-3 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
-                        />
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1.5">Sample Correct Answer (for AI grading)</label>
+                          <textarea
+                            value={question.correctAnswer || ''}
+                            onChange={(e) => updateQuestion(index, 'correctAnswer', e.target.value)}
+                            placeholder="Provide a sample correct answer to help the AI grade student responses..."
+                            rows={3}
+                            disabled={isReadOnly}
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:border-blue-500 focus:ring-blue-500/20 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                          />
+                        </div>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                   );
                 })}
               </div>
             ) : (
-              <div className="text-center py-8 text-slate-500">
-                <p>No questions added yet.</p>
-                <p className="text-sm mt-1">Click "Add Question" or use "Generate with AI" to get started.</p>
+              <div className="text-center py-12 px-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
+                  <Plus className="w-8 h-8 text-slate-400" />
+                </div>
+                <p className="text-slate-600 font-medium">No questions added yet</p>
+                <p className="text-sm text-slate-500 mt-1">Click "Add Question" above or use "Generate with AI" to get started</p>
               </div>
             )}
           </Card>

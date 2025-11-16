@@ -186,16 +186,6 @@ export const LoginPage: React.FC = () => {
               {t('login.signIn')}
             </Button>
 
-            {/* Demo Account Hints */}
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <p className="text-sm text-slate-600 font-medium mb-2">{t('login.demoAccounts')}</p>
-              <div className="space-y-1 text-xs text-slate-500">
-                <p>• {t('login.demoTeacher')}</p>
-                <p>• {t('login.demoStudent')}</p>
-                <p>• {t('login.demoAdmin')}</p>
-              </div>
-            </div>
-
             {/* Sign Up Link */}
             <div className="text-center pt-4 border-t border-slate-200">
               <p className="text-slate-600">
