@@ -11,7 +11,7 @@ import { Button, Input, Card, Badge } from '../../components/common';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SignupFormData, UserRole } from '../../types';
-import { Mail, Lock, User, GraduationCap, Users, Shield, AlertCircle, CheckCircle } from 'lucide-react';
+import { Mail, Lock, User, GraduationCap, Users, AlertCircle, CheckCircle } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -82,12 +82,6 @@ export const SignupPage: React.FC = () => {
       title: t('signup.roleStudent'),
       description: t('signup.roleStudentDesc'),
     },
-    {
-      value: 'admin' as UserRole,
-      icon: Shield,
-      title: t('signup.roleAdmin'),
-      description: t('signup.roleAdminDesc'),
-    },
   ];
 
   return (
@@ -135,7 +129,7 @@ export const SignupPage: React.FC = () => {
               <label className="block text-sm font-medium text-slate-700 mb-3">
                 {t('signup.roleLabel')}
               </label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {roles.map((role) => (
                   <motion.button
                     key={role.value}
@@ -252,26 +246,6 @@ export const SignupPage: React.FC = () => {
               />
             </div>
 
-            {/* School Code - Required for ALL roles */}
-            <Input
-              label={t('signup.schoolCodeLabel')}
-              type="text"
-              placeholder="e.g., DEMO0001"
-              error={errors.schoolCode?.message}
-              {...register('schoolCode', {
-                required: 'School code is required',
-                minLength: {
-                  value: 8,
-                  message: 'School code must be 8 characters',
-                },
-                maxLength: {
-                  value: 8,
-                  message: 'School code must be 8 characters',
-                },
-              })}
-              helperText="Get this code from your school administrator"
-            />
-
             {/* Conditional Fields Based on Role */}
             {selectedRole === 'student' && (
               <Input
@@ -314,20 +288,6 @@ export const SignupPage: React.FC = () => {
             >
               Create Account
             </Button>
-
-            {/* Benefits */}
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <div className="flex items-center gap-2 mb-3">
-                <CheckCircle className="w-5 h-5 text-success" />
-                <span className="font-medium text-slate-900">Your free trial includes:</span>
-              </div>
-              <ul className="space-y-2 text-sm text-slate-600 ml-7">
-                <li>• 14 days full access to all features</li>
-                <li>• No credit card required</li>
-                <li>• Unlimited classes and students</li>
-                <li>• Cancel anytime</li>
-              </ul>
-            </div>
 
             {/* Sign In Link */}
             <div className="text-center pt-4 border-t border-slate-200">
