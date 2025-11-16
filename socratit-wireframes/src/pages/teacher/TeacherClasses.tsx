@@ -26,6 +26,7 @@ import {
   MoreVertical,
   Settings,
 } from 'lucide-react';
+import { getSubjectIcon } from '../../utils/subjectIconMap';
 import { classService, ClassWithStats } from '../../services/class.service';
 import { ClassCreationWizard } from './ClassCreationWizard';
 
@@ -208,7 +209,10 @@ export const TeacherClasses: React.FC = () => {
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <BookOpen className="w-6 h-6" />
+                              {(() => {
+                                const SubjectIcon = getSubjectIcon(classItem.subject);
+                                return <SubjectIcon className="w-6 h-6" />;
+                              })()}
                               <h2 className="text-2xl font-bold">{classItem.name}</h2>
                               {classItem.period && (
                                 <Badge variant="success" size="sm" className="bg-white/20 text-white border-white/30">

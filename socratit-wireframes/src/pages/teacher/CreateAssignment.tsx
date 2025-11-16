@@ -4,22 +4,33 @@
 // ============================================================================
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DashboardLayout } from '../../components/layout';
 import { Card, Button } from '../../components/common';
-import { ArrowLeft, Save, Sparkles, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles, Plus, Trash2, BookOpen } from 'lucide-react';
 import { assignmentService, CreateAssignmentDTO, Question } from '../../services/assignment.service';
 import { classService } from '../../services/class.service';
 import { AIAssignmentModal } from '../../components/teacher/AIAssignmentModal';
 
 export const CreateAssignment: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { assignmentId } = useParams<{ assignmentId: string }>();
   const isEditMode = !!assignmentId;
   const [showAIModal, setShowAIModal] = useState(false);
+
+  // Extract curriculum subunit context from navigation state
+  const subUnitContext = location.state as {
+    classId?: string;
+    curriculumSubUnitId?: string;
+    subUnitName?: string;
+    subUnitDescription?: string;
+    concepts?: string[];
+    learningObjectives?: string[];
+  } | null;
 
   // Form state
   const [formData, setFormData] = useState<CreateAssignmentDTO>({
@@ -50,7 +61,7 @@ export const CreateAssignment: React.FC = () => {
     enabled: isEditMode,
   });
 
-  // Populate form when assignment data loads
+  // Populate form when assignment data loads OR when coming from curriculum
   useEffect(() => {
     if (existingAssignment && isEditMode) {
       // Convert ISO date to datetime-local format
@@ -79,8 +90,24 @@ export const CreateAssignment: React.FC = () => {
         maxAttempts: existingAssignment.maxAttempts,
         questions: existingAssignment.questions || [],
       });
+    } else if (subUnitContext && !isEditMode) {
+      // Pre-populate form with subunit context when coming from curriculum
+      setFormData((prev) => ({
+        ...prev,
+        classId: subUnitContext.classId || prev.classId,
+        title: subUnitContext.subUnitName || prev.title,
+        description: subUnitContext.subUnitDescription || prev.description,
+        instructions: subUnitContext.learningObjectives?.length
+          ? `Learning Objectives:\n${subUnitContext.learningObjectives.map((obj, idx) => `${idx + 1}. ${obj}`).join('\n')}`
+          : prev.instructions,
+      }));
+
+      // Automatically open AI modal if coming from curriculum with topic context
+      if (subUnitContext.curriculumSubUnitId) {
+        setShowAIModal(true);
+      }
     }
-  }, [existingAssignment, isEditMode]);
+  }, [existingAssignment, isEditMode, subUnitContext]);
 
   // Create assignment mutation
   const createMutation = useMutation({
@@ -206,6 +233,32 @@ export const CreateAssignment: React.FC = () => {
   return (
     <DashboardLayout userRole="teacher">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Curriculum Context Banner */}
+        {subUnitContext && subUnitContext.curriculumSubUnitId && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 p-4 rounded-lg"
+          >
+            <div className="flex items-start gap-3">
+              <BookOpen className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900">
+                  Creating assignment from curriculum topic
+                </h3>
+                <p className="text-sm text-gray-700 mt-1">
+                  <span className="font-medium">{subUnitContext.subUnitName}</span>
+                  {subUnitContext.concepts && subUnitContext.concepts.length > 0 && (
+                    <span className="text-gray-600">
+                      {' • '}Covers: {subUnitContext.concepts.join(', ')}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -573,6 +626,7 @@ export const CreateAssignment: React.FC = () => {
           navigate(`/teacher/assignments/${assignmentId}/edit`);
         }}
         preSelectedClassId={formData.classId}
+        subUnitContext={subUnitContext || undefined}
       />
     </DashboardLayout>
   );

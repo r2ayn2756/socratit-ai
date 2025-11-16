@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Plus,
 } from 'lucide-react';
+import { getSubjectIcon } from '../../utils/subjectIconMap';
 import classService from '../../services/class.service';
 import { assignmentService } from '../../services/assignment.service';
 import messageService from '../../services/message.service';
@@ -200,7 +201,9 @@ export const TeacherDashboard: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {upcomingClasses.map((cls: any, index: number) => (
+                    {upcomingClasses.map((cls: any, index: number) => {
+                      const SubjectIcon = getSubjectIcon(cls.subject);
+                      return (
                       <motion.div
                         key={cls.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -210,8 +213,8 @@ export const TeacherDashboard: React.FC = () => {
                         className="flex items-center gap-4 p-4 rounded-xl bg-white/70 backdrop-blur-md border border-white/20 hover:bg-white/90 hover:shadow-xl transition-all cursor-pointer"
                         onClick={() => navigate(`/teacher/classes/${cls.id}/roster`)}
                       >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
-                          {cls.name?.charAt(0) || 'C'}
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white shadow-lg`}>
+                          <SubjectIcon className="w-6 h-6" />
                         </div>
 
                         <div className="flex-1">
@@ -235,7 +238,8 @@ export const TeacherDashboard: React.FC = () => {
                           <div className="text-xs text-slate-500">{t('teacher.dashboard.classAvg')}</div>
                         </div>
                       </motion.div>
-                    ))}
+                    );
+                    })}
                   </div>
                 )}
 

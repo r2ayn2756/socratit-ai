@@ -20,6 +20,13 @@ interface AIAssignmentModalProps {
   onClose: () => void;
   onAssignmentGenerated: (assignmentId: string) => void;
   preSelectedClassId?: string;
+  subUnitContext?: {
+    curriculumSubUnitId?: string;
+    subUnitName?: string;
+    subUnitDescription?: string;
+    concepts?: string[];
+    learningObjectives?: string[];
+  };
 }
 
 type Step = 'upload' | 'select-existing' | 'configure' | 'generating';
@@ -33,6 +40,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
   onClose,
   onAssignmentGenerated,
   preSelectedClassId,
+  subUnitContext,
 }) => {
   const queryClient = useQueryClient();
   const [step, setStep] = useState<Step>('select-existing');

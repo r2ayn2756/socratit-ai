@@ -184,7 +184,7 @@ async function callGemini(systemPrompt: string, userPrompt: string, maxTokens: n
   try {
     const client = getGeminiClient();
     const model = client.getGenerativeModel({
-      model: env.GEMINI_MODEL || 'gemini-2.0-flash-thinking-exp-1219',
+      model: env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
       generationConfig: {
         maxOutputTokens: maxTokens,
         temperature: 0.7,
@@ -830,7 +830,7 @@ export async function streamChatCompletion(
       // Use Gemini streaming
       const client = getGeminiClient();
       const geminiModel = client.getGenerativeModel({
-        model: model || env.GEMINI_MODEL || 'gemini-2.0-flash-thinking-exp-1219'
+        model: model || env.GEMINI_MODEL || 'gemini-2.0-flash-exp'
       });
 
       // Convert messages to Gemini format
@@ -1430,7 +1430,7 @@ async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
   try {
     const client = getGeminiClient();
     const model = client.getGenerativeModel({
-      model: env.GEMINI_MODEL || 'gemini-2.0-flash-thinking-exp-1219', // Supports audio input
+      model: env.GEMINI_MODEL || 'gemini-2.0-flash-exp', // Supports audio input
     });
 
     // Convert audio buffer to base64

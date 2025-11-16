@@ -23,6 +23,7 @@ import {
   Loader2,
   AlertCircle,
 } from 'lucide-react';
+import { getSubjectIcon } from '../../utils/subjectIconMap';
 import { classService } from '../../services/class.service';
 import { assignmentService } from '../../services/assignment.service';
 import { EnrollWithCodeModal } from '../../components/class/EnrollWithCodeModal';
@@ -270,7 +271,10 @@ export const Classes: React.FC = () => {
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <BookOpen className="w-6 h-6" />
+                              {(() => {
+                                const SubjectIcon = getSubjectIcon(classData.subject);
+                                return <SubjectIcon className="w-6 h-6" />;
+                              })()}
                               <h2 className="text-2xl font-bold">{classData.name}</h2>
                             </div>
                             <div className="flex items-center gap-4 text-sm opacity-90">
