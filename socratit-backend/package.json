@@ -11,7 +11,7 @@
     "test:coverage": "jest --coverage",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:prod": "npx prisma migrate resolve --rolled-back 20251116151230_update_assignment_system || true && npx prisma migrate deploy",
+    "prisma:migrate:prod": "node scripts/fix-migration.js && npx prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "db:setup": "npm run prisma:migrate && npm run prisma:seed",
