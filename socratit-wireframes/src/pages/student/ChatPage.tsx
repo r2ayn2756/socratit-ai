@@ -351,6 +351,28 @@ export const ChatPage: React.FC = () => {
   // Determine user role, defaulting to 'student' for backwards compatibility
   const userRole = (user?.role === 'teacher' || user?.role === 'admin') ? user.role : 'student';
 
+  // Debug logging to help diagnose role detection issues
+  useEffect(() => {
+    console.log('🔍 ChatPage User Debug:', {
+      user,
+      userRole,
+      authLoading,
+      userRoleFromStorage: user?.role,
+    });
+  }, [user, userRole, authLoading]);
+
+  // Show loading state while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <DashboardLayout userRole={userRole}>
       <div className="flex h-full -m-6 overflow-hidden bg-white">
