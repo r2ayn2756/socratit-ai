@@ -90,8 +90,8 @@ router.post(
         senderId: userId,
         classId,
         content,
-        subject,
-        messageType,
+        subject: subject?.trim() || undefined, // Convert empty strings to undefined
+        messageType: messageType || 'ANNOUNCEMENT',
       });
 
       res.status(201).json({

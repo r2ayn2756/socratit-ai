@@ -279,28 +279,43 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Analytics & Assignments/Roster Row */}
+        {/* Analytics Row - Full Width */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <ClassAnalyticsSection
+            classId={classId!}
+            onContactStudent={(studentId) => console.log('Contact student:', studentId)}
+          />
+        </motion.div>
+
+        {/* Schedule & Assignments/Roster/Lessons Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Analytics Section - Left Two Thirds */}
+          {/* Left Column - Schedule (2/3) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <ClassAnalyticsSection
-              classId={classId!}
-              onContactStudent={(studentId) => console.log('Contact student:', studentId)}
+            <CurriculumSection
+              schedule={classData.schedule}
+              currentUnit={classData.currentUnit}
+              upcomingUnits={classData.upcomingUnits}
+              onManageClick={handleManageCurriculum}
+              onUnitClick={handleUnitClick}
             />
           </motion.div>
 
-          {/* Right Column - Assignments & Roster */}
+          {/* Right Column - Assignments, Roster & Lessons (1/3) */}
           <div className="space-y-6">
             {/* Assignments Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3 }}
             >
               <AssignmentsSection
                 assignments={classData.assignments}
@@ -316,7 +331,7 @@ export const ClassDashboard: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4 }}
             >
               <RosterSection
                 students={classData.students}
@@ -326,31 +341,7 @@ export const ClassDashboard: React.FC = () => {
                 onStudentClick={(student) => console.log('Student clicked:', student)}
               />
             </motion.div>
-          </div>
-        </div>
 
-        {/* Curriculum & Lessons Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - 60% width (2/3) */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Curriculum Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <CurriculumSection
-                schedule={classData.schedule}
-                currentUnit={classData.currentUnit}
-                upcomingUnits={classData.upcomingUnits}
-                onManageClick={handleManageCurriculum}
-                onUnitClick={handleUnitClick}
-              />
-            </motion.div>
-          </div>
-
-          {/* Right Column - 40% width (1/3) */}
-          <div className="space-y-6">
             {/* Lessons Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

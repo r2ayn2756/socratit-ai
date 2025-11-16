@@ -34,7 +34,7 @@ export const sendClassMessageSchema = Joi.object({
     'string.max': 'Message cannot exceed 5000 characters',
     'any.required': 'Message content is required',
   }),
-  subject: Joi.string().max(200).optional().allow('').messages({
+  subject: Joi.string().max(200).optional().allow('', null).messages({
     'string.max': 'Subject cannot exceed 200 characters',
   }),
   messageType: Joi.string()
@@ -44,7 +44,7 @@ export const sendClassMessageSchema = Joi.object({
     .messages({
       'any.only': 'Message type must be CLASS_GROUP or ANNOUNCEMENT',
     }),
-});
+}).options({ stripUnknown: true });
 
 /**
  * Validation schema for getting conversation
