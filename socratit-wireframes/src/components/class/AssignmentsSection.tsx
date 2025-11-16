@@ -52,14 +52,13 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
       defaultExpanded={false}
       action={
         onCreateAssignment && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={onCreateAssignment}
-            icon={<Plus />}
+            className="p-2 rounded-lg hover:bg-neutral-100 transition-colors text-neutral-600 hover:text-primary-600"
+            aria-label="Create Assignment"
           >
-            Create Assignment
-          </Button>
+            <Plus className="w-5 h-5" />
+          </button>
         )
       }
     >
