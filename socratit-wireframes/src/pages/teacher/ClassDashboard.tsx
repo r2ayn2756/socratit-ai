@@ -279,35 +279,37 @@ export const ClassDashboard: React.FC = () => {
           />
         </motion.div>
 
-        {/* Analytics Row - Full Width */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <ClassAnalyticsSection
-            classId={classId!}
-            onContactStudent={(studentId) => console.log('Contact student:', studentId)}
-          />
-        </motion.div>
-
-        {/* Schedule & Assignments/Roster/Lessons Row */}
+        {/* Main Content Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Schedule (2/3) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-2"
-          >
-            <CurriculumSection
-              schedule={classData.schedule}
-              currentUnit={classData.currentUnit}
-              upcomingUnits={classData.upcomingUnits}
-              onManageClick={handleManageCurriculum}
-              onUnitClick={handleUnitClick}
-            />
-          </motion.div>
+          {/* Left Column - Analytics & Schedule (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Analytics Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <ClassAnalyticsSection
+                classId={classId!}
+                onContactStudent={(studentId) => console.log('Contact student:', studentId)}
+              />
+            </motion.div>
+
+            {/* Schedule Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <CurriculumSection
+                schedule={classData.schedule}
+                currentUnit={classData.currentUnit}
+                upcomingUnits={classData.upcomingUnits}
+                onManageClick={handleManageCurriculum}
+                onUnitClick={handleUnitClick}
+              />
+            </motion.div>
+          </div>
 
           {/* Right Column - Assignments, Roster & Lessons (1/3) */}
           <div className="space-y-6">
