@@ -497,15 +497,17 @@ export const StudentDashboard: React.FC = () => {
 
                 {/* Header with icon */}
                 <div className="relative flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Brain className="w-7 h-7 text-white" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
+                    <img src="/logo512.png" alt="SocratIt" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-xl text-slate-800">{t('student.dashboard.aiTutor.title')}</h3>
                       <Sparkles className="w-4 h-4 text-purple-600" />
                     </div>
-                    <p className="text-sm text-purple-700 font-medium">{t('student.dashboard.aiTutor.subtitle')}</p>
+                    {t('student.dashboard.aiTutor.subtitle') && (
+                      <p className="text-sm text-purple-700 font-medium">{t('student.dashboard.aiTutor.subtitle')}</p>
+                    )}
                   </div>
                 </div>
 

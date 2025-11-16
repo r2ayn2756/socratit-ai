@@ -150,8 +150,8 @@
   "student.dashboard.progress": "Progreso",
   "student.dashboard.quickActions": "Acciones Rápidas",
   "student.dashboard.aiTutor.title": "SocratIt!",
-  "student.dashboard.aiTutor.subtitle": "Soporte 24/7 • Siempre Listo",
-  "student.dashboard.aiTutor.description": "¡Pregúntame lo que sea! Puedo ayudarte con la tarea, explicar conceptos o guiarte a través de problemas.",
+  "student.dashboard.aiTutor.subtitle": "",
+  "student.dashboard.aiTutor.description": "Puedo ayudarte con la tarea, explicar conceptos o guiarte a través de problemas.",
   "student.dashboard.aiTutor.placeholder": "Escribe tu pregunta aquí...",
 
   "_comment11": "TEACHER DASHBOARD",
