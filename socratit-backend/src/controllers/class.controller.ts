@@ -137,7 +137,7 @@ export const createClass = async (
                 estimatedWeeks: unit.estimatedWeeks || 1,
                 topics: unit.topics || [],
                 learningObjectives: unit.learningObjectives || [],
-                status: 'DRAFT',
+                status: 'SCHEDULED',
               },
             });
           }
