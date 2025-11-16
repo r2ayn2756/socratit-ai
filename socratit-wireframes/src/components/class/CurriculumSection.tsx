@@ -4,15 +4,13 @@
 // ============================================================================
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { BookOpen, Calendar, ArrowRight, Settings } from 'lucide-react';
+import { BookOpen, Calendar, Settings } from 'lucide-react';
 import { CollapsibleSection } from './CollapsibleSection';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { EmptyState } from '../common/EmptyState';
 import { ProgressBar } from '../curriculum/ProgressBar';
 import type { CurriculumUnit, CurriculumSchedule } from '../../types/curriculum.types';
-import { format } from 'date-fns';
 
 interface CurriculumSectionProps {
   schedule: CurriculumSchedule | null;
@@ -97,7 +95,8 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             <div className="space-y-3">
               {allUnits.map((unit) => {
                 const isCurrent = currentUnit?.id === unit.id;
-                const subUnitCount = unit.subUnits?.length || unit.topics?.length || 0;
+                const topicNames = unit.subUnits?.map(su => su.name) ||
+                                   unit.topics?.flatMap(t => [t.name, ...t.subtopics]) || [];
 
                 return (
                   <Card
@@ -109,7 +108,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                       ${isCurrent ? 'border-2 border-primary-300 bg-gradient-to-br from-primary-50 to-secondary-50' : ''}
                     `}
                   >
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         {isCurrent && (
                           <div className="px-2 py-1 rounded-md bg-primary-500 text-white text-xs font-semibold">
@@ -122,27 +121,31 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-sm text-neutral-600 mb-3 line-clamp-1">
-                      {subUnitCount} topics to cover
-                    </p>
+                    {/* Description */}
+                    {unit.description && (
+                      <p className="text-sm text-neutral-700 mb-3">
+                        {unit.description}
+                      </p>
+                    )}
 
-                    <div className="flex items-center gap-4 text-sm text-neutral-600">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          {format(new Date(unit.startDate), 'MMM d')} -{' '}
-                          {format(new Date(unit.endDate), 'MMM d')}
-                        </span>
+                    {/* Topics */}
+                    {topicNames.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {topicNames.slice(0, 5).map((topic, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-1 rounded-md bg-neutral-100 text-neutral-700 text-xs"
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                        {topicNames.length > 5 && (
+                          <span className="px-2 py-1 text-neutral-500 text-xs">
+                            +{topicNames.length - 5} more
+                          </span>
+                        )}
                       </div>
-                      <div className="px-2 py-1 rounded-md bg-neutral-100 text-neutral-700 font-medium">
-                        {unit.estimatedWeeks} weeks
-                      </div>
-                      {unit.percentComplete !== undefined && (
-                        <div className="text-primary-600 font-semibold ml-auto">
-                          {unit.percentComplete}% complete
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </Card>
                 );
               })}

@@ -20,6 +20,13 @@ export interface UploadResponse {
   data: UploadedFile;
 }
 
+export interface CurriculumStatus {
+  id: string;
+  processingStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  extractedText?: string;
+  errorMessage?: string;
+}
+
 /**
  * Upload curriculum file
  * @param file - File to upload
@@ -68,9 +75,23 @@ export async function downloadCurriculumFile(fileId: string): Promise<Blob> {
   return response.data;
 }
 
+/**
+ * Get curriculum file processing status
+ * @param fileId - File ID to check
+ * @returns Processing status
+ */
+export async function getCurriculumStatus(fileId: string): Promise<CurriculumStatus> {
+  const response = await apiService.get<{ success: boolean; data: CurriculumStatus }>(
+    `/curriculum/${fileId}/status`
+  );
+
+  return response.data.data;
+}
+
 export const uploadService = {
   uploadCurriculumFile,
   downloadCurriculumFile,
+  getCurriculumStatus,
 };
 
 export default uploadService;

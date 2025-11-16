@@ -64,17 +64,57 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 
         const uploadedFile = await uploadService.uploadCurriculumFile(file);
         fileIds.push(uploadedFile.id);
-        setProgress(10 + (i + 1) / wizardState.curriculumFiles.length * 30);
+        setProgress(10 + (i + 1) / wizardState.curriculumFiles.length * 20);
       }
 
-      // Step 2: Process with AI
+      // Step 2: Wait for file processing (text extraction)
+      setCurrentTask('Processing uploaded file...');
+      setProgress(35);
+
+      // Poll for processing completion (max 30 seconds)
+      let processingComplete = false;
+      let attempts = 0;
+      const maxAttempts = 15; // 15 attempts * 2 seconds = 30 seconds max
+
+      while (!processingComplete && attempts < maxAttempts) {
+        try {
+          const status = await uploadService.getCurriculumStatus(fileIds[0]);
+
+          if (status.processingStatus === 'COMPLETED') {
+            processingComplete = true;
+            setProgress(40);
+          } else if (status.processingStatus === 'FAILED') {
+            throw new Error('File processing failed. Please try a different file.');
+          } else {
+            // Still processing, wait 2 seconds before checking again
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            attempts++;
+            setProgress(35 + (attempts / maxAttempts) * 5);
+          }
+        } catch (statusError) {
+          console.warn('Failed to check processing status:', statusError);
+          // Continue anyway - the AI endpoint will handle it
+          break;
+        }
+      }
+
+      // Step 3: Process with AI
       setCurrentTask('Analyzing curriculum with AI...');
       setProgress(45);
 
-      try {
-        const targetUnits = wizardState.aiPreferences.targetUnits || 8;
-        const pacingPreference = wizardState.aiPreferences.pacingPreference || 'standard';
+      const targetUnits = wizardState.aiPreferences.targetUnits || 8;
+      const pacingPreference = wizardState.aiPreferences.pacingPreference || 'standard';
 
+      // Start simulated progress that increments gradually during AI processing
+      let currentProgress = 45;
+      const progressInterval = setInterval(() => {
+        currentProgress += 1;
+        if (currentProgress < 85) {
+          setProgress(currentProgress);
+        }
+      }, 1000); // Increment every second
+
+      try {
         const aiResult = await curriculumApi.schedules.generateCurriculumPreview({
           curriculumMaterialId: fileIds[0],
           schoolYearStart: wizardState.schoolYearStart!.toISOString(),
@@ -86,6 +126,8 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
           },
         });
 
+        // Clear the interval and jump to completion
+        clearInterval(progressInterval);
         setProgress(90);
         const extractedUnits = aiResult.units || [];
 
@@ -103,15 +145,31 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
           onNext();
         }, 500);
 
-      } catch (aiError) {
+      } catch (aiError: any) {
+        // Clear the progress interval on error
+        clearInterval(progressInterval);
         console.error('AI processing failed:', aiError);
 
-        // Fallback: create mock units
-        const targetUnits = wizardState.aiPreferences.targetUnits || 8;
+        // Check if it's a "not processed yet" error
+        const errorMessage = aiError?.response?.data?.message || aiError.message || 'Unknown error';
+
+        if (errorMessage.includes('not been processed yet')) {
+          setCurrentTask('File is still being processed. Please wait a moment and try again.');
+          setIsProcessing(false);
+          return;
+        }
+
+        // For other errors, show the error but allow user to continue
+        setCurrentTask(`AI analysis failed: ${errorMessage}`);
+
+        // Wait 3 seconds to show the error, then proceed with mock units
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // Fallback: create mock units so user can still create the class
         const mockUnits = Array.from({ length: targetUnits }, (_, i) => ({
           id: `preview-unit-${i + 1}`,
           title: `Unit ${i + 1}`,
-          description: `AI analysis pending. Topics will be generated when class is created.`,
+          description: `AI analysis failed. You can edit these units or generate curriculum after class creation.`,
           topics: [],
           learningObjectives: [],
           estimatedWeeks: Math.ceil(40 / targetUnits),
@@ -130,7 +188,8 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 
     } catch (error: any) {
       console.error('Upload failed:', error);
-      setCurrentTask('Upload failed. Please try again.');
+      const errorMessage = error?.response?.data?.message || error.message || 'Unknown error';
+      setCurrentTask(`Upload failed: ${errorMessage}. Please try again.`);
       setIsProcessing(false);
     }
   };

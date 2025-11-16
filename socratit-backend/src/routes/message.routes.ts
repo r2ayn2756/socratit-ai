@@ -84,6 +84,8 @@ router.post(
       const { classId } = req.params;
       const { content, subject, messageType } = req.body;
 
+      console.log('Sending class message:', { userId, classId, content, subject, messageType });
+
       const message = await sendClassMessage({
         senderId: userId,
         classId,
@@ -98,6 +100,7 @@ router.post(
         message: 'Message sent to class successfully',
       });
     } catch (error: any) {
+      console.error('Error sending class message:', error);
       next(error);
     }
   }

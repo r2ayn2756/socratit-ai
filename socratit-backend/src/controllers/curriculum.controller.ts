@@ -679,10 +679,20 @@ export async function analyzeCurriculumPreview(req: Request, res: Response): Pro
 
     console.log('[Analyze Preview] School year:', { startDate, endDate, totalWeeks });
 
+    // Truncate very large curriculum files to speed up AI processing
+    // Most models work better with 10-20k characters anyway
+    const MAX_CURRICULUM_LENGTH = 20000;
+    let curriculumText = curriculum.extractedText;
+
+    if (curriculumText.length > MAX_CURRICULUM_LENGTH) {
+      console.log(`[Analyze Preview] Truncating curriculum from ${curriculumText.length} to ${MAX_CURRICULUM_LENGTH} characters for faster processing`);
+      curriculumText = curriculumText.substring(0, MAX_CURRICULUM_LENGTH) + '\n\n[Curriculum truncated for processing speed. Full content will be used for detailed lesson planning.]';
+    }
+
     // Call AI service to analyze curriculum
     const { analyzeCurriculumForScheduling } = await import('../services/ai.service');
 
-    const aiResult = await analyzeCurriculumForScheduling(curriculum.extractedText, {
+    const aiResult = await analyzeCurriculumForScheduling(curriculumText, {
       gradeLevel: 'High School', // Default, can be enhanced later
       subject: curriculum.title,
       schoolYearStart: startDate,
