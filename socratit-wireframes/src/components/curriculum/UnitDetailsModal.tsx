@@ -110,73 +110,9 @@ export const UnitDetailsModal: React.FC<UnitDetailsModalProps> = ({
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto p-6 modal-scroll">
                   {/* Topics List */}
-                  {((unit.subUnits && unit.subUnits.length > 0) || (unit.topics && unit.topics.length > 0)) ? (
+                  {unit.topics && unit.topics.length > 0 ? (
                     <div className="space-y-4">
-                      {/* Display Sub-Units (Lesson-level topics) */}
-                      {unit.subUnits && unit.subUnits.length > 0 && (
-                        <div className="space-y-3">
-                          {unit.subUnits.length > 0 && (
-                            <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                              Lesson Topics
-                            </h3>
-                          )}
-                          {unit.subUnits.map((subUnit, idx) => (
-                            <motion.button
-                              key={subUnit.id}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: idx * 0.05 }}
-                              onClick={() => userRole === 'teacher' && onGenerateAssignment?.(subUnit)}
-                              disabled={userRole !== 'teacher' || !onGenerateAssignment}
-                              className={`
-                                w-full p-4 rounded-xl bg-gradient-to-br from-white/90 to-white/70
-                                border border-gray-200/50 transition-all text-left
-                                ${
-                                  userRole === 'teacher' && onGenerateAssignment
-                                    ? 'hover:border-primary-300 hover:shadow-lg cursor-pointer group'
-                                    : 'cursor-default'
-                                }
-                              `}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3 flex-1">
-                                  <span className="px-2.5 py-1 rounded-lg bg-primary-100 text-primary-700 text-sm font-semibold">
-                                    {idx + 1}
-                                  </span>
-                                  <div className="flex-1">
-                                    <h4 className="font-semibold text-gray-900">
-                                      {subUnit.name}
-                                    </h4>
-                                    {subUnit.description && (
-                                      <p className="text-sm text-gray-600 mt-1">
-                                        {subUnit.description}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                  {/* Performance Percentage */}
-                                  {subUnit.performancePercentage !== undefined && (
-                                    <div className={`text-2xl font-bold ${getPerformanceColor(subUnit.performancePercentage)}`}>
-                                      {subUnit.performancePercentage}%
-                                    </div>
-                                  )}
-
-                                  {/* Generate Assignment Icon - Only visible on hover for teachers */}
-                                  {userRole === 'teacher' && onGenerateAssignment && (
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <Sparkles className="w-5 h-5 text-primary-500" />
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </motion.button>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Display High-Level Topics (from topics array) */}
+                      {/* Display Main Topics */}
                       {unit.topics && unit.topics.length > 0 && (
                         <div className="space-y-3">
                           {unit.topics.length > 0 && (
