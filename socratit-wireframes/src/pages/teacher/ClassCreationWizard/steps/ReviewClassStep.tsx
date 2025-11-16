@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, BookOpen, Calendar, FileText, Sparkles, AlertCircle } from 'lucide-react';
+import { Check, BookOpen, Calendar, FileText, Sparkles, AlertCircle, Edit2, Trash2, Plus } from 'lucide-react';
 import { Button } from '../../../../components/curriculum/Button';
 import { GlassCard } from '../../../../components/curriculum/GlassCard';
 import type { ClassCreationState } from '../ClassCreationWizard';
@@ -31,6 +31,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [editingUnitId, setEditingUnitId] = useState<string | null>(null);
+  const [editingUnit, setEditingUnit] = useState<any>(null);
 
   const handleCreate = async () => {
     setIsCreating(true);
@@ -191,6 +193,56 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
     return patterns[wizardState.meetingPattern] || wizardState.meetingPattern;
   };
 
+  const handleEditUnit = (unit: any) => {
+    setEditingUnitId(unit.id);
+    setEditingUnit({ ...unit });
+  };
+
+  const handleSaveUnit = () => {
+    if (!editingUnit || !wizardState.generatedUnits) return;
+
+    const updatedUnits = wizardState.generatedUnits.map(unit =>
+      unit.id === editingUnit.id ? editingUnit : unit
+    );
+
+    onUpdate({ generatedUnits: updatedUnits });
+    setEditingUnitId(null);
+    setEditingUnit(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUnitId(null);
+    setEditingUnit(null);
+  };
+
+  const handleDeleteUnit = (unitId: string) => {
+    if (!wizardState.generatedUnits) return;
+
+    const updatedUnits = wizardState.generatedUnits.filter(unit => unit.id !== unitId);
+    onUpdate({ generatedUnits: updatedUnits });
+  };
+
+  const handleAddTopic = () => {
+    if (!editingUnit) return;
+    setEditingUnit({
+      ...editingUnit,
+      topics: [...(editingUnit.topics || []), ''],
+    });
+  };
+
+  const handleUpdateTopic = (index: number, value: string) => {
+    if (!editingUnit) return;
+    const newTopics = [...(editingUnit.topics || [])];
+    newTopics[index] = value;
+    setEditingUnit({ ...editingUnit, topics: newTopics });
+  };
+
+  const handleRemoveTopic = (index: number) => {
+    if (!editingUnit) return;
+    const newTopics = editingUnit.topics.filter((_: any, i: number) => i !== index);
+    setEditingUnit({ ...editingUnit, topics: newTopics });
+  };
+
   return (
     <div className="space-y-6">
       {/* Create Button - Top */}
@@ -291,71 +343,167 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
             </div>
 
             <div className="space-y-3 max-h-96 overflow-y-auto modal-scroll">
-              {wizardState.generatedUnits.map((unit: any, index: number) => (
-                <motion.div
-                  key={unit.id || index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="p-4 rounded-xl bg-white border border-gray-200"
-                >
-                  <div className="space-y-3">
-                    {/* Unit Header */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{unit.title}</h4>
-                        {unit.description && (
-                          <p className="text-sm text-gray-600 mt-1">{unit.description}</p>
-                        )}
-                      </div>
-                      {unit.estimatedWeeks && (
-                        <span className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full ml-3">
-                          {unit.estimatedWeeks} weeks
-                        </span>
-                      )}
-                    </div>
+              {wizardState.generatedUnits.map((unit: any, index: number) => {
+                const isEditing = editingUnitId === unit.id;
+                const displayUnit = isEditing ? editingUnit : unit;
 
-                    {/* Topics */}
-                    {unit.topics && unit.topics.length > 0 && (
-                      <div className="pt-3 border-t border-gray-100">
-                        <p className="text-xs font-semibold text-gray-700 mb-2">Topics ({unit.topics.length}):</p>
-                        <div className="flex flex-wrap gap-2">
-                          {unit.topics.map((topic: any, i: number) => (
-                            <span key={i} className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-lg">
-                              {typeof topic === 'string' ? topic : topic.name || topic.title}
-                            </span>
-                          ))}
+                return (
+                  <motion.div
+                    key={unit.id || index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={`p-4 rounded-xl bg-white border ${isEditing ? 'border-blue-400 shadow-md' : 'border-gray-200'}`}
+                  >
+                    {isEditing ? (
+                      // EDIT MODE
+                      <div className="space-y-4">
+                        {/* Unit Title & Description */}
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            value={displayUnit.title}
+                            onChange={(e) => setEditingUnit({ ...editingUnit, title: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none font-semibold"
+                            placeholder="Unit title"
+                          />
+                          <textarea
+                            value={displayUnit.description || ''}
+                            onChange={(e) => setEditingUnit({ ...editingUnit, description: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
+                            placeholder="Unit description"
+                            rows={2}
+                          />
+                          <input
+                            type="number"
+                            value={displayUnit.estimatedWeeks || ''}
+                            onChange={(e) => setEditingUnit({ ...editingUnit, estimatedWeeks: parseInt(e.target.value) || 0 })}
+                            className="w-32 px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none text-sm"
+                            placeholder="Weeks"
+                            min="1"
+                          />
+                        </div>
+
+                        {/* Topics */}
+                        <div className="pt-3 border-t border-gray-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-xs font-semibold text-gray-700">Topics:</p>
+                            <button
+                              onClick={handleAddTopic}
+                              className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                            >
+                              <Plus className="w-3 h-3" />
+                              Add Topic
+                            </button>
+                          </div>
+                          <div className="space-y-2">
+                            {(displayUnit.topics || []).map((topic: any, i: number) => (
+                              <div key={i} className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={typeof topic === 'string' ? topic : topic.name || topic.title || ''}
+                                  onChange={(e) => handleUpdateTopic(i, e.target.value)}
+                                  className="flex-1 px-2 py-1 rounded border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none text-sm"
+                                  placeholder="Topic name"
+                                />
+                                <button
+                                  onClick={() => handleRemoveTopic(i)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+                          <Button variant="primary" size="sm" onClick={handleSaveUnit}>
+                            Save Changes
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                            Cancel
+                          </Button>
                         </div>
                       </div>
-                    )}
+                    ) : (
+                      // VIEW MODE
+                      <div className="space-y-3">
+                        {/* Unit Header */}
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900">{displayUnit.title}</h4>
+                            {displayUnit.description && (
+                              <p className="text-sm text-gray-600 mt-1">{displayUnit.description}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 ml-3">
+                            {displayUnit.estimatedWeeks && (
+                              <span className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                                {displayUnit.estimatedWeeks} weeks
+                              </span>
+                            )}
+                            <button
+                              onClick={() => handleEditUnit(unit)}
+                              className="text-gray-400 hover:text-blue-600 transition-colors"
+                              title="Edit unit"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUnit(unit.id)}
+                              className="text-gray-400 hover:text-red-600 transition-colors"
+                              title="Delete unit"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
 
-                    {/* Learning Objectives */}
-                    {unit.learningObjectives && unit.learningObjectives.length > 0 && (
-                      <div className="pt-3 border-t border-gray-100">
-                        <p className="text-xs font-semibold text-gray-700 mb-2">Learning Objectives:</p>
-                        <ul className="space-y-1">
-                          {unit.learningObjectives.slice(0, 3).map((obj: string, i: number) => (
-                            <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
-                              <span className="w-1 h-1 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-                              <span>{obj}</span>
-                            </li>
-                          ))}
-                          {unit.learningObjectives.length > 3 && (
-                            <li className="text-sm text-gray-500 pl-3">
-                              +{unit.learningObjectives.length - 3} more objectives
-                            </li>
-                          )}
-                        </ul>
+                        {/* Topics */}
+                        {displayUnit.topics && displayUnit.topics.length > 0 && (
+                          <div className="pt-3 border-t border-gray-100">
+                            <p className="text-xs font-semibold text-gray-700 mb-2">Topics ({displayUnit.topics.length}):</p>
+                            <div className="flex flex-wrap gap-2">
+                              {displayUnit.topics.map((topic: any, i: number) => (
+                                <span key={i} className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-lg">
+                                  {typeof topic === 'string' ? topic : topic.name || topic.title}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Learning Objectives */}
+                        {displayUnit.learningObjectives && displayUnit.learningObjectives.length > 0 && (
+                          <div className="pt-3 border-t border-gray-100">
+                            <p className="text-xs font-semibold text-gray-700 mb-2">Learning Objectives:</p>
+                            <ul className="space-y-1">
+                              {displayUnit.learningObjectives.slice(0, 3).map((obj: string, i: number) => (
+                                <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                                  <span className="w-1 h-1 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                                  <span>{obj}</span>
+                                </li>
+                              ))}
+                              {displayUnit.learningObjectives.length > 3 && (
+                                <li className="text-sm text-gray-500 pl-3">
+                                  +{displayUnit.learningObjectives.length - 3} more objectives
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
 
             <div className="pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-600">
-                💡 Units will be created in this order. You can edit and reorder them after class creation.
+                💡 Click <Edit2 className="w-3 h-3 inline" /> to edit unit details, or <Trash2 className="w-3 h-3 inline" /> to remove a unit. Units will be created in this order.
               </p>
             </div>
           </div>

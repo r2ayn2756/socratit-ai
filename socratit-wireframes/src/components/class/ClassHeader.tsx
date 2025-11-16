@@ -4,9 +4,8 @@
 // ============================================================================
 
 import React from 'react';
-import { Users, BookOpen, TrendingUp } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Card } from '../common/Card';
-import { StatCard } from '../common/StatCard';
 
 interface ClassHeaderProps {
   className: string;

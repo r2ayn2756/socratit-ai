@@ -274,6 +274,8 @@ export class AITAService {
   ): Promise<{ userMessage: AIMessage; conversationId: string }> {
     const { conversationId, studentId, content, currentQuestionId, ipAddress, userAgent } = options;
 
+    console.log('🚀 [AI-TA] streamMessage called:', { conversationId, studentId, contentLength: content.length });
+
     // Check message limit
     const limitCheck = await aiContextService.checkMessageLimit(studentId);
     if (!limitCheck.allowed) {
@@ -312,6 +314,7 @@ export class AITAService {
     }
 
     // Save user message
+    console.log('💾 [AI-TA] Saving user message to database...');
     const userMessage = await prisma.aIMessage.create({
       data: {
         conversationId,
@@ -319,6 +322,7 @@ export class AITAService {
         content,
       },
     });
+    console.log('✅ [AI-TA] User message saved:', { id: userMessage.id, conversationId });
 
     // Build context
     const context = await aiContextService.buildStudentContext(
@@ -377,6 +381,7 @@ export class AITAService {
           );
 
           // Save AI response
+          console.log('💾 [AI-TA] Saving AI response to database...');
           const aiResponse = await prisma.aIMessage.create({
             data: {
               conversationId,
@@ -396,8 +401,10 @@ export class AITAService {
               flaggedContent: !outputFilter.allowed,
             },
           });
+          console.log('✅ [AI-TA] AI response saved:', { id: aiResponse.id, conversationId, contentLength: finalResponse.length });
 
           // Update conversation
+          console.log('💾 [AI-TA] Updating conversation metadata...');
           const cost = calculateCost(usage);
           await prisma.aIConversation.update({
             where: { id: conversationId },
@@ -411,6 +418,7 @@ export class AITAService {
               },
             },
           });
+          console.log('✅ [AI-TA] Conversation metadata updated');
 
           // Log interaction
           await this.logInteraction({
@@ -451,6 +459,8 @@ export class AITAService {
     conversationId: string,
     studentId: string
   ): Promise<ConversationWithMessages> {
+    console.log('📖 [AI-TA] getConversation called:', { conversationId, studentId });
+
     const conversation = await prisma.aIConversation.findUnique({
       where: { id: conversationId },
       include: {
@@ -461,12 +471,20 @@ export class AITAService {
     });
 
     if (!conversation) {
+      console.error('❌ [AI-TA] Conversation not found:', conversationId);
       throw new Error('Conversation not found');
     }
 
     if (conversation.studentId !== studentId) {
+      console.error('❌ [AI-TA] Unauthorized access attempt:', { conversationId, requesterId: studentId, ownerId: conversation.studentId });
       throw new Error('Unauthorized');
     }
+
+    console.log('✅ [AI-TA] getConversation returning:', {
+      conversationId,
+      messageCount: conversation.messages.length,
+      messages: conversation.messages.map(m => ({ id: m.id, role: m.role, contentLength: m.content.length }))
+    });
 
     return conversation;
   }
