@@ -26,26 +26,23 @@ export const sendDirectMessageSchema = Joi.object({
 
 /**
  * Validation schema for sending a class message
+ * Note: classId comes from URL params, not body
  */
 export const sendClassMessageSchema = Joi.object({
-  classId: Joi.string().uuid().required().messages({
-    'string.guid': 'Class ID must be a valid UUID',
-    'any.required': 'Class ID is required',
-  }),
   content: Joi.string().min(1).max(5000).required().messages({
     'string.min': 'Message cannot be empty',
     'string.max': 'Message cannot exceed 5000 characters',
     'any.required': 'Message content is required',
   }),
-  subject: Joi.string().max(200).optional().messages({
+  subject: Joi.string().max(200).optional().allow('').messages({
     'string.max': 'Subject cannot exceed 200 characters',
   }),
   messageType: Joi.string()
     .valid(MessageType.CLASS_GROUP, MessageType.ANNOUNCEMENT)
-    .required()
+    .optional()
+    .default(MessageType.ANNOUNCEMENT)
     .messages({
       'any.only': 'Message type must be CLASS_GROUP or ANNOUNCEMENT',
-      'any.required': 'Message type is required',
     }),
 });
 

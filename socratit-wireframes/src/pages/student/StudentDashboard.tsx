@@ -308,7 +308,7 @@ export const StudentDashboard: React.FC = () => {
                               </div>
                             )}
 
-                            <Button variant="primary" size="sm" className="w-full">
+                            <Button variant="gradient" size="sm" className="w-full">
                               <Play className="w-4 h-4 mr-2" />
                               {progress > 0 ? t('common.buttons.continue') : t('common.buttons.startAssignment')}
                             </Button>
@@ -342,8 +342,10 @@ export const StudentDashboard: React.FC = () => {
                     return (
                       <Card
                         key={assignment.id}
-                        padding="sm"
-                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        variant="glass"
+                        padding="md"
+                        hover
+                        className="cursor-pointer"
                         onClick={() =>
                           navigate(`/student/assignments/${assignment.id}`)
                         }

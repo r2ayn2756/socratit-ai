@@ -16,7 +16,7 @@ export interface Message {
   classId: string | null;
   content: string;
   subject?: string;
-  messageType: 'DIRECT' | 'CLASS_ANNOUNCEMENT' | 'CLASS_GENERAL';
+  messageType: 'DIRECT' | 'CLASS_GROUP' | 'ANNOUNCEMENT';
   isRead: boolean;
   readAt: Date | null;
   createdAt: Date;
@@ -68,7 +68,7 @@ export interface SendDirectMessageRequest {
 export interface SendClassMessageRequest {
   content: string;
   subject?: string;
-  messageType?: 'CLASS_ANNOUNCEMENT' | 'CLASS_GENERAL';
+  messageType?: 'CLASS_GROUP' | 'ANNOUNCEMENT';
 }
 
 export interface UnreadCountResponse {
@@ -131,7 +131,7 @@ export const getConversation = async (
  */
 export const getClassMessages = async (
   classId: string,
-  messageType?: 'CLASS_ANNOUNCEMENT' | 'CLASS_GENERAL'
+  messageType?: 'CLASS_GROUP' | 'ANNOUNCEMENT'
 ): Promise<Message[]> => {
   const params: any = {};
   if (messageType) params.messageType = messageType;

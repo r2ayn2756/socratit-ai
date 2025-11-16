@@ -155,7 +155,7 @@ export const TeacherDashboard: React.FC = () => {
           </div>
 
           <Button
-            variant="primary"
+            variant="gradient"
             size="lg"
             icon={<Plus className="w-5 h-5" />}
             iconPosition="left"
@@ -169,7 +169,7 @@ export const TeacherDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* My Classes - Takes 2 columns */}
           <motion.div variants={fadeInUp} className="lg:col-span-2">
-            <Card padding="none" className="overflow-hidden h-full">
+            <Card variant="glassElevated" padding="none" className="overflow-hidden h-full">
               <div className="p-6 border-b border-neutral-200">
                 <div className="flex items-center justify-between">
                   <div>
@@ -206,7 +206,8 @@ export const TeacherDashboard: React.FC = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-neutral-50 to-neutral-100 hover:shadow-lg transition-all cursor-pointer"
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        className="flex items-center gap-4 p-4 rounded-xl bg-white/70 backdrop-blur-md border border-white/20 hover:bg-white/90 hover:shadow-xl transition-all cursor-pointer"
                         onClick={() => navigate(`/teacher/classes/${cls.id}/roster`)}
                       >
                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
@@ -254,7 +255,7 @@ export const TeacherDashboard: React.FC = () => {
 
           {/* Action Items - Takes 1 column */}
           <motion.div variants={fadeInUp}>
-            <Card padding="none" className="h-full">
+            <Card variant="glassElevated" padding="none" className="h-full">
               <div className="p-6 border-b border-slate-200">
                 <h2 className="text-xl font-bold text-slate-900 mb-1">
                   {t('teacher.dashboard.actionItems')}
@@ -264,14 +265,15 @@ export const TeacherDashboard: React.FC = () => {
 
               <div className="p-6 space-y-4">
                 {actionItems.map((item) => (
-                  <div
+                  <motion.div
                     key={item.id}
-                    className={`p-4 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className={`p-4 rounded-xl cursor-pointer transition-all ${
                       item.priority === 'high'
-                        ? 'bg-red-50 border border-red-200'
+                        ? 'bg-red-50/70 backdrop-blur-md border border-red-200/50 hover:bg-red-50/90 hover:shadow-lg hover:shadow-red-500/10'
                         : item.priority === 'medium'
-                        ? 'bg-orange-50 border border-orange-200'
-                        : 'bg-blue-50 border border-blue-200'
+                        ? 'bg-orange-50/70 backdrop-blur-md border border-orange-200/50 hover:bg-orange-50/90 hover:shadow-lg hover:shadow-orange-500/10'
+                        : 'bg-blue-50/70 backdrop-blur-md border border-blue-200/50 hover:bg-blue-50/90 hover:shadow-lg hover:shadow-blue-500/10'
                     }`}
                     onClick={item.action}
                   >
@@ -294,7 +296,7 @@ export const TeacherDashboard: React.FC = () => {
                         <p className="text-sm text-slate-600">{item.subtitle}</p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </Card>
@@ -303,12 +305,13 @@ export const TeacherDashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <motion.div variants={fadeInUp}>
-          <Card>
+          <Card variant="glassElevated" padding="lg">
             <h2 className="text-xl font-bold text-slate-900 mb-4">{t('teacher.dashboard.quickActions')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Button
-                variant="ghost"
-                className="p-6 h-auto justify-start"
+                variant="glass"
+                glow={false}
+                className="p-6 h-auto justify-start hover:scale-105"
                 onClick={() => navigate('/teacher/assignments/new')}
               >
                 <div className="text-left">
@@ -320,8 +323,9 @@ export const TeacherDashboard: React.FC = () => {
               </Button>
 
               <Button
-                variant="ghost"
-                className="p-6 h-auto justify-start"
+                variant="glass"
+                glow={false}
+                className="p-6 h-auto justify-start hover:scale-105"
                 onClick={() => navigate('/teacher/analytics')}
               >
                 <div className="text-left">
@@ -333,8 +337,9 @@ export const TeacherDashboard: React.FC = () => {
               </Button>
 
               <Button
-                variant="ghost"
-                className="p-6 h-auto justify-start"
+                variant="glass"
+                glow={false}
+                className="p-6 h-auto justify-start hover:scale-105"
                 onClick={() => navigate('/teacher/curriculum')}
               >
                 <div className="text-left">

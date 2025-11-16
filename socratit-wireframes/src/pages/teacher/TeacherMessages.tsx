@@ -88,7 +88,7 @@ export const TeacherMessages: React.FC = () => {
       messageService.sendClassMessage(data.classId, {
         content: data.content,
         subject: data.subject,
-        messageType: 'CLASS_ANNOUNCEMENT',
+        messageType: 'ANNOUNCEMENT',
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
