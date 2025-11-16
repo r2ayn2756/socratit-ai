@@ -38,6 +38,7 @@ export interface CurriculumSubUnit {
   concepts: string[];
   learningObjectives: string[];
   estimatedHours: number;
+  performancePercentage?: number;
   aiGenerated: boolean;
   teacherModified: boolean;
   createdAt: string;
