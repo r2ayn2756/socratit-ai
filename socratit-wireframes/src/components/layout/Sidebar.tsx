@@ -59,6 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: 'Dashboard', icon: LayoutDashboard, path: '/teacher/dashboard' },
       { label: 'Classes', icon: BookOpen, path: '/teacher/classes' },
       { label: 'Assignments', icon: FileText, path: '/teacher/assignments' },
+      { label: 'SocratIt', icon: Brain, path: '/teacher/ai-tutor' },
       { label: 'Messages', icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
       // REMOVED: Analytics and AI Insights - now part of class pages
       // Analytics features: Performance tracking, concept mastery, engagement metrics
