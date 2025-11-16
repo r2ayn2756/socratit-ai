@@ -543,11 +543,6 @@ export const ChatPage: React.FC = () => {
                   <Menu className="w-5 h-5 text-slate-600" />
                 )}
               </button>
-              <img
-                src="/logo512.png"
-                alt="SocratIt"
-                className="h-10 w-auto object-contain"
-              />
             </div>
 
             {selectedConversation && (

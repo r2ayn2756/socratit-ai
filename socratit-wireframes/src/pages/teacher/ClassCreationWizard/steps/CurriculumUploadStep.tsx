@@ -149,9 +149,12 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
         // Clear the progress interval on error
         clearInterval(progressInterval);
         console.error('AI processing failed:', aiError);
+        console.error('Error response:', aiError?.response);
+        console.error('Error data:', aiError?.response?.data);
 
         // Check if it's a "not processed yet" error
-        const errorMessage = aiError?.response?.data?.message || aiError.message || 'Unknown error';
+        const errorMessage = aiError?.response?.data?.message || aiError?.response?.data?.error || aiError.message || 'Unknown error';
+        console.error('Extracted error message:', errorMessage);
 
         if (errorMessage.includes('not been processed yet')) {
           setCurrentTask('File is still being processed. Please wait a moment and try again.');

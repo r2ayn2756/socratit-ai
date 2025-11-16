@@ -692,6 +692,15 @@ export async function analyzeCurriculumPreview(req: Request, res: Response): Pro
     // Call AI service to analyze curriculum
     const { analyzeCurriculumForScheduling } = await import('../services/ai.service');
 
+    console.log('[Analyze Preview] Calling AI service with:', {
+      textLength: curriculumText.length,
+      gradeLevel: 'High School',
+      subject: curriculum.title,
+      totalWeeks,
+      targetUnits: preferences?.targetUnits || 8,
+      pacingPreference: preferences?.pacingPreference || 'standard',
+    });
+
     const aiResult = await analyzeCurriculumForScheduling(curriculumText, {
       gradeLevel: 'High School', // Default, can be enhanced later
       subject: curriculum.title,
@@ -755,16 +764,16 @@ export async function analyzeCurriculumPreview(req: Request, res: Response): Pro
     if (error.message.includes('AI') || error.message.includes('Gemini')) {
       res.status(503).json({
         success: false,
-        message: 'AI analysis failed. Please try again.',
-        errors: [error.message],
+        message: `AI analysis failed: ${error.message}`,
+        error: error.message,
       });
       return;
     }
 
     res.status(500).json({
       success: false,
-      message: 'Failed to analyze curriculum',
-      errors: [error.message],
+      message: `Failed to analyze curriculum: ${error.message}`,
+      error: error.message,
     });
   }
 }
