@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, AlertCircle, CheckCircle, Upload } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { classService, CreateClassDTO } from '../../services/class.service';
-import { FileUpload } from '../../components/common/FileUpload';
+import { FileUpload } from '../../components/shared/FileUpload';
 import { curriculumService } from '../../services/curriculum.service';
 
 interface FormData {
@@ -392,8 +392,8 @@ export const CreateClass: React.FC = () => {
                 onFileSelect={handleFileSelect}
                 onFileRemove={handleFileRemove}
                 label="Curriculum File"
-                acceptedTypes={['.pdf', '.docx', '.doc', '.txt']}
-                maxSizeMB={100}
+                accept=".pdf,.docx,.doc,.txt"
+                maxSize={100}
                 error={errors.curriculumFile}
               />
             </div>

@@ -394,7 +394,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
         <FileUpload
           onFileSelect={handleFileSelect}
           onFileRemove={() => setSelectedFile(null)}
-          currentFileName={selectedFile?.name}
+          currentFile={selectedFile}
           label="Curriculum File *"
         />
 
