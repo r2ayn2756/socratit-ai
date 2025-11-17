@@ -307,6 +307,7 @@ export const ClassDashboard: React.FC = () => {
                 upcomingUnits={classData.upcomingUnits}
                 onManageClick={handleManageCurriculum}
                 onUnitClick={handleUnitClick}
+                onGenerateAssignment={handleGenerateAssignment}
               />
             </motion.div>
           </div>

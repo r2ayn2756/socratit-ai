@@ -4,13 +4,13 @@
 // ============================================================================
 
 import React from 'react';
-import { BookOpen, Calendar, Settings } from 'lucide-react';
+import { BookOpen, Calendar, Settings, Sparkles } from 'lucide-react';
 import { CollapsibleSection } from './CollapsibleSection';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { EmptyState } from '../common/EmptyState';
 import { ProgressBar } from '../curriculum/ProgressBar';
-import type { CurriculumUnit, CurriculumSchedule } from '../../types/curriculum.types';
+import type { CurriculumUnit, CurriculumSchedule, CurriculumSubUnit } from '../../types/curriculum.types';
 
 interface CurriculumSectionProps {
   schedule: CurriculumSchedule | null;
@@ -18,6 +18,7 @@ interface CurriculumSectionProps {
   upcomingUnits?: CurriculumUnit[];
   onManageClick?: () => void;
   onUnitClick?: (unit: CurriculumUnit) => void;
+  onGenerateAssignment?: (subUnit: CurriculumSubUnit) => void;
 }
 
 export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
@@ -26,6 +27,7 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
   upcomingUnits = [],
   onManageClick,
   onUnitClick,
+  onGenerateAssignment,
 }) => {
   if (!schedule) {
     // No curriculum setup
@@ -95,15 +97,26 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
             <div className="space-y-3">
               {allUnits.map((unit) => {
                 const isCurrent = currentUnit?.id === unit.id;
-                const topicNames = unit.subUnits?.map(su => su.name) ||
-                                   unit.topics?.flatMap(t => [t.name, ...(t.subtopics || [])]) || [];
+
+                // Get sub-units from either the subUnits array or convert topics to pseudo-subunits
+                const subUnits = unit.subUnits || unit.topics?.map((topic, idx) => ({
+                  id: `topic-${unit.id}-${idx}`,
+                  unitId: unit.id,
+                  name: topic.name,
+                  orderIndex: idx,
+                  concepts: topic.concepts || [],
+                  learningObjectives: topic.learningObjectives || [],
+                  estimatedHours: 0,
+                  aiGenerated: unit.aiGenerated,
+                  teacherModified: unit.teacherModified,
+                  createdAt: unit.createdAt,
+                  updatedAt: unit.updatedAt,
+                })) || [];
 
                 return (
                   <Card
                     key={unit.id}
-                    hover
                     padding="md"
-                    onClick={() => onUnitClick?.(unit)}
                     className={`
                       ${isCurrent ? 'border-2 border-primary-300 bg-gradient-to-br from-primary-50 to-secondary-50' : ''}
                     `}
@@ -121,29 +134,51 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
                       </div>
                     </div>
 
-                    {/* Description */}
-                    {unit.description && (
-                      <p className="text-sm text-neutral-700 mb-3">
-                        {unit.description}
-                      </p>
+                    {/* Sub-units as clickable items */}
+                    {subUnits.length > 0 && (
+                      <div className="space-y-2">
+                        {subUnits.map((subUnit, idx) => (
+                          <div
+                            key={subUnit.id}
+                            className="group p-3 rounded-lg bg-white border border-neutral-200 hover:border-primary-300 hover:shadow-sm transition-all cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onGenerateAssignment) {
+                                onGenerateAssignment(subUnit);
+                              }
+                            }}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-3 flex-1">
+                                <span className="px-2 py-1 rounded-md bg-primary-100 text-primary-700 text-xs font-semibold flex-shrink-0">
+                                  {idx + 1}
+                                </span>
+                                <span className="text-sm font-medium text-neutral-900">
+                                  {subUnit.name}
+                                </span>
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (onGenerateAssignment) {
+                                    onGenerateAssignment(subUnit);
+                                  }
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-md bg-gradient-to-r from-primary-500 to-secondary-600 text-white text-xs font-medium hover:shadow-md flex items-center gap-1.5"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                Generate Assignment
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
 
-                    {/* Topics */}
-                    {topicNames.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {topicNames.slice(0, 5).map((topic, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 rounded-md bg-neutral-100 text-neutral-700 text-xs"
-                          >
-                            {topic}
-                          </span>
-                        ))}
-                        {topicNames.length > 5 && (
-                          <span className="px-2 py-1 text-neutral-500 text-xs">
-                            +{topicNames.length - 5} more
-                          </span>
-                        )}
+                    {/* No sub-units state */}
+                    {subUnits.length === 0 && (
+                      <div className="text-sm text-neutral-500 italic">
+                        No topics available for this unit
                       </div>
                     )}
                   </Card>
