@@ -21,7 +21,7 @@ CREATE TYPE "AssignmentType_new" AS ENUM ('PRACTICE', 'TEST', 'HOMEWORK', 'ESSAY
 -- QUIZ -> PRACTICE (closest equivalent)
 -- CHALLENGE -> PRACTICE (closest equivalent)
 UPDATE "assignments"
-SET type = 'PRACTICE'::text
+SET type = 'PRACTICE'::"AssignmentType"
 WHERE type IN ('QUIZ', 'CHALLENGE');
 
 -- Alter the column to use the new enum
