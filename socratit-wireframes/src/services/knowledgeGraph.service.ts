@@ -1,4 +1,4 @@
-import api from './api';
+import api from './api.service';
 import { MasteryLevel } from '../types/knowledgeGraph';
 
 export interface KnowledgeGraphNode {

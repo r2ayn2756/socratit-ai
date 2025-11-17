@@ -111,7 +111,7 @@ export interface GenerateAssignmentRequest {
   numQuestions?: number;
   difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
   questionTypes?: Array<'multiple_choice' | 'free_response'>;
-  type?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+  type?: 'PRACTICE' | 'TEST';
   totalPoints?: number;
   dueDate?: string;
   timeLimit?: number;

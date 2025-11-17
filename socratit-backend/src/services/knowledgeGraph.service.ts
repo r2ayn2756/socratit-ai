@@ -473,6 +473,35 @@ export class KnowledgeGraphService {
         assignmentId
       );
 
+      // ========================================================================
+      // REAL-TIME UPDATES: Emit WebSocket events to student's Atlas room
+      // ========================================================================
+      try {
+        const {
+          emitAtlasMasteryUpdate,
+          emitAtlasConceptDiscovered,
+        } = await import('./websocket.service');
+
+        // If this is the first time encountering this concept
+        if (!existingMastery) {
+          emitAtlasConceptDiscovered(studentId, concept.id, concept.conceptName, concept.subject);
+        }
+
+        // Emit mastery update
+        emitAtlasMasteryUpdate(
+          studentId,
+          concept.id,
+          concept.conceptName,
+          newMasteryPercent,
+          newMasteryLevel,
+          trend
+        );
+      } catch (wsError: any) {
+        // Non-blocking: Log but don't fail mastery update
+        console.error('⚠️ WebSocket emit failed (non-blocking):', wsError.message);
+      }
+      // ========================================================================
+
       return updatedMastery;
     } catch (error) {
       console.error('Error updating concept mastery:', error);

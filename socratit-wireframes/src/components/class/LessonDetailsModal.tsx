@@ -51,7 +51,7 @@ export const LessonDetailsModal: React.FC<LessonDetailsModalProps> = ({
         lessonId,
         numQuestions: 10,
         difficulty: 'mixed',
-        assignmentType: 'QUIZ',
+        assignmentType: 'PRACTICE',
       }),
     onSuccess: (assignment) => {
       // Navigate to the edit page for the generated assignment

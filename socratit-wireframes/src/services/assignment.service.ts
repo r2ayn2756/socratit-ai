@@ -17,7 +17,7 @@ export interface Assignment {
   title: string;
   description?: string;
   instructions?: string;
-  type: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'ESSAY' | 'INTERACTIVE_MATH';
+  type: 'PRACTICE' | 'TEST' | 'ESSAY' | 'INTERACTIVE_MATH';
   status: 'DRAFT' | 'SCHEDULED' | 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
   totalPoints: number;
   passingScore?: number;
@@ -154,7 +154,7 @@ export interface CreateAssignmentDTO {
   title: string;
   description?: string;
   instructions?: string;
-  type: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'ESSAY' | 'INTERACTIVE_MATH';
+  type: 'PRACTICE' | 'TEST' | 'ESSAY' | 'INTERACTIVE_MATH';
   totalPoints?: number;
   passingScore?: number;
   dueDate?: string;
@@ -176,7 +176,7 @@ export interface CreateAssignmentDTO {
 export interface GenerateQuizDTO {
   classId: string;
   curriculumText: string;
-  assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'INTERACTIVE_MATH';
+  assignmentType?: 'PRACTICE' | 'TEST' | 'INTERACTIVE_MATH';
   numQuestions?: number;
   questionTypes?: Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE' | 'MATH_EXPRESSION'>;
   difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
@@ -188,7 +188,7 @@ export interface UpdateAssignmentDTO {
   title?: string;
   description?: string;
   instructions?: string;
-  type?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'ESSAY' | 'INTERACTIVE_MATH';
+  type?: 'PRACTICE' | 'TEST' | 'ESSAY' | 'INTERACTIVE_MATH';
   totalPoints?: number;
   passingScore?: number;
   dueDate?: string;
@@ -264,7 +264,7 @@ class AssignmentService {
     lessonId: string;
     numQuestions?: number;
     difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
-    assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE' | 'INTERACTIVE_MATH';
+    assignmentType?: 'PRACTICE' | 'TEST' | 'INTERACTIVE_MATH';
   }): Promise<Assignment> {
     const response = await apiService.post<{ success: boolean; data: Assignment }>(
       '/assignments/generate-from-lesson',

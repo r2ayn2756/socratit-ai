@@ -216,6 +216,22 @@ const handleSocketEvents = (socket: Socket, userId: string) => {
       isTyping: false,
     });
   });
+
+  // ============================================================================
+  // ATLAS KNOWLEDGE GRAPH - Real-time Updates
+  // ============================================================================
+
+  // Join Atlas knowledge graph room (student-specific)
+  socket.on('atlas:join', async () => {
+    socket.join(`atlas:${userId}`);
+    console.log(`[WEBSOCKET] User ${userId} joined Atlas room`);
+  });
+
+  // Leave Atlas knowledge graph room
+  socket.on('atlas:leave', async () => {
+    socket.leave(`atlas:${userId}`);
+    console.log(`[WEBSOCKET] User ${userId} left Atlas room`);
+  });
 };
 
 /**
@@ -293,6 +309,114 @@ export const isUserOnline = (userId: string): boolean => {
  */
 export const getOnlineUsers = (): string[] => {
   return Array.from(userSockets.keys());
+};
+
+// ============================================================================
+// ATLAS KNOWLEDGE GRAPH - WebSocket Helpers
+// ============================================================================
+
+/**
+ * Emit concept mastery update to student's Atlas room
+ * Called when assignment is graded or concept mastery changes
+ */
+export const emitAtlasMasteryUpdate = (
+  studentId: string,
+  conceptId: string,
+  conceptName: string,
+  newMastery: number,
+  masteryLevel: string,
+  trend: string
+): void => {
+  if (!io) {
+    console.warn('[WEBSOCKET] Socket.IO not initialized');
+    return;
+  }
+
+  io.to(`atlas:${studentId}`).emit('atlas:mastery:updated', {
+    conceptId,
+    conceptName,
+    mastery: newMastery,
+    masteryLevel,
+    trend,
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[ATLAS] Sent mastery update for ${conceptName} (${newMastery}%) to student ${studentId}`);
+};
+
+/**
+ * Emit new concept discovered event
+ * Called when student encounters a new concept for the first time
+ */
+export const emitAtlasConceptDiscovered = (
+  studentId: string,
+  conceptId: string,
+  conceptName: string,
+  subject: string
+): void => {
+  if (!io) {
+    console.warn('[WEBSOCKET] Socket.IO not initialized');
+    return;
+  }
+
+  io.to(`atlas:${studentId}`).emit('atlas:concept:discovered', {
+    conceptId,
+    conceptName,
+    subject,
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[ATLAS] Student ${studentId} discovered new concept: ${conceptName}`);
+};
+
+/**
+ * Emit milestone achieved event
+ * Called when student reaches mastery milestone (e.g., 90% = MASTERED)
+ */
+export const emitAtlasMilestoneAchieved = (
+  studentId: string,
+  conceptId: string,
+  conceptName: string,
+  milestoneType: string,
+  classId?: string
+): void => {
+  if (!io) {
+    console.warn('[WEBSOCKET] Socket.IO not initialized');
+    return;
+  }
+
+  io.to(`atlas:${studentId}`).emit('atlas:milestone:achieved', {
+    conceptId,
+    conceptName,
+    milestoneType,
+    classId,
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[ATLAS] Student ${studentId} achieved milestone: ${milestoneType} for ${conceptName}`);
+};
+
+/**
+ * Emit concept discussed in AI chat
+ * Called when AI tutor extracts concepts from conversation
+ */
+export const emitAtlasConceptDiscussed = (
+  studentId: string,
+  conceptIds: string[],
+  conversationId: string
+): void => {
+  if (!io) {
+    console.warn('[WEBSOCKET] Socket.IO not initialized');
+    return;
+  }
+
+  io.to(`atlas:${studentId}`).emit('atlas:concepts:discussed', {
+    conceptIds,
+    conversationId,
+    timestamp: new Date().toISOString(),
+  });
+
+  console.log(`[ATLAS] Student ${studentId} discussed ${conceptIds.length} concepts in AI chat`);
 };
 
 /**

@@ -421,13 +421,10 @@ export const CreateAssignment: React.FC = () => {
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Assignment Type <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { value: 'PRACTICE', label: 'Practice', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
-                    { value: 'QUIZ', label: 'Quiz', activeClass: 'border-purple-500 bg-purple-50 text-purple-700' },
                     { value: 'TEST', label: 'Test', activeClass: 'border-red-500 bg-red-50 text-red-700' },
-                    { value: 'HOMEWORK', label: 'Homework', activeClass: 'border-green-500 bg-green-50 text-green-700' },
-                    { value: 'CHALLENGE', label: 'Challenge', activeClass: 'border-orange-500 bg-orange-50 text-orange-700' },
                     { value: 'INTERACTIVE_MATH', label: 'Interactive Math', activeClass: 'border-indigo-500 bg-indigo-50 text-indigo-700' },
                     { value: 'ESSAY', label: 'Essay', activeClass: 'border-pink-500 bg-pink-50 text-pink-700' },
                   ].map((type) => (

@@ -60,7 +60,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
     numQuestions: 10,
     difficulty: 'mixed' as 'easy' | 'medium' | 'hard' | 'mixed',
     questionTypes: ['multiple_choice'] as Array<'multiple_choice' | 'free_response'>,
-    type: 'QUIZ' as 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE',
+    type: 'PRACTICE' as 'PRACTICE' | 'TEST',
     totalPoints: 100,
     dueDate: '',
     timeLimit: 30,
@@ -135,7 +135,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
     mutationFn: async (data: {
       classId: string;
       curriculumText: string;
-      assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+      assignmentType?: 'PRACTICE' | 'TEST';
       numQuestions?: number;
       difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
       questionTypes?: Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE'>;
@@ -271,7 +271,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
       numQuestions: 10,
       difficulty: 'mixed',
       questionTypes: ['multiple_choice'],
-      type: 'QUIZ',
+      type: 'PRACTICE',
       totalPoints: 100,
       dueDate: '',
       timeLimit: 30,
@@ -531,10 +531,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
             className="w-full px-4 py-2 bg-white/90 backdrop-blur-md border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="PRACTICE">Practice</option>
-            <option value="QUIZ">Quiz</option>
             <option value="TEST">Test</option>
-            <option value="HOMEWORK">Homework</option>
-            <option value="CHALLENGE">Challenge</option>
           </select>
         </div>
 

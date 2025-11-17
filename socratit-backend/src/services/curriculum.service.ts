@@ -203,6 +203,32 @@ export async function processCurriculumFile(curriculumId: string, userId: string
       },
     });
 
+    // ========================================================================
+    // ATLAS INTEGRATION: Auto-generate knowledge graph from curriculum
+    // ========================================================================
+    try {
+      // Import AI Knowledge Graph Service
+      const aiKnowledgeGraphService = (await import('./aiKnowledgeGraph.service')).default;
+
+      // Get class information for context
+      const classInfo = curriculum.classId
+        ? await prisma.class.findUnique({ where: { id: curriculum.classId } })
+        : null;
+
+      // Generate concept graph from curriculum text
+      const graphResult = await aiKnowledgeGraphService.generateConceptGraphFromCurriculum(
+        textForAI,
+        classInfo?.subject || 'General',
+        classInfo?.gradeLevel || 'Unknown'
+      );
+
+      console.log(`✅ Atlas: Generated ${graphResult.conceptsGenerated} concepts and ${graphResult.relationshipsGenerated} relationships from curriculum`);
+    } catch (atlasError: any) {
+      // Non-blocking: Log error but don't fail the whole processing
+      console.error('⚠️ Atlas concept generation failed (non-blocking):', atlasError.message);
+    }
+    // ========================================================================
+
     const processingTime = Date.now() - startTime;
 
     // Log processing success
