@@ -324,8 +324,10 @@ export const getClassById = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log('[getClassById] Called for class:', req.params.classId);
     // Class data is attached by middleware
     const classData = req.class;
+    console.log('[getClassById] Class data from middleware:', classData ? 'exists' : 'missing');
 
     // Fetch complete class data
     const fullClass = await prisma.class.findUnique({
@@ -370,6 +372,7 @@ export const getClassById = async (
 
     res.json(response);
   } catch (error) {
+    console.error('[getClassById] Error:', error);
     throw error;
   }
 };
