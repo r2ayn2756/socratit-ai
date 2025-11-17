@@ -32,15 +32,33 @@ interface KnowledgeGraphCanvasProps {
 
 /**
  * Layout graph using Dagre for hierarchical positioning
+ * Groups nodes by subject and spreads them out to prevent bunching
  */
 const getLayoutedElements = (
   nodes: Node[],
   edges: Edge[],
   direction: 'TB' | 'LR' = 'TB'
 ) => {
+  // Group nodes by subject
+  const nodesBySubject = new Map<string, Node[]>();
+  nodes.forEach((node) => {
+    const subject = node.data.subject || 'Other';
+    if (!nodesBySubject.has(subject)) {
+      nodesBySubject.set(subject, []);
+    }
+    nodesBySubject.get(subject)!.push(node);
+  });
+
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
-  dagreGraph.setGraph({ rankdir: direction, nodesep: 100, ranksep: 150 });
+  // Increase spacing to prevent bunching: nodesep controls horizontal spacing, ranksep controls vertical
+  dagreGraph.setGraph({
+    rankdir: direction,
+    nodesep: 200,  // Increased from 100
+    ranksep: 250,  // Increased from 150
+    marginx: 50,
+    marginy: 50
+  });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: 250, height: 120 });
@@ -52,12 +70,22 @@ const getLayoutedElements = (
 
   dagre.layout(dagreGraph);
 
+  // Apply subject-based horizontal offset to spread subjects apart
+  const subjects = Array.from(nodesBySubject.keys());
+  const subjectOffsets = new Map<string, number>();
+  subjects.forEach((subject, index) => {
+    subjectOffsets.set(subject, index * 400); // 400px offset between subject columns
+  });
+
   const layoutedNodes = nodes.map((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
+    const subject = node.data.subject || 'Other';
+    const subjectOffset = subjectOffsets.get(subject) || 0;
+
     return {
       ...node,
       position: {
-        x: nodeWithPosition.x - 125, // Center the node
+        x: nodeWithPosition.x - 125 + subjectOffset, // Center the node + subject offset
         y: nodeWithPosition.y - 60,
       },
     };
