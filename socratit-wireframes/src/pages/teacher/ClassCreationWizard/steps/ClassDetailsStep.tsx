@@ -67,7 +67,7 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
   return (
     <div className="space-y-6">
       {/* Next Button - Top */}
-      <div className="flex justify-end pb-2">
+      <div className="flex justify-end pb-2 pr-2">
         <Button
           variant="primary"
           size="lg"
@@ -78,28 +78,62 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
         </Button>
       </div>
 
-      {/* Class Name */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('classWizard.details.className')} <span className="text-red-500">*</span>
-        </label>
-        <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            <BookOpen className="w-5 h-5" />
+      {/* Class Name and Grade Level - Side by Side */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Class Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('classWizard.details.className')} <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              value={wizardState.className}
+              onChange={(e) => onUpdate({ className: e.target.value })}
+              placeholder={t('classWizard.details.classNamePlaceholder')}
+              className="
+                w-full pl-12 pr-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur-xl border border-gray-200
+                text-gray-900 placeholder-gray-400
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
+                transition-all duration-200
+              "
+            />
           </div>
-          <input
-            type="text"
-            value={wizardState.className}
-            onChange={(e) => onUpdate({ className: e.target.value })}
-            placeholder={t('classWizard.details.classNamePlaceholder')}
-            className="
-              w-full pl-12 pr-4 py-3 rounded-xl
-              bg-white/70 backdrop-blur-xl border border-gray-200
-              text-gray-900 placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-              transition-all duration-200
-            "
-          />
+        </div>
+
+        {/* Grade Level */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('classWizard.details.gradeLevel')} <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            <select
+              value={wizardState.gradeLevel}
+              onChange={(e) => onUpdate({ gradeLevel: e.target.value })}
+              className="
+                w-full pl-12 pr-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur-xl border border-gray-200
+                text-gray-900
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
+                transition-all duration-200
+                appearance-none cursor-pointer
+              "
+            >
+              <option value="">{t('classWizard.details.gradeLevelPlaceholder')}</option>
+              {GRADE_LEVELS.map((grade) => (
+                <option key={grade} value={grade}>
+                  {grade}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -128,37 +162,6 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
               {subject}
             </motion.button>
           ))}
-        </div>
-      </div>
-
-      {/* Grade Level */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('classWizard.details.gradeLevel')} <span className="text-red-500">*</span>
-        </label>
-        <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            <GraduationCap className="w-5 h-5" />
-          </div>
-          <select
-            value={wizardState.gradeLevel}
-            onChange={(e) => onUpdate({ gradeLevel: e.target.value })}
-            className="
-              w-full pl-12 pr-4 py-3 rounded-xl
-              bg-white/70 backdrop-blur-xl border border-gray-200
-              text-gray-900
-              focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-              transition-all duration-200
-              appearance-none cursor-pointer
-            "
-          >
-            <option value="">{t('classWizard.details.gradeLevelPlaceholder')}</option>
-            {GRADE_LEVELS.map((grade) => (
-              <option key={grade} value={grade}>
-                {grade}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 

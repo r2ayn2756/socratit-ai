@@ -69,7 +69,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 
       // Step 2: Wait for file processing (text extraction)
       setCurrentTask('Processing uploaded file...');
-      setProgress(35);
+      setProgress(30);
 
       // Poll for processing completion (max 30 seconds)
       let processingComplete = false;
@@ -82,14 +82,16 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
 
           if (status.processingStatus === 'COMPLETED') {
             processingComplete = true;
-            setProgress(40);
+            setProgress(45);
           } else if (status.processingStatus === 'FAILED') {
             throw new Error('File processing failed. Please try a different file.');
           } else {
             // Still processing, wait 2 seconds before checking again
             await new Promise(resolve => setTimeout(resolve, 2000));
             attempts++;
-            setProgress(35 + (attempts / maxAttempts) * 5);
+            // Smooth progression from 30% to 45% during processing
+            const processingProgress = 30 + (attempts / maxAttempts) * 15;
+            setProgress(Math.floor(processingProgress));
           }
         } catch (statusError) {
           console.warn('Failed to check processing status:', statusError);
@@ -105,14 +107,30 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
       const targetUnits = wizardState.aiPreferences.targetUnits || 8;
       const pacingPreference = wizardState.aiPreferences.pacingPreference || 'standard';
 
-      // Start simulated progress that increments gradually during AI processing
+      // Start dynamic simulated progress with variable speed for smoother feel
       let currentProgress = 45;
+      let progressSpeed = 500; // Start at 500ms per increment
+
       const progressInterval = setInterval(() => {
-        currentProgress += 1;
-        if (currentProgress < 85) {
-          setProgress(currentProgress);
+        // Gradually slow down as we get closer to 90% to account for longer processing
+        if (currentProgress < 60) {
+          progressSpeed = 500; // Fast at start
+          currentProgress += 0.8;
+        } else if (currentProgress < 75) {
+          progressSpeed = 800; // Medium speed
+          currentProgress += 0.5;
+        } else if (currentProgress < 85) {
+          progressSpeed = 1200; // Slower near end
+          currentProgress += 0.3;
+        } else if (currentProgress < 90) {
+          progressSpeed = 2000; // Very slow approach to 90%
+          currentProgress += 0.15;
         }
-      }, 1000); // Increment every second
+
+        if (currentProgress < 90) {
+          setProgress(Math.floor(currentProgress));
+        }
+      }, 400); // Check every 400ms
 
       try {
         const aiResult = await curriculumApi.schedules.generateCurriculumPreview({
@@ -202,7 +220,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
       {!isProcessing ? (
         <>
           {/* Navigation - Top */}
-          <div className="flex justify-end pb-2">
+          <div className="flex justify-end pb-2 pr-2">
             {wizardState.curriculumFiles.length > 0 ? (
               <Button
                 variant="primary"

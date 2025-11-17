@@ -258,7 +258,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
   return (
     <div className="space-y-6">
       {/* Create Button - Top */}
-      <div className="flex justify-end pb-2">
+      <div className="flex justify-end pb-2 pr-2">
         <Button
           variant="primary"
           size="lg"
