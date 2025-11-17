@@ -43,10 +43,6 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
     try {
       console.log('Starting class creation flow...');
       console.log('[DEBUG] Full wizard state:', wizardState);
-      console.log('[DEBUG] generatedUnits:', wizardState.generatedUnits);
-      console.log('[DEBUG] generatedUnits type:', typeof wizardState.generatedUnits);
-      console.log('[DEBUG] generatedUnits length:', wizardState.generatedUnits?.length);
-      console.log('[DEBUG] generatedUnits content:', JSON.stringify(wizardState.generatedUnits, null, 2));
 
       // Step 1: Get curriculum file IDs (already uploaded in AI step if applicable)
       let curriculumMaterialIds: string[] = [];
@@ -103,22 +99,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
           classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
           classData.meetingPattern = wizardState.meetingPattern;
-          classData.generateWithAI = !wizardState.skipCurriculum;
-          classData.aiPreferences = wizardState.aiPreferences;
-
-          // Pass pre-generated units if available (user may have edited them)
-          console.log('[DEBUG] Checking generatedUnits before adding to classData');
-          console.log('[DEBUG] wizardState.generatedUnits exists:', !!wizardState.generatedUnits);
-          console.log('[DEBUG] wizardState.generatedUnits length:', wizardState.generatedUnits?.length);
-
-          if (wizardState.generatedUnits && wizardState.generatedUnits.length > 0) {
-            classData.preGeneratedUnits = wizardState.generatedUnits;
-            console.log('[DEBUG] Including pre-generated units:', wizardState.generatedUnits.length);
-            console.log('[DEBUG] Sample unit:', JSON.stringify(wizardState.generatedUnits[0], null, 2));
-          } else {
-            console.log('[DEBUG] NO pre-generated units to include - will rely on backend AI generation');
-            console.log('[DEBUG] Reason: generatedUnits =', wizardState.generatedUnits);
-          }
+          // Don't generate with AI during class creation - schedule will be created empty
+          classData.generateWithAI = false;
 
           console.log('[DEBUG] Curriculum fields added successfully');
           console.log('[DEBUG] Final classData curriculum fields:', {
@@ -127,8 +109,6 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
             schoolYearEnd: classData.schoolYearEnd,
             meetingPattern: classData.meetingPattern,
             generateWithAI: classData.generateWithAI,
-            hasPreGeneratedUnits: !!classData.preGeneratedUnits,
-            preGeneratedUnitsCount: classData.preGeneratedUnits?.length || 0,
           });
         } catch (dateError) {
           console.error('[ERROR] Failed to convert dates to ISO string:', dateError);
@@ -155,56 +135,14 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       console.log('Class created successfully:', newClass);
       console.log('[DEBUG] Response includes scheduleId:', newClass.scheduleId);
 
-      // Step 3: If AI generation was requested and we have a schedule, generate it
-      // SKIP if we already have pre-generated units (they were generated during wizard and possibly edited)
-      let aiGenerationFailed = false;
-      if (newClass.scheduleId && classData.generateWithAI && curriculumMaterialIds.length > 0 && !classData.preGeneratedUnits) {
-        console.log('Starting AI schedule generation for schedule:', newClass.scheduleId);
-        setLoadingMessage('Analyzing curriculum and generating units with AI... This may take up to 2 minutes.');
-
-        try {
-          // Use the first curriculum material for AI generation
-          // In the future, AI could potentially analyze multiple files
-          const aiResult = await curriculumApi.schedules.generateScheduleFromAI(
-            newClass.scheduleId,
-            {
-              curriculumMaterialId: curriculumMaterialIds[0],
-              preferences: {
-                targetUnits: wizardState.aiPreferences.targetUnits || 8,
-                pacingPreference: (wizardState.aiPreferences.pacingPreference || 'standard') as 'standard' | 'accelerated' | 'extended',
-              },
-            }
-          );
-          console.log('AI generation completed:', aiResult);
-        } catch (aiError: any) {
-          // AI generation failed, but class was created successfully
-          console.error('AI generation failed:', aiError);
-          aiGenerationFailed = true;
-          const aiErrorMessage = aiError.response?.data?.message || aiError.message;
-
-          // Provide more helpful error message for timeout
-          if (aiErrorMessage.includes('timeout')) {
-            setError(`Class created successfully, but AI generation timed out. This usually happens with large curriculum files. You can generate the curriculum later from the class dashboard (it will work there). Click "Continue" to proceed to your class.`);
-          } else {
-            setError(`Class created successfully, but AI generation failed: ${aiErrorMessage || 'Unknown error'}. You can generate the curriculum later from the class dashboard. Click "Continue" to proceed to your class.`);
-          }
-          // Don't throw - teacher can generate later
-        } finally {
-          setLoadingMessage('');
-        }
-      } else if (classData.preGeneratedUnits) {
-        console.log('[DEBUG] Skipping AI generation - using pre-generated units from wizard');
-      }
-
       // Update wizard state with created class ID
       onUpdate({ classId: newClass.id });
 
-      // Complete wizard and navigate to class dashboard (even if AI failed)
-      if (!aiGenerationFailed && onComplete) {
+      // Complete wizard and navigate to class dashboard
+      if (onComplete) {
         console.log('Navigating to class dashboard:', newClass.id);
         onComplete(newClass.id);
       }
-      // If AI failed, don't auto-navigate - let teacher see the error and manually continue
     } catch (err: any) {
       console.error('[ERROR] Class creation failed:', err);
       console.error('[ERROR] Error response:', err.response);

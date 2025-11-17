@@ -5,10 +5,11 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, GraduationCap, FileText } from 'lucide-react';
+import { BookOpen, GraduationCap, FileText, Calendar } from 'lucide-react';
 import { Button } from '../../../../components/curriculum/Button';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import type { ClassCreationState } from '../ClassCreationWizard';
+import { format } from 'date-fns';
 
 interface ClassDetailsStepProps {
   wizardState: ClassCreationState;
@@ -56,7 +57,9 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
   const isValid =
     wizardState.className.trim().length > 0 &&
     wizardState.subject.length > 0 &&
-    wizardState.gradeLevel.length > 0;
+    wizardState.gradeLevel.length > 0 &&
+    wizardState.schoolYearStart !== null &&
+    wizardState.schoolYearEnd !== null;
 
   const handleNext = () => {
     if (isValid) {
@@ -188,6 +191,89 @@ export const ClassDetailsStep: React.FC<ClassDetailsStepProps> = ({
               resize-none
             "
           />
+        </div>
+      </div>
+
+      {/* School Year Dates */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* School Year Start */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            School Year Start <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <input
+              type="date"
+              value={wizardState.schoolYearStart ? format(wizardState.schoolYearStart, 'yyyy-MM-dd') : ''}
+              onChange={(e) => onUpdate({ schoolYearStart: e.target.value ? new Date(e.target.value) : null })}
+              className="
+                w-full pl-12 pr-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur-xl border border-gray-200
+                text-gray-900
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
+                transition-all duration-200
+              "
+            />
+          </div>
+        </div>
+
+        {/* School Year End */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            School Year End <span className="text-red-500">*</span>
+          </label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <input
+              type="date"
+              value={wizardState.schoolYearEnd ? format(wizardState.schoolYearEnd, 'yyyy-MM-dd') : ''}
+              onChange={(e) => onUpdate({ schoolYearEnd: e.target.value ? new Date(e.target.value) : null })}
+              className="
+                w-full pl-12 pr-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur-xl border border-gray-200
+                text-gray-900
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
+                transition-all duration-200
+              "
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Meeting Pattern */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Meeting Pattern <span className="text-red-500">*</span>
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { value: 'daily', label: 'Daily (M-F)' },
+            { value: 'mwf', label: 'Mon/Wed/Fri' },
+            { value: 'tth', label: 'Tue/Thu' },
+          ].map((pattern) => (
+            <motion.button
+              key={pattern.value}
+              type="button"
+              onClick={() => onUpdate({ meetingPattern: pattern.value })}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`
+                px-4 py-3 rounded-xl text-sm font-medium
+                transition-all duration-200
+                ${wizardState.meetingPattern === pattern.value
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30'
+                  : 'bg-white/70 backdrop-blur-xl border border-gray-200 text-gray-700 hover:border-blue-300'
+                }
+              `}
+            >
+              {pattern.label}
+            </motion.button>
+          ))}
         </div>
       </div>
 

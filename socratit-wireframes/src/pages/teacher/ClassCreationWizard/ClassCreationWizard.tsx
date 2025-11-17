@@ -13,8 +13,6 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 // Step Components
 import { ClassDetailsStep } from './steps/ClassDetailsStep';
 import { CurriculumUploadStep } from './steps/CurriculumUploadStep';
-import { SchoolYearStep } from './steps/SchoolYearStep';
-import { AIScheduleStep } from './steps/AIScheduleStep';
 import { ReviewClassStep } from './steps/ReviewClassStep';
 
 // ============================================================================
@@ -98,36 +96,22 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
   const STEPS: Step[] = [
     {
       id: 1,
-      title: t('classWizard.step1.title'),
-      subtitle: t('classWizard.step1.subtitle'),
+      title: t('classWizard.step1.title') || 'Class Details',
+      subtitle: t('classWizard.step1.subtitle') || 'Enter class information',
       component: ClassDetailsStep,
       canSkip: false,
     },
     {
       id: 2,
-      title: t('classWizard.step2.title'),
-      subtitle: t('classWizard.step2.subtitle'),
-      component: SchoolYearStep,
+      title: t('classWizard.step2.title') || 'Curriculum',
+      subtitle: t('classWizard.step2.subtitle') || 'Upload curriculum files',
+      component: CurriculumUploadStep,
       canSkip: false,
     },
     {
       id: 3,
-      title: t('classWizard.step3.title'),
-      subtitle: t('classWizard.step3.subtitle'),
-      component: CurriculumUploadStep,
-      canSkip: true,
-    },
-    {
-      id: 4,
-      title: t('classWizard.step4.title') || 'AI Schedule',
-      subtitle: t('classWizard.step4.subtitle') || 'Generate curriculum with AI',
-      component: AIScheduleStep,
-      canSkip: true, // Can skip if no curriculum uploaded
-    },
-    {
-      id: 5,
-      title: t('classWizard.step5.title') || 'Review',
-      subtitle: t('classWizard.step5.subtitle') || 'Review and create class',
+      title: t('classWizard.step3.title') || 'Review',
+      subtitle: t('classWizard.step3.subtitle') || 'Review and create',
       component: ReviewClassStep,
       canSkip: false,
     },
@@ -162,13 +146,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     newCompletedSteps.add(wizardState.currentStep);
 
     // Determine next step
-    let nextStep = wizardState.currentStep + 1;
-
-    // Skip AI Schedule step (step 4) if curriculum was skipped
-    if (nextStep === 4 && wizardState.skipCurriculum) {
-      nextStep = 5; // Jump directly to Review step
-      console.log('[Wizard] Skipping AI Schedule step - no curriculum uploaded');
-    }
+    const nextStep = wizardState.currentStep + 1;
 
     setWizardState(prev => ({
       ...prev,
@@ -178,13 +156,7 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
   };
 
   const handleBack = () => {
-    let previousStep = wizardState.currentStep - 1;
-
-    // Skip AI Schedule step (step 4) if going back and curriculum was skipped
-    if (previousStep === 4 && wizardState.skipCurriculum) {
-      previousStep = 3; // Go back to Curriculum Upload step
-      console.log('[Wizard] Skipping AI Schedule step (going back) - no curriculum uploaded');
-    }
+    const previousStep = wizardState.currentStep - 1;
 
     setWizardState(prev => ({
       ...prev,
@@ -326,17 +298,6 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
           >
             {wizardState.currentStep === 1 ? t('common.buttons.cancel') : t('common.buttons.back')}
           </Button>
-
-          <div className="flex items-center gap-3">
-            {currentStepConfig.canSkip && (
-              <Button
-                variant="ghost"
-                onClick={handleNext}
-              >
-                {t('classWizard.curriculum.skipCurriculum')}
-              </Button>
-            )}
-          </div>
         </div>
       </div>
     </Modal>

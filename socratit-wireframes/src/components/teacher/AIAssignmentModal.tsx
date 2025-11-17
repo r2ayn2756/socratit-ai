@@ -114,7 +114,7 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
     },
   });
 
-  // Generate assignment mutation
+  // Generate assignment mutation (from curriculum material)
   const generateMutation = useMutation({
     mutationFn: ({ curriculumId, config }: { curriculumId: string; config: any }) =>
       curriculumService.generateAssignment(curriculumId, config),
@@ -129,6 +129,51 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
       alert(error.response?.data?.message || 'Failed to generate assignment');
     },
   });
+
+  // Direct generation mutation (from sub-unit context - no curriculum material needed)
+  const generateDirectMutation = useMutation({
+    mutationFn: async (data: {
+      classId: string;
+      curriculumText: string;
+      assignmentType?: 'PRACTICE' | 'QUIZ' | 'TEST' | 'HOMEWORK' | 'CHALLENGE';
+      numQuestions?: number;
+      difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';
+      questionTypes?: Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE'>;
+    }) => {
+      // Import the assignment service
+      const { assignmentService } = await import('../../services/assignment.service');
+      return assignmentService.generateQuiz(data);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
+      onAssignmentGenerated(data.id);
+      handleClose();
+    },
+    onError: (error: any) => {
+      console.error('Direct generation failed:', error);
+      alert(error.response?.data?.message || 'Failed to generate assignment');
+    },
+  });
+
+  // ============================================================================
+  // EFFECTS
+  // ============================================================================
+
+  // Auto-configure from subUnitContext if provided
+  useEffect(() => {
+    if (subUnitContext && isOpen) {
+      // Pre-fill assignment config from sub-unit context
+      setAssignmentConfig((prev) => ({
+        ...prev,
+        title: subUnitContext.subUnitName || prev.title,
+        description: subUnitContext.subUnitDescription || prev.description,
+        classId: preSelectedClassId || prev.classId,
+      }));
+
+      // Skip directly to configure step
+      setStep('configure');
+    }
+  }, [subUnitContext, isOpen, preSelectedClassId]);
 
   // ============================================================================
   // HANDLERS
@@ -159,8 +204,43 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
   };
 
   const handleGenerate = () => {
-    if (!selectedCurriculumId || !assignmentConfig.title || !assignmentConfig.classId) {
+    if (!assignmentConfig.title || !assignmentConfig.classId) {
       alert('Please fill in all required fields');
+      return;
+    }
+
+    // If we have subUnitContext, generate directly from it
+    if (subUnitContext) {
+      // Build curriculum text from concepts and learning objectives
+      const curriculumText = [
+        `Topic: ${subUnitContext.subUnitName || assignmentConfig.title}`,
+        subUnitContext.subUnitDescription ? `Description: ${subUnitContext.subUnitDescription}` : '',
+        subUnitContext.concepts && subUnitContext.concepts.length > 0
+          ? `\nConcepts:\n${subUnitContext.concepts.map((c) => `- ${c}`).join('\n')}`
+          : '',
+        subUnitContext.learningObjectives && subUnitContext.learningObjectives.length > 0
+          ? `\nLearning Objectives:\n${subUnitContext.learningObjectives.map((obj) => `- ${obj}`).join('\n')}`
+          : '',
+      ].filter(Boolean).join('\n');
+
+      // Use direct generation endpoint instead of curriculum-based generation
+      generateDirectMutation.mutate({
+        classId: assignmentConfig.classId,
+        curriculumText,
+        assignmentType: assignmentConfig.type,
+        numQuestions: assignmentConfig.numQuestions,
+        difficulty: assignmentConfig.difficulty,
+        questionTypes: assignmentConfig.questionTypes.map(qt =>
+          qt === 'multiple_choice' ? 'MULTIPLE_CHOICE' : 'FREE_RESPONSE'
+        ) as Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE'>,
+      });
+      setStep('generating');
+      return;
+    }
+
+    // Otherwise use curriculum-based generation
+    if (!selectedCurriculumId) {
+      alert('Please select a curriculum material');
       return;
     }
 
@@ -339,6 +419,26 @@ export const AIAssignmentModal: React.FC<AIAssignmentModalProps> = ({
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
         Configure Assignment
       </h3>
+
+      {/* Show context info when generating from sub-unit */}
+      {subUnitContext && (
+        <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+          <div className="flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-blue-900 text-sm mb-1">
+                Generating from Topic: {subUnitContext.subUnitName}
+              </h4>
+              {subUnitContext.concepts && subUnitContext.concepts.length > 0 && (
+                <p className="text-sm text-blue-700">
+                  Concepts: {subUnitContext.concepts.slice(0, 3).join(', ')}
+                  {subUnitContext.concepts.length > 3 && ` +${subUnitContext.concepts.length - 3} more`}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
