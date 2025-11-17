@@ -35,6 +35,7 @@ import { ChatPage } from './pages/student/ChatPage';
 import { TakeAssignment } from './pages/student/TakeAssignment';
 import { StudentClassView } from './pages/student/StudentClassView';
 import { StudentCurriculumView } from './pages/student/StudentCurriculumView';
+import Atlas from './pages/student/Atlas';
 
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -81,6 +82,7 @@ function App() {
             <Route path="/student/assignments" element={<Assignments />} />
             <Route path="/student/assignments/:assignmentId" element={<TakeAssignment />} />
             <Route path="/student/grades" element={<Grades />} />
+            <Route path="/student/atlas" element={<Atlas />} />
             <Route path="/student/messages" element={<Messages />} />
             <Route path="/student/ai-tutor" element={<ChatPage />} />
 

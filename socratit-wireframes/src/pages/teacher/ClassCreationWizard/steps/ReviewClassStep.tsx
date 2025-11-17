@@ -67,12 +67,13 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         }
       }
 
-      // Step 2: Create class with optional curriculum schedule
+      // Step 2: Create class
+      const currentYear = new Date().getFullYear();
       const classData: any = {
         name: wizardState.className,
         subject: wizardState.subject || '',
         gradeLevel: wizardState.gradeLevel || '',
-        academicYear: `${wizardState.schoolYearStart?.getFullYear()}-${wizardState.schoolYearEnd?.getFullYear()}`,
+        academicYear: `${currentYear}-${currentYear + 1}`,
         color: 'blue',
       };
 
@@ -80,56 +81,14 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         classData.description = wizardState.description;
       }
 
-      // Add curriculum schedule data if available
-      console.log('[DEBUG] Curriculum condition check:', {
-        hasCurriculumMaterialIds: curriculumMaterialIds.length > 0,
-        hasSchoolYearStart: !!wizardState.schoolYearStart,
-        hasSchoolYearEnd: !!wizardState.schoolYearEnd,
-        curriculumMaterialIds,
-        schoolYearStart: wizardState.schoolYearStart,
-        schoolYearEnd: wizardState.schoolYearEnd,
-        skipCurriculum: wizardState.skipCurriculum,
-      });
-
-      if (curriculumMaterialIds.length > 0 && wizardState.schoolYearStart && wizardState.schoolYearEnd) {
-        console.log('[DEBUG] Adding curriculum fields to classData');
-        try {
-          // Use the first file as primary curriculum material
-          classData.curriculumMaterialId = curriculumMaterialIds[0];
-          classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
-          classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
-          classData.meetingPattern = wizardState.meetingPattern;
-          // Don't generate with AI during class creation - schedule will be created empty
-          classData.generateWithAI = false;
-
-          console.log('[DEBUG] Curriculum fields added successfully');
-          console.log('[DEBUG] Final classData curriculum fields:', {
-            curriculumMaterialId: classData.curriculumMaterialId,
-            schoolYearStart: classData.schoolYearStart,
-            schoolYearEnd: classData.schoolYearEnd,
-            meetingPattern: classData.meetingPattern,
-            generateWithAI: classData.generateWithAI,
-          });
-        } catch (dateError) {
-          console.error('[ERROR] Failed to convert dates to ISO string:', dateError);
-          console.error('[ERROR] schoolYearStart type:', typeof wizardState.schoolYearStart);
-          console.error('[ERROR] schoolYearEnd type:', typeof wizardState.schoolYearEnd);
-          throw new Error('Invalid date format. Please refresh and try again.');
-        }
-      } else {
-        console.log('[DEBUG] Skipping curriculum fields - condition not met');
-        console.log('[DEBUG] Curriculum condition details:', {
-          hasCurriculumMaterialIds: curriculumMaterialIds.length > 0,
-          hasSchoolYearStart: !!wizardState.schoolYearStart,
-          hasSchoolYearEnd: !!wizardState.schoolYearEnd,
-        });
+      // Add curriculum file IDs if uploaded
+      if (curriculumMaterialIds.length > 0) {
+        console.log('[DEBUG] Adding curriculum file references');
+        // Just store the file IDs for later use - no schedule creation
+        classData.curriculumMaterialId = curriculumMaterialIds[0];
       }
 
       console.log('Creating class with data:', classData);
-      console.log('[DEBUG] classData.curriculumMaterialId:', classData.curriculumMaterialId);
-      console.log('[DEBUG] classData.schoolYearStart:', classData.schoolYearStart);
-      console.log('[DEBUG] classData.schoolYearEnd:', classData.schoolYearEnd);
-      console.log('[DEBUG] classData.generateWithAI:', classData.generateWithAI);
       console.log('[DEBUG] Calling API: POST /api/v1/classes');
       const newClass = await classCurriculumService.createClass(classData);
       console.log('Class created successfully:', newClass);

@@ -30,11 +30,6 @@ export interface ClassCreationState {
   gradeLevel: string;
   description: string;
 
-  // School Year & Schedule (Step 2)
-  schoolYearStart: Date | null;
-  schoolYearEnd: Date | null;
-  meetingPattern: string;
-
   // Curriculum Upload (Step 2)
   curriculumFiles: File[];
   curriculumMaterialIds?: string[]; // Uploaded file IDs from server
@@ -124,9 +119,6 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     subject: '',
     gradeLevel: '',
     description: '',
-    schoolYearStart: new Date(new Date().getFullYear(), 7, 1), // Default to August 1st of current year
-    schoolYearEnd: new Date(new Date().getFullYear() + 1, 5, 30), // Default to June 30th of next year
-    meetingPattern: 'daily',
     curriculumFiles: [],
     skipCurriculum: false,
     aiGenerating: false,
@@ -183,9 +175,6 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
       subject: '',
       gradeLevel: '',
       description: '',
-      schoolYearStart: new Date(new Date().getFullYear(), 7, 1),
-      schoolYearEnd: new Date(new Date().getFullYear() + 1, 5, 30),
-      meetingPattern: 'daily',
       curriculumFiles: [],
       skipCurriculum: false,
       aiGenerating: false,

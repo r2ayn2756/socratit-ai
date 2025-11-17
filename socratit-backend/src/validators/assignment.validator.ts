@@ -51,7 +51,7 @@ export const createAssignmentValidator = Joi.object({
   description: Joi.string().max(1000).allow(null, ''),
   instructions: Joi.string().max(2000).allow(null, ''),
   type: Joi.string()
-    .valid('PRACTICE', 'TEST', 'HOMEWORK', 'ESSAY', 'INTERACTIVE_MATH')
+    .valid('PRACTICE', 'TEST', 'ESSAY', 'INTERACTIVE_MATH')
     .required(),
   totalPoints: Joi.number().integer().min(1).max(1000).default(100),
   passingScore: Joi.number().integer().min(0).max(1000).allow(null),
@@ -92,7 +92,7 @@ export const generateQuizValidator = Joi.object({
   classId: Joi.string().uuid().required(),
   curriculumText: Joi.string().min(50).max(10000).required(),
   assignmentType: Joi.string()
-    .valid('PRACTICE', 'TEST', 'HOMEWORK', 'ESSAY', 'INTERACTIVE_MATH')
+    .valid('PRACTICE', 'TEST', 'ESSAY', 'INTERACTIVE_MATH')
     .default('PRACTICE'),
   numQuestions: Joi.number().integer().min(1).max(50).default(10),
   questionTypes: Joi.array()

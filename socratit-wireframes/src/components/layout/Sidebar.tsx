@@ -21,7 +21,8 @@ import {
   GraduationCap,
   ShieldCheck,
   Brain,
-  FolderOpen
+  FolderOpen,
+  Map
 } from 'lucide-react';
 import messageService from '../../services/message.service';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -72,6 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: t('sidebar.myClasses'), icon: BookOpen, path: '/student/classes' },
       { label: t('sidebar.assignments'), icon: FileText, path: '/student/assignments' },
       { label: t('sidebar.grades'), icon: BarChart3, path: '/student/grades' },
+      { label: 'Atlas', icon: Map, path: '/student/atlas' },
       { label: t('sidebar.aiTutor'), icon: Brain, path: '/student/ai-tutor' },
       { label: t('sidebar.messages'), icon: MessageSquare, path: '/student/messages', badge: unreadCount },
     ],

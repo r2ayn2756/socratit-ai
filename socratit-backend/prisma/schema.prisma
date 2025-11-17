@@ -70,7 +70,6 @@ enum EnrollmentStatus {
 enum AssignmentType {
   PRACTICE
   TEST
-  HOMEWORK
   ESSAY
   INTERACTIVE_MATH
 }
