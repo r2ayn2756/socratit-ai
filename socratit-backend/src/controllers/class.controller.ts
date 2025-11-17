@@ -214,7 +214,6 @@ export const createClass = async (
       message: 'Class created successfully',
     };
 
-    console.log('[DEBUG] Sending response with scheduleId:', scheduleId);
     res.status(201).json(response);
   } catch (error) {
     throw error;
