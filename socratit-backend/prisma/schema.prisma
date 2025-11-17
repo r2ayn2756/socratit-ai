@@ -2391,7 +2391,7 @@ model StudentConceptMastery {
   conceptId String @map("concept_id")
 
   // Relations
-  student User            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student User            @relation("StudentConceptMasteries", fields: [studentId], references: [id], onDelete: Cascade)
   school  School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   concept ConceptTaxonomy @relation(fields: [conceptId], references: [id], onDelete: Cascade)
 

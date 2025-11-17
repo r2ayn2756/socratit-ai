@@ -1,0 +1,42 @@
+--- a/socratit-wireframes/src/pages/teacher/TeacherAssignments.tsx
++++ b/socratit-wireframes/src/pages/teacher/TeacherAssignments.tsx
+@@ -70,9 +70,16 @@ export const TeacherAssignments: React.FC = () => {
+   // Publish assignment mutation
+   const publishMutation = useMutation({
+     mutationFn: (assignmentId: string) =>
+       assignmentService.publishAssignment(assignmentId, { publishNow: true }),
+     onSuccess: () => {
+       queryClient.invalidateQueries({ queryKey: ['assignments'] });
+     },
++    onError: (error: any) => {
++      const errorMessage = error?.response?.data?.message || 'Failed to publish assignment';
++      alert(errorMessage);
++      console.error('Error publishing assignment:', error);
++    },
+   });
+
+   const assignments = assignmentsData?.data || [];
+@@ -210,14 +217,24 @@ export const TeacherAssignments: React.FC = () => {
+                   </Button>
+                 )}
+                 {assignment.status === 'DRAFT' && (
+                   <>
++                    {/* Show number of questions */}
++                    {(assignment._count?.questions || 0) === 0 && (
++                      <span className="text-xs text-red-600 mr-2">
++                        No questions
++                      </span>
++                    )}
+                     <Button
+                       variant="primary"
+                       size="sm"
+                       onClick={() => publishMutation.mutate(assignment.id)}
+-                      disabled={publishMutation.isPending}
++                      disabled={publishMutation.isPending || (assignment._count?.questions || 0) === 0}
++                      title={(assignment._count?.questions || 0) === 0 ? 'Cannot publish without questions' : ''}
+                     >
+                       <CheckCircle className="w-4 h-4 mr-2" />
+                       {publishMutation.isPending ? 'Publishing...' : 'Publish'}
+                     </Button>
+                     <Button
+                       variant="secondary"

@@ -92,30 +92,19 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         classData.meetingPattern = 'daily';
         classData.generateWithAI = false; // Units already generated
         classData.preGeneratedUnits = wizardState.generatedUnits || [];
-
-        console.log('[DEBUG] Adding curriculum with', classData.preGeneratedUnits.length, 'units');
       }
 
-      console.log('Creating class with data:', classData);
-      console.log('[DEBUG] Calling API: POST /api/v1/classes');
       const newClass = await classCurriculumService.createClass(classData);
-      console.log('Class created successfully:', newClass);
-      console.log('[DEBUG] Response includes scheduleId:', newClass.scheduleId);
 
       // Update wizard state with created class ID
       onUpdate({ classId: newClass.id });
 
       // Complete wizard and navigate to class dashboard
       if (onComplete) {
-        console.log('Navigating to class dashboard:', newClass.id);
         onComplete(newClass.id);
       }
     } catch (err: any) {
-      console.error('[ERROR] Class creation failed:', err);
-      console.error('[ERROR] Error response:', err.response);
-      console.error('[ERROR] Error message:', err.message);
-      console.error('[ERROR] Full error object:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
-
+      console.error('Class creation failed:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to create class. Please try again.';
       setError(errorMessage);
     } finally {

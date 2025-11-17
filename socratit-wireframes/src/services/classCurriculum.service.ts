@@ -114,37 +114,7 @@ export interface ProgressData {
  * @returns Created class details
  */
 export async function createClass(data: CreateClassRequest): Promise<ClassDetailsResponse> {
-  console.log('[classCurriculum] createClass called with data:', data);
-  console.log('[classCurriculum] data.curriculumMaterialId:', data.curriculumMaterialId);
-  console.log('[classCurriculum] data.schoolYearStart:', data.schoolYearStart);
-  console.log('[classCurriculum] data.schoolYearEnd:', data.schoolYearEnd);
-  console.log('[classCurriculum] Stringified data:', JSON.stringify(data, null, 2));
-
-  // CRITICAL FIX: Create a clean copy to ensure all fields are sent
-  const cleanData = {
-    name: data.name,
-    subject: data.subject,
-    gradeLevel: data.gradeLevel,
-    academicYear: data.academicYear,
-    color: data.color,
-    description: data.description,
-    meetingPattern: data.meetingPattern,
-    period: data.period,
-    room: data.room,
-    scheduleTime: data.scheduleTime,
-    curriculumMaterialId: data.curriculumMaterialId,
-    schoolYearStart: data.schoolYearStart,
-    schoolYearEnd: data.schoolYearEnd,
-    generateWithAI: data.generateWithAI,
-    preGeneratedUnits: data.preGeneratedUnits, // Include AI-generated units
-    aiPreferences: data.aiPreferences,
-  };
-
-  console.log('[classCurriculum] Sending clean data:', JSON.stringify(cleanData, null, 2));
-
-  const response = await apiService.post<CreateClassResponse>('/classes', cleanData);
-
-  console.log('[classCurriculum] Response received:', response.data);
+  const response = await apiService.post<CreateClassResponse>('/classes', data);
   return response.data.data;
 }
 

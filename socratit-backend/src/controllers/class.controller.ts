@@ -78,18 +78,8 @@ export const createClass = async (
 
     // Create curriculum schedule if data provided
     let scheduleId: string | undefined;
-    console.log('[DEBUG] Checking curriculum data:', {
-      hasCurriculumMaterialId: !!body.curriculumMaterialId,
-      hasSchoolYearStart: !!body.schoolYearStart,
-      hasSchoolYearEnd: !!body.schoolYearEnd,
-      curriculumMaterialId: body.curriculumMaterialId,
-      schoolYearStart: body.schoolYearStart,
-      schoolYearEnd: body.schoolYearEnd,
-      generateWithAI: body.generateWithAI,
-    });
 
     if (body.curriculumMaterialId && body.schoolYearStart && body.schoolYearEnd) {
-      console.log('[DEBUG] Creating curriculum schedule...');
       try {
         const schoolYearStart = new Date(body.schoolYearStart);
         const schoolYearEnd = new Date(body.schoolYearEnd);
@@ -119,14 +109,9 @@ export const createClass = async (
         });
 
         scheduleId = schedule.id;
-        console.log('[DEBUG] Curriculum schedule created successfully:', scheduleId);
 
         // If pre-generated units are provided, create them immediately
-        console.log('[DEBUG] Checking for pre-generated units. Has preGeneratedUnits:', !!body.preGeneratedUnits, 'Length:', body.preGeneratedUnits?.length || 0);
-
         if (body.preGeneratedUnits && body.preGeneratedUnits.length > 0) {
-          console.log('[DEBUG] Creating pre-generated units:', body.preGeneratedUnits.length);
-          console.log('[DEBUG] First unit sample:', JSON.stringify(body.preGeneratedUnits[0]).substring(0, 200));
 
           // Calculate date ranges for each unit
           let currentDate = new Date(schoolYearStart);
@@ -174,20 +159,16 @@ export const createClass = async (
               totalUnits: body.preGeneratedUnits.length,
             },
           });
-
-          console.log('[DEBUG] Pre-generated units created and schedule published');
         }
 
       } catch (scheduleError) {
-        console.error('[ERROR] Failed to create curriculum schedule:', scheduleError);
+        console.error('Failed to create curriculum schedule:', scheduleError);
         // Continue with class creation even if schedule fails
         // Teacher can create schedule later
       }
 
       // Note: If no pre-generated units, AI generation will be triggered by frontend calling separate endpoint
       // POST /api/curriculum-schedules/:scheduleId/generate-ai
-    } else {
-      console.log('[DEBUG] Skipping curriculum schedule creation - missing required fields');
     }
 
     // Log audit event

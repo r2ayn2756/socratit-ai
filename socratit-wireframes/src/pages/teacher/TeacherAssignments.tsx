@@ -74,6 +74,11 @@ export const TeacherAssignments: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
     },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 'Failed to publish assignment';
+      alert(errorMessage);
+      console.error('Error publishing assignment:', error);
+    },
   });
 
   const assignments = assignmentsData?.data || [];
@@ -149,6 +154,7 @@ export const TeacherAssignments: React.FC = () => {
     // In a real implementation, we'd need to fetch actual submission status
     const totalSubmissions = assignment._count?.submissions || 0;
     const submissionRate = 0; // TODO: Need to fetch actual submitted vs in-progress submissions
+    const hasNoQuestions = (assignment._count?.questions || 0) === 0;
 
     return (
       <motion.div key={assignment.id} variants={fadeInUp} whileHover={{ scale: 1.01, y: -2 }}>
@@ -211,15 +217,21 @@ export const TeacherAssignments: React.FC = () => {
                 )}
                 {assignment.status === 'DRAFT' && (
                   <>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => publishMutation.mutate(assignment.id)}
-                      disabled={publishMutation.isPending}
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      {publishMutation.isPending ? 'Publishing...' : 'Publish'}
-                    </Button>
+                    <div className="flex flex-col items-end gap-1">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => publishMutation.mutate(assignment.id)}
+                        disabled={publishMutation.isPending || hasNoQuestions}
+                        title={hasNoQuestions ? 'Cannot publish assignment with no questions' : ''}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        {publishMutation.isPending ? 'Publishing...' : 'Publish'}
+                      </Button>
+                      {hasNoQuestions && (
+                        <span className="text-xs text-red-600">No questions</span>
+                      )}
+                    </div>
                     <Button
                       variant="secondary"
                       size="sm"

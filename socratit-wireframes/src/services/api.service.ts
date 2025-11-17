@@ -25,15 +25,6 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Debug logging for POST /classes requests
-    if (config.method === 'post' && config.url === '/classes') {
-      console.log('[AXIOS] POST /classes interceptor');
-      console.log('[AXIOS] Request data:', config.data);
-      console.log('[AXIOS] Stringified request:', JSON.stringify(config.data, null, 2));
-      console.log('[AXIOS] Config headers:', config.headers);
-      console.log('[AXIOS] Number of keys in data:', Object.keys(config.data || {}).length);
-    }
-
     return config;
   },
   (error: AxiosError) => {
@@ -98,18 +89,7 @@ export const apiService = {
 
   // POST request
   post: <T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
-    console.log('[apiService.post] Called with URL:', url);
-    console.log('[apiService.post] Data before axios:', data);
-    console.log('[apiService.post] Data keys:', Object.keys(data || {}));
-
-    // CRITICAL FIX: Force JSON serialization for non-FormData requests
-    let requestData = data;
-    if (data && !(data instanceof FormData)) {
-      requestData = JSON.parse(JSON.stringify(data));
-      console.log('[apiService.post] Data after JSON round-trip:', requestData);
-    }
-
-    return apiClient.post<T>(url, requestData, config);
+    return apiClient.post<T>(url, data, config);
   },
 
   // PUT request
