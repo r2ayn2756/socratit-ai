@@ -94,8 +94,9 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       // Update wizard state with created class ID
       onUpdate({ classId: newClass.id });
 
-      // Wait a moment to ensure database commits complete
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for database to commit all transactions
+      setLoadingMessage('Finalizing...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Complete wizard and navigate to class dashboard
       if (onComplete) {

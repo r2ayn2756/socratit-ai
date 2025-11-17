@@ -77,8 +77,25 @@ export const ClassDashboard: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Load class info from both services to get complete data
-      const classInfo = await classCurriculumService.getClass(classId!);
+      // Load class info with retry logic for newly created classes
+      let classInfo: any = null;
+      let retries = 0;
+      const maxRetries = 3;
+
+      while (retries < maxRetries) {
+        try {
+          classInfo = await classCurriculumService.getClass(classId!);
+          break; // Success, exit retry loop
+        } catch (err: any) {
+          if (err.response?.status === 500 && retries < maxRetries - 1) {
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 1000 * (retries + 1)));
+            retries++;
+          } else {
+            throw err; // Re-throw if not a 500 or max retries reached
+          }
+        }
+      }
 
       // Also get class info from classService to get classCode and enrollment counts
       let classWithStats: any = null;
