@@ -13,6 +13,8 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 // Step Components
 import { ClassDetailsStep } from './steps/ClassDetailsStep';
 import { CurriculumUploadStep } from './steps/CurriculumUploadStep';
+import { SchoolYearStep } from './steps/SchoolYearStep';
+import { AIScheduleStep } from './steps/AIScheduleStep';
 import { ReviewClassStep } from './steps/ReviewClassStep';
 
 // ============================================================================
@@ -105,13 +107,27 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
       id: 2,
       title: t('classWizard.step2.title'),
       subtitle: t('classWizard.step2.subtitle'),
-      component: CurriculumUploadStep,
-      canSkip: true,
+      component: SchoolYearStep,
+      canSkip: false,
     },
     {
       id: 3,
       title: t('classWizard.step3.title'),
       subtitle: t('classWizard.step3.subtitle'),
+      component: CurriculumUploadStep,
+      canSkip: true,
+    },
+    {
+      id: 4,
+      title: t('classWizard.step4.title') || 'AI Schedule',
+      subtitle: t('classWizard.step4.subtitle') || 'Generate curriculum with AI',
+      component: AIScheduleStep,
+      canSkip: true, // Can skip if no curriculum uploaded
+    },
+    {
+      id: 5,
+      title: t('classWizard.step5.title') || 'Review',
+      subtitle: t('classWizard.step5.subtitle') || 'Review and create class',
       component: ReviewClassStep,
       canSkip: false,
     },
@@ -148,6 +164,12 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
     // Determine next step
     let nextStep = wizardState.currentStep + 1;
 
+    // Skip AI Schedule step (step 4) if curriculum was skipped
+    if (nextStep === 4 && wizardState.skipCurriculum) {
+      nextStep = 5; // Jump directly to Review step
+      console.log('[Wizard] Skipping AI Schedule step - no curriculum uploaded');
+    }
+
     setWizardState(prev => ({
       ...prev,
       currentStep: nextStep,
@@ -156,7 +178,13 @@ export const ClassCreationWizard: React.FC<ClassCreationWizardProps> = ({
   };
 
   const handleBack = () => {
-    const previousStep = wizardState.currentStep - 1;
+    let previousStep = wizardState.currentStep - 1;
+
+    // Skip AI Schedule step (step 4) if going back and curriculum was skipped
+    if (previousStep === 4 && wizardState.skipCurriculum) {
+      previousStep = 3; // Go back to Curriculum Upload step
+      console.log('[Wizard] Skipping AI Schedule step (going back) - no curriculum uploaded');
+    }
 
     setWizardState(prev => ({
       ...prev,

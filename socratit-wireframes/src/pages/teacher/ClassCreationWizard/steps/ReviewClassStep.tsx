@@ -43,6 +43,10 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
     try {
       console.log('Starting class creation flow...');
       console.log('[DEBUG] Full wizard state:', wizardState);
+      console.log('[DEBUG] generatedUnits:', wizardState.generatedUnits);
+      console.log('[DEBUG] generatedUnits type:', typeof wizardState.generatedUnits);
+      console.log('[DEBUG] generatedUnits length:', wizardState.generatedUnits?.length);
+      console.log('[DEBUG] generatedUnits content:', JSON.stringify(wizardState.generatedUnits, null, 2));
 
       // Step 1: Get curriculum file IDs (already uploaded in AI step if applicable)
       let curriculumMaterialIds: string[] = [];
@@ -103,9 +107,17 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           classData.aiPreferences = wizardState.aiPreferences;
 
           // Pass pre-generated units if available (user may have edited them)
+          console.log('[DEBUG] Checking generatedUnits before adding to classData');
+          console.log('[DEBUG] wizardState.generatedUnits exists:', !!wizardState.generatedUnits);
+          console.log('[DEBUG] wizardState.generatedUnits length:', wizardState.generatedUnits?.length);
+
           if (wizardState.generatedUnits && wizardState.generatedUnits.length > 0) {
             classData.preGeneratedUnits = wizardState.generatedUnits;
             console.log('[DEBUG] Including pre-generated units:', wizardState.generatedUnits.length);
+            console.log('[DEBUG] Sample unit:', JSON.stringify(wizardState.generatedUnits[0], null, 2));
+          } else {
+            console.log('[DEBUG] NO pre-generated units to include - will rely on backend AI generation');
+            console.log('[DEBUG] Reason: generatedUnits =', wizardState.generatedUnits);
           }
 
           console.log('[DEBUG] Curriculum fields added successfully');
