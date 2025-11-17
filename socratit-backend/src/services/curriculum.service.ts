@@ -210,16 +210,12 @@ export async function processCurriculumFile(curriculumId: string, userId: string
       // Import AI Knowledge Graph Service
       const aiKnowledgeGraphService = (await import('./aiKnowledgeGraph.service')).default;
 
-      // Get class information for context
-      const classInfo = curriculum.classId
-        ? await prisma.class.findUnique({ where: { id: curriculum.classId } })
-        : null;
-
       // Generate concept graph from curriculum text
+      // Note: CurriculumMaterial is teacher-level, not class-specific
       const graphResult = await aiKnowledgeGraphService.generateConceptGraphFromCurriculum(
         textForAI,
-        classInfo?.subject || 'General',
-        classInfo?.gradeLevel || 'Unknown'
+        'General',
+        'Unknown'
       );
 
       console.log(`✅ Atlas: Generated ${graphResult.conceptsGenerated} concepts and ${graphResult.relationshipsGenerated} relationships from curriculum`);

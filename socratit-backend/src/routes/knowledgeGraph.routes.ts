@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import knowledgeGraphService from '../services/knowledgeGraph.service';
 import aiKnowledgeGraphService from '../services/aiKnowledgeGraph.service';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 import { MasteryLevel } from '@prisma/client';
 
 const router = express.Router();

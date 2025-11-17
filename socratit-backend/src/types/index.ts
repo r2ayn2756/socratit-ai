@@ -219,6 +219,9 @@ export interface CreateClassRequestBody {
   meetingPattern?: string;
   generateWithAI?: boolean;
   preGeneratedUnits?: any[];
+  aiPreferences?: {
+    targetUnits?: number;
+  };
 }
 
 export interface UpdateClassRequestBody {

@@ -32,14 +32,14 @@ export class KnowledgeGraphService {
           ...(options?.filterMasteryLevel && {
             overallMasteryLevel: options.filterMasteryLevel,
           }),
+          ...(options?.filterSubject && {
+            concept: {
+              subject: options.filterSubject,
+            },
+          }),
         },
         include: {
           concept: {
-            where: options?.filterSubject
-              ? {
-                  subject: options.filterSubject,
-                }
-              : {},
             include: {
               sourceRelationships: {
                 include: { targetConcept: true },
