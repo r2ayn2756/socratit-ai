@@ -198,12 +198,24 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
       return;
     }
 
-    // Find the question
+    // For essay assignments, handle differently since they don't have questions
+    const isEssay = submission.assignment.type === 'ESSAY';
+
+    // Find the question (or handle essay case)
     const question = submission.assignment.questions.find((q) => q.id === questionId);
-    if (!question) {
+    if (!question && !isEssay) {
       res.status(404).json({
         success: false,
         message: 'Question not found in this assignment',
+      });
+      return;
+    }
+
+    // For essays, validate that questionId follows the expected pattern
+    if (isEssay && !questionId.startsWith('essay-')) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid essay submission format',
       });
       return;
     }
@@ -224,11 +236,17 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
     let aiConfidence: number | null = null;
     let aiGraded = false;
 
-    if (question.type === QuestionType.MULTIPLE_CHOICE && selectedOption) {
+    // For essays, store content but leave ungraded for teacher manual grading
+    if (isEssay) {
+      // Essays are not auto-graded - teacher will grade manually
+      isCorrect = null;
+      pointsEarned = null;
+      aiGraded = false;
+    } else if (question && question.type === QuestionType.MULTIPLE_CHOICE && selectedOption) {
       // Instant grading for multiple choice
       isCorrect = selectedOption === question.correctOption;
       pointsEarned = isCorrect ? question.points : 0;
-    } else if (question.type === QuestionType.FREE_RESPONSE && answerText) {
+    } else if (question && question.type === QuestionType.FREE_RESPONSE && answerText) {
       // AI grading for free response
       try {
         const gradingResult = await gradeFreeResponse(
@@ -253,6 +271,9 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
       }
     }
 
+    // For essays, points possible comes from assignment total points, not question
+    const pointsPossible = isEssay ? submission.assignment.totalPoints : (question?.points || 0);
+
     // Create or update answer
     const answer = existingAnswer
       ? await prisma.answer.update({
@@ -264,7 +285,7 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
             selectedOption,
             isCorrect,
             pointsEarned,
-            pointsPossible: question.points,
+            pointsPossible,
             aiGraded,
             aiFeedback,
             aiScore,
@@ -272,7 +293,7 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
             answeredAt: new Date(),
             gradedAt: isCorrect !== null ? new Date() : null,
           },
-          include: {
+          include: isEssay ? undefined : {
             question: {
               select: {
                 id: true,
@@ -294,7 +315,7 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
             selectedOption,
             isCorrect,
             pointsEarned,
-            pointsPossible: question.points,
+            pointsPossible,
             aiGraded,
             aiFeedback,
             aiScore,
@@ -302,7 +323,7 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
             answeredAt: new Date(),
             gradedAt: isCorrect !== null ? new Date() : null,
           },
-          include: {
+          include: isEssay ? undefined : {
             question: {
               select: {
                 id: true,
@@ -323,14 +344,15 @@ export async function submitAnswer(req: AuthenticatedRequest, res: Response): Pr
         studentId: user.id,
         assignmentId: submission.assignmentId,
         submissionId: submission.id,
-        questionId,
+        questionId: isEssay ? null : questionId,
         schoolId: user.schoolId,
-        eventType: 'answer_submitted',
+        eventType: isEssay ? 'essay_submitted' : 'answer_submitted',
         eventData: {
-          questionType: question.type,
+          questionType: isEssay ? 'ESSAY' : question?.type,
           isCorrect,
           pointsEarned,
           aiGraded,
+          wordCount: isEssay && answerText ? answerText.split(/\s+/).filter(Boolean).length : undefined,
         },
         ipAddress: req.ip || 'unknown',
         userAgent: req.get('user-agent'),

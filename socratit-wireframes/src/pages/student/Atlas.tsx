@@ -227,7 +227,7 @@ const Atlas: React.FC = () => {
     if (!user?.id) return;
 
     // Get base URL without /api/v1 path for WebSocket connection
-    const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1').replace('/api/v1', '');
+    const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1').replace('/api/v1', '');
     const token = localStorage.getItem('authToken');
 
     if (!token) {

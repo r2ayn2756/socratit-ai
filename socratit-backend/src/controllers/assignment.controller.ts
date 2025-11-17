@@ -955,13 +955,24 @@ export async function publishAssignment(req: AuthenticatedRequest, res: Response
       return;
     }
 
-    // Validate assignment has questions
-    if (assignment.questions.length === 0) {
+    // Validate assignment has questions (except for essays which don't need them)
+    if (assignment.type !== 'ESSAY' && assignment.questions.length === 0) {
       res.status(400).json({
         success: false,
         message: 'Cannot publish assignment without questions',
       });
       return;
+    }
+
+    // For essay assignments, validate that they have proper configuration
+    if (assignment.type === 'ESSAY') {
+      if (!assignment.description || assignment.description.trim() === '') {
+        res.status(400).json({
+          success: false,
+          message: 'Essay assignments must have a description with the prompt/topic',
+        });
+        return;
+      }
     }
 
     // Determine new status

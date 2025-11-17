@@ -81,6 +81,7 @@ export const requireClassAccess = async (
 
     next();
   } catch (error) {
+    console.error('requireClassAccess middleware error:', error);
     next(error);
   }
 };
