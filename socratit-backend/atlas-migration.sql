@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS "student_concept_mastery" (
 
     CONSTRAINT "student_concept_mastery_student_id_fkey"
         FOREIGN KEY ("student_id")
-        REFERENCES "User"("id")
+        REFERENCES "users"("id")
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "student_concept_mastery_concept_id_fkey"
         FOREIGN KEY ("concept_id")
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS "class_concept" (
 
     CONSTRAINT "class_concept_class_id_fkey"
         FOREIGN KEY ("class_id")
-        REFERENCES "Class"("id")
+        REFERENCES "classes"("id")
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "class_concept_concept_id_fkey"
         FOREIGN KEY ("concept_id")
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS "concept_milestone" (
 
     CONSTRAINT "concept_milestone_student_id_fkey"
         FOREIGN KEY ("student_id")
-        REFERENCES "User"("id")
+        REFERENCES "users"("id")
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "concept_milestone_concept_id_fkey"
         FOREIGN KEY ("concept_id")
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS "concept_milestone" (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "concept_milestone_class_id_fkey"
         FOREIGN KEY ("class_id")
-        REFERENCES "Class"("id")
+        REFERENCES "classes"("id")
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS "concept_practice_log" (
 
     CONSTRAINT "concept_practice_log_student_id_fkey"
         FOREIGN KEY ("student_id")
-        REFERENCES "User"("id")
+        REFERENCES "users"("id")
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "concept_practice_log_concept_id_fkey"
         FOREIGN KEY ("concept_id")
@@ -173,11 +173,11 @@ CREATE TABLE IF NOT EXISTS "concept_practice_log" (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "concept_practice_log_class_id_fkey"
         FOREIGN KEY ("class_id")
-        REFERENCES "Class"("id")
+        REFERENCES "classes"("id")
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "concept_practice_log_assignment_id_fkey"
         FOREIGN KEY ("assignment_id")
-        REFERENCES "Assignment"("id")
+        REFERENCES "assignments"("id")
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -199,11 +199,11 @@ CREATE TABLE IF NOT EXISTS "student_grade_history" (
 
     CONSTRAINT "student_grade_history_student_id_fkey"
         FOREIGN KEY ("student_id")
-        REFERENCES "User"("id")
+        REFERENCES "users"("id")
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "student_grade_history_school_id_fkey"
         FOREIGN KEY ("school_id")
-        REFERENCES "School"("id")
+        REFERENCES "schools"("id")
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "student_grade_history_student_id_school_year_key"
         UNIQUE ("student_id", "school_year")

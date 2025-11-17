@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import * as aiService from './ai.service';
+import { chatCompletion } from './ai.service';
 
 const prisma = new PrismaClient();
 
@@ -83,7 +83,7 @@ Guidelines:
 
 Return ONLY valid JSON, no additional text.`;
 
-      const response = await aiService.chatCompletion(
+      const response = await chatCompletion(
         [
           { role: 'system', content: 'You are an educational AI that analyzes curriculum.' },
           { role: 'user', content: prompt },
@@ -217,7 +217,7 @@ Return JSON:
 
 Focus on meaningful, pedagogically valuable connections. Return ONLY valid JSON.`;
 
-      const response = await aiService.chatCompletion(
+      const response = await chatCompletion(
         [
           {
             role: 'system',
@@ -351,7 +351,7 @@ Return JSON:
 
 Focus on actionable predictions based on prerequisite gaps. Return ONLY valid JSON.`;
 
-      const response = await aiService.chatCompletion(
+      const response = await chatCompletion(
         [
           {
             role: 'system',
@@ -410,7 +410,7 @@ Return JSON:
 
 Extract only genuine educational concepts, not casual mentions. Return ONLY valid JSON.`;
 
-      const response = await aiService.chatCompletion(
+      const response = await chatCompletion(
         [
           { role: 'system', content: 'You are an educational AI that identifies concepts.' },
           { role: 'user', content: prompt },
@@ -455,7 +455,7 @@ Return JSON showing which concepts are prerequisites for others:
 
 Order concepts from fundamental to advanced. Return ONLY valid JSON.`;
 
-      const response = await aiService.chatCompletion(
+      const response = await chatCompletion(
         [
           {
             role: 'system',

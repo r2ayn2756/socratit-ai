@@ -710,6 +710,7 @@ export interface ChatCompletionOptions {
   temperature?: number;
   maxTokens?: number;
   model?: string;
+  responseFormat?: { type: 'json_object' | 'text' };
 }
 
 export interface StreamCallback {
@@ -736,6 +737,7 @@ export async function chatCompletion(
     temperature = 0.7,
     maxTokens = 500,
     model,
+    responseFormat,
   } = options;
 
   const provider = env.AI_PROVIDER || 'claude';
@@ -752,10 +754,18 @@ export async function chatCompletion(
       }));
 
       const client = getAnthropicClient();
+
+      // Note: Claude doesn't have a native responseFormat parameter
+      // If JSON is requested, we add instruction to system prompt
+      let systemPrompt = systemMessage?.content || '';
+      if (responseFormat?.type === 'json_object') {
+        systemPrompt += '\n\nYou must respond with valid JSON only. Do not include any text outside the JSON object.';
+      }
+
       const response = await client.messages.create({
         model: model || env.CLAUDE_MODEL || 'claude-3-haiku-20240307',
         max_tokens: maxTokens,
-        system: systemMessage?.content,
+        system: systemPrompt || undefined,
         messages: claudeMessages,
       });
 
@@ -782,6 +792,7 @@ export async function chatCompletion(
         })),
         temperature,
         max_tokens: maxTokens,
+        ...(responseFormat && { response_format: responseFormat }),
       });
 
       const content = response.choices[0]?.message?.content || '';
