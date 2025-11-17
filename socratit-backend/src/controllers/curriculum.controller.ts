@@ -718,10 +718,17 @@ export async function analyzeCurriculumPreview(req: Request, res: Response): Pro
       id: `preview-unit-${index + 1}`,
       title: unit.title,
       description: unit.description,
-      topics: unit.subUnits.map((su) => su.name), // Extract topic names from sub-units
+      // Convert subUnits to proper UnitTopic format for frontend
+      topics: unit.subUnits.map((su) => ({
+        name: su.name,
+        subtopics: [], // Sub-units don't have subtopics at this level
+        concepts: su.concepts || [],
+        learningObjectives: su.learningObjectives || [],
+      })),
       learningObjectives: unit.subUnits.flatMap((su) => su.learningObjectives),
       estimatedWeeks: unit.estimatedWeeks,
       difficultyLevel: unit.difficultyLevel,
+      concepts: unit.subUnits.flatMap((su) => su.concepts || []),
       subUnits: unit.subUnits,
     }));
 
