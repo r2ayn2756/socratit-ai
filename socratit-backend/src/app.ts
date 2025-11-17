@@ -59,23 +59,7 @@ const isVercelPreview = (origin: string) => {
 };
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
-
-    // Log the origin for debugging
-    console.log('CORS request from origin:', origin);
-
-    // Check if origin is in allowed list or is a Vercel preview
-    if (allowedOrigins.includes(origin) || isVercelPreview(origin)) {
-      console.log('✅ CORS allowed for origin:', origin);
-      callback(null, true);
-    } else {
-      console.log('❌ CORS blocked for origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // TEMPORARY: Allow all origins to debug CORS issue
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
