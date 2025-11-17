@@ -505,9 +505,6 @@ export const StudentDashboard: React.FC = () => {
                       <h3 className="font-bold text-xl text-slate-800">{t('student.dashboard.aiTutor.title')}</h3>
                       <Sparkles className="w-4 h-4 text-purple-600" />
                     </div>
-                    {t('student.dashboard.aiTutor.subtitle') && (
-                      <p className="text-sm text-purple-700 font-medium">{t('student.dashboard.aiTutor.subtitle')}</p>
-                    )}
                   </div>
                 </div>
 
