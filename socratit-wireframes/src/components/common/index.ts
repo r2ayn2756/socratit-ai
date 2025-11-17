@@ -18,6 +18,6 @@ export type { BadgeProps } from './Badge';
 export { StatCard } from './StatCard';
 export type { StatCardProps } from './StatCard';
 
-export { FileUpload } from './FileUpload';
+export { FileUpload, MultiFileUpload } from '../shared/FileUpload';
 
 export { LanguageSelector } from './LanguageSelector';
