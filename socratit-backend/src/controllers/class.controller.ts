@@ -24,8 +24,6 @@ export const createClass = async (
     const schoolId = req.user!.schoolId;
     const body = req.body as CreateClassRequestBody;
 
-    console.log('[DEBUG] Raw request body:', JSON.stringify(req.body, null, 2));
-
     // Generate unique class code
     let classCode = generateClassCode();
     let isUnique = false;
@@ -111,14 +109,7 @@ export const createClass = async (
         scheduleId = schedule.id;
 
         // If pre-generated units are provided, create them immediately
-        console.log('[DEBUG] Checking preGeneratedUnits:', {
-          exists: !!body.preGeneratedUnits,
-          isArray: Array.isArray(body.preGeneratedUnits),
-          length: body.preGeneratedUnits?.length || 0
-        });
-
         if (body.preGeneratedUnits && body.preGeneratedUnits.length > 0) {
-          console.log('[DEBUG] Creating', body.preGeneratedUnits.length, 'pre-generated units');
 
           // Calculate date ranges for each unit
           let currentDate = new Date(schoolYearStart);
@@ -166,10 +157,6 @@ export const createClass = async (
               totalUnits: body.preGeneratedUnits.length,
             },
           });
-
-          console.log('[DEBUG] Successfully created', body.preGeneratedUnits.length, 'units and published schedule');
-        } else {
-          console.log('[DEBUG] No pre-generated units to create');
         }
 
       } catch (scheduleError) {

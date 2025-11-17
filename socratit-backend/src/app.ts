@@ -80,16 +80,6 @@ app.use(express.urlencoded({
   parameterLimit: 50000  // Increase from default 1000
 }));
 
-// DEBUG: Log body immediately after parsing to diagnose missing fields
-app.use((req, _res, next) => {
-  if (req.method === 'POST' && req.path.includes('/classes')) {
-    console.log('[BODY-PARSER] Path:', req.path);
-    console.log('[BODY-PARSER] Body keys:', Object.keys(req.body || {}).length);
-    console.log('[BODY-PARSER] Body:', JSON.stringify(req.body, null, 2));
-  }
-  next();
-});
-
 // Logging middleware (only in development)
 if (env.NODE_ENV === 'development') {
   app.use(morgan('dev'));

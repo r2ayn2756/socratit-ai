@@ -3,7 +3,8 @@
     "allow": [
       "Bash(DATABASE_URL=\"postgresql://postgres:BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl@gondola.proxy.rlwy.net:13992/railway\" npx prisma migrate deploy:*)",
       "Bash(PGPASSWORD=BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl psql:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(.vercel-deploy)"
     ],
     "deny": [],
     "ask": []

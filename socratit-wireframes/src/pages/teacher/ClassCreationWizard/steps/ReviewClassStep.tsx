@@ -87,13 +87,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         classData.meetingPattern = 'daily';
         classData.generateWithAI = false; // Units already generated
         classData.preGeneratedUnits = wizardState.generatedUnits || [];
-
-        console.log('[ReviewClassStep] Wizard state generatedUnits:', wizardState.generatedUnits);
-        console.log('[ReviewClassStep] preGeneratedUnits being sent:', classData.preGeneratedUnits);
-        console.log('[ReviewClassStep] Number of units:', classData.preGeneratedUnits.length);
       }
 
-      console.log('[ReviewClassStep] Final classData before API call:', classData);
       const newClass = await classCurriculumService.createClass(classData);
 
       // Update wizard state with created class ID

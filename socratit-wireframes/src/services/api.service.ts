@@ -89,11 +89,6 @@ export const apiService = {
 
   // POST request
   post: <T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
-    if (url === '/classes') {
-      console.log('[apiService.post] POST /classes data:', data);
-      console.log('[apiService.post] Has preGeneratedUnits:', !!data?.preGeneratedUnits);
-      console.log('[apiService.post] preGeneratedUnits length:', data?.preGeneratedUnits?.length);
-    }
     return apiClient.post<T>(url, data, config);
   },
 
