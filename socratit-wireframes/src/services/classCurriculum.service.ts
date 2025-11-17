@@ -35,6 +35,7 @@ export interface CreateClassRequest {
   schoolYearStart?: string; // ISO date string
   schoolYearEnd?: string; // ISO date string
   generateWithAI?: boolean;
+  preGeneratedUnits?: any[]; // Units generated from AI processing
   aiPreferences?: {
     targetUnits?: number;
     pacingPreference?: 'slow' | 'standard' | 'fast';
@@ -135,6 +136,7 @@ export async function createClass(data: CreateClassRequest): Promise<ClassDetail
     schoolYearStart: data.schoolYearStart,
     schoolYearEnd: data.schoolYearEnd,
     generateWithAI: data.generateWithAI,
+    preGeneratedUnits: data.preGeneratedUnits, // Include AI-generated units
     aiPreferences: data.aiPreferences,
   };
 
