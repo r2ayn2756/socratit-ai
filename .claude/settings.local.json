@@ -4,7 +4,9 @@
       "Bash(DATABASE_URL=\"postgresql://postgres:BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl@gondola.proxy.rlwy.net:13992/railway\" npx prisma migrate deploy:*)",
       "Bash(PGPASSWORD=BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl psql:*)",
       "Bash(git fetch:*)",
-      "Bash(.vercel-deploy)"
+      "Bash(.vercel-deploy)",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, title, description, topics, \"\"learningObjectives\"\", concepts FROM \"\"CurriculumUnit\"\" WHERE \"\"scheduleId\"\" IN (SELECT id FROM \"\"CurriculumSchedule\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 1) ORDER BY \"\"unitNumber\"\" LIMIT 3;\")",
+      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, title, LEFT(CAST(topics AS TEXT), 100) as topics_preview FROM \"\"CurriculumUnit\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 3;\")"
     ],
     "deny": [],
     "ask": []
