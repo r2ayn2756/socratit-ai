@@ -92,9 +92,18 @@ export const createClassSchema = Joi.object({
       description: Joi.string().optional().allow(''),
       estimatedWeeks: Joi.number().optional().min(1).max(10),
       difficultyLevel: Joi.number().optional().min(1).max(5),
-      topics: Joi.array().items(Joi.string()).optional(),
+      // Topics as UnitTopic objects with name, subtopics, concepts, learningObjectives
+      topics: Joi.array().items(
+        Joi.object({
+          name: Joi.string().required(),
+          subtopics: Joi.array().items(Joi.string()).optional(),
+          concepts: Joi.array().items(Joi.string()).optional(),
+          learningObjectives: Joi.array().items(Joi.string()).optional(),
+        })
+      ).optional(),
       learningObjectives: Joi.array().items(Joi.string()).optional(),
       concepts: Joi.array().items(Joi.string()).optional(),
+      subUnits: Joi.array().optional(), // Allow subUnits array to pass through
     })
   ).optional().messages({
     'array.base': 'Pre-generated units must be an array',
