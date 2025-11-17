@@ -2280,3 +2280,267 @@ model CurriculumMilestone {
   @@index([status])
   @@map("curriculum_milestones")
 }
+
+// ============================================================================
+// ATLAS - MULTI-YEAR KNOWLEDGE GRAPH SYSTEM
+// Lifelong knowledge tracking across all grades and subjects
+// ============================================================================
+
+// ============================================================================
+// CONCEPT TAXONOMY
+// Canonical concept definitions spanning all subjects and grade levels
+// ============================================================================
+
+model ConceptTaxonomy {
+  id          String  @id @default(uuid())
+  conceptName String  @unique @map("concept_name") // "Quadratic Equations"
+  subject     String // "Mathematics", "Science", "English", etc.
+  gradeLevel  String? @map("grade_level") // "9-10" (when typically taught)
+  description String? @db.Text
+
+  // Hierarchical taxonomy
+  parentConceptId String?          @map("parent_concept_id")
+  parentConcept   ConceptTaxonomy? @relation("ConceptHierarchy", fields: [parentConceptId], references: [id], onDelete: SetNull)
+  childConcepts   ConceptTaxonomy[] @relation("ConceptHierarchy")
+
+  // Fuzzy matching support
+  aliases String[] // ["quadratics", "quadratic functions", "parabolas"]
+
+  // Cross-subject connections
+  sourceRelationships ConceptRelationship[] @relation("SourceConcept")
+  targetRelationships ConceptRelationship[] @relation("TargetConcept")
+
+  // Mastery tracking
+  studentMasteries StudentConceptMastery[]
+  milestones       ConceptMilestone[]
+
+  // Metadata
+  aiGenerated     Boolean @default(false) @map("ai_generated")
+  teacherModified Boolean @default(false) @map("teacher_modified")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([subject, gradeLevel])
+  @@index([conceptName])
+  @@map("concept_taxonomy")
+}
+
+// ============================================================================
+// CONCEPT RELATIONSHIP
+// Semantic connections between concepts (prerequisites, applications, etc.)
+// ============================================================================
+
+model ConceptRelationship {
+  id               String @id @default(uuid())
+  sourceConceptId  String @map("source_concept_id")
+  targetConceptId  String @map("target_concept_id")
+  relationshipType String @map("relationship_type") // "prerequisite", "builds_upon", "applied_in", "related"
+  strength         Float  @default(1.0) // 0-1, how strong the connection is
+
+  sourceConcept ConceptTaxonomy @relation("SourceConcept", fields: [sourceConceptId], references: [id], onDelete: Cascade)
+  targetConcept ConceptTaxonomy @relation("TargetConcept", fields: [targetConceptId], references: [id], onDelete: Cascade)
+
+  // AI-generated metadata
+  aiGenerated Boolean @default(false) @map("ai_generated")
+  confidence  Float? // 0-1, AI confidence in relationship
+  reasoning   String? @db.Text // AI explanation for relationship
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([sourceConceptId, targetConceptId, relationshipType])
+  @@index([sourceConceptId])
+  @@index([targetConceptId])
+  @@index([relationshipType])
+  @@map("concept_relationships")
+}
+
+// ============================================================================
+// STUDENT CONCEPT MASTERY
+// Student-scoped mastery tracking across ALL classes (not class-scoped)
+// ============================================================================
+
+model StudentConceptMastery {
+  id        String @id @default(uuid())
+  studentId String @map("student_id")
+  schoolId  String @map("school_id")
+  conceptId String @map("concept_id")
+
+  // Relations
+  student User            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school  School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  concept ConceptTaxonomy @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  // Aggregate mastery across ALL classes where concept appeared
+  overallMasteryPercent Float        @default(0) @map("overall_mastery_percent") // 0-100
+  overallMasteryLevel   MasteryLevel @default(NOT_STARTED) @map("overall_mastery_level")
+
+  // Attempt statistics (aggregated across all classes)
+  totalAttempts     Int @default(0) @map("total_attempts")
+  correctAttempts   Int @default(0) @map("correct_attempts")
+  incorrectAttempts Int @default(0) @map("incorrect_attempts")
+
+  // Trend analysis
+  trend           TrendDirection @default(STABLE)
+  previousPercent Float?         @map("previous_percent") // Mastery % before last update
+  improvementRate Float?         @map("improvement_rate") // Rate of improvement per week
+
+  // Timeline tracking
+  firstAssessed DateTime? @map("first_assessed") // When student first encountered this concept
+  lastAssessed  DateTime? @map("last_assessed") // Most recent assessment across all classes
+
+  // Historical progression (JSON array of changes)
+  masteryHistory Json? @map("mastery_history") // [{date, percent, classId, assignmentId, grade, event}]
+
+  // Class-specific tracking
+  classMasteries ClassConceptMastery[]
+
+  // Knowledge graph visualization
+  graphPositionX Float? @map("graph_position_x") // React Flow X coordinate
+  graphPositionY Float? @map("graph_position_y") // React Flow Y coordinate
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([studentId, conceptId])
+  @@index([studentId, overallMasteryPercent])
+  @@index([conceptId])
+  @@index([overallMasteryLevel])
+  @@map("student_concept_mastery")
+}
+
+// ============================================================================
+// CLASS CONCEPT MASTERY
+// Class-specific context for historical analysis
+// ============================================================================
+
+model ClassConceptMastery {
+  id                      String @id @default(uuid())
+  studentConceptMasteryId String @map("student_concept_mastery_id")
+  classId                 String @map("class_id")
+
+  // Relations
+  studentConceptMastery StudentConceptMastery @relation(fields: [studentConceptMasteryId], references: [id], onDelete: Cascade)
+  class                 Class                 @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  // Class-specific performance
+  masteryPercent   Float @default(0) @map("mastery_percent") // Mastery at end of this class
+  attemptsInClass  Int   @default(0) @map("attempts_in_class")
+  correctInClass   Int   @default(0) @map("correct_in_class")
+  incorrectInClass Int   @default(0) @map("incorrect_in_class")
+
+  // When concept was taught/assessed in this class
+  firstAssessedInClass DateTime? @map("first_assessed_in_class")
+  lastAssessedInClass  DateTime? @map("last_assessed_in_class")
+
+  // Teacher feedback (optional)
+  teacherNotes String? @db.Text @map("teacher_notes")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([studentConceptMasteryId, classId])
+  @@index([classId])
+  @@index([studentConceptMasteryId])
+  @@map("class_concept_mastery")
+}
+
+// ============================================================================
+// STUDENT LEARNING JOURNEY
+// Aggregate view of student's complete learning path across all years
+// ============================================================================
+
+model StudentLearningJourney {
+  id        String @id @default(uuid())
+  studentId String @unique @map("student_id")
+  schoolId  String @map("school_id")
+
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school  School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  // AI-identified knowledge gaps
+  identifiedGaps  String[]  @default([]) // [conceptId1, conceptId2]
+  gapsLastUpdated DateTime? @map("gaps_last_updated")
+
+  // Predicted future struggles (AI-powered)
+  predictedStruggles Json? @map("predicted_struggles")
+  // Format: {conceptId: {probability: 0.75, reason: "struggled with prerequisites"}}
+
+  // Concept milestones
+  conceptMilestones ConceptMilestone[]
+
+  // Graph visualization preferences
+  preferredLayout String @default("hierarchical") @map("preferred_layout")
+  // Options: "hierarchical", "force", "circular", "radial"
+
+  // Student achievements
+  totalConceptsMastered Int     @default(0) @map("total_concepts_mastered")
+  currentGradeLevel     String? @map("current_grade_level")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([studentId])
+  @@map("student_learning_journeys")
+}
+
+// ============================================================================
+// CONCEPT MILESTONE
+// Track significant learning achievements
+// ============================================================================
+
+model ConceptMilestone {
+  id        String @id @default(uuid())
+  journeyId String @map("journey_id")
+  conceptId String @map("concept_id")
+
+  journey StudentLearningJourney @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  concept ConceptTaxonomy         @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  milestoneType String   @map("milestone_type") // "FIRST_INTRODUCED", "MASTERED", "REMEDIATED", "APPLIED_IN_NEW_CONTEXT"
+  achievedDate  DateTime @map("achieved_date")
+
+  // Context of achievement
+  achievedInClassId String? @map("achieved_in_class_id")
+  assignmentId      String? @map("assignment_id")
+  gradeLevel        String? @map("grade_level")
+
+  // Additional context
+  contextData Json? @map("context_data") // {score, teacherNotes, aiInsights}
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([journeyId, achievedDate])
+  @@index([conceptId])
+  @@map("concept_milestones")
+}
+
+// ============================================================================
+// STUDENT GRADE HISTORY
+// Track student progression through grade levels
+// ============================================================================
+
+model StudentGradeHistory {
+  id         String @id @default(uuid())
+  studentId  String @map("student_id")
+  gradeLevel String @map("grade_level") // "9th Grade", "10th Grade"
+  schoolYear String @map("school_year") // "2024-2025"
+
+  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  startDate DateTime
+  endDate   DateTime?
+
+  // Advancement status
+  advancement String // "PROMOTED", "RETAINED", "SKIPPED"
+
+  // Academic performance summary
+  gpa        Float? // GPA for this grade level
+  attendance Float? // Attendance percentage
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([studentId, startDate])
+  @@index([schoolYear])
+  @@map("student_grade_history")
+}

@@ -73,7 +73,9 @@
       "Bash(git stash:*)",
       "Bash(DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\" npx prisma migrate dev:*)",
       "Bash(export DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\")",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(set DATABASE_URL=postgresql://test:test@localhost:5432/test)",
+      "Bash(PGPASSWORD=BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl psql:*)"
     ],
     "deny": [],
     "ask": []
