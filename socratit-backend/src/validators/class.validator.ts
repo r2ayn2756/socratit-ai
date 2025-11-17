@@ -84,6 +84,21 @@ export const createClassSchema = Joi.object({
       'array.base': 'Focus areas must be an array of strings',
     }),
   }).optional(),
+
+  // Pre-generated curriculum units from AI analysis
+  preGeneratedUnits: Joi.array().items(
+    Joi.object({
+      title: Joi.string().required(),
+      description: Joi.string().optional().allow(''),
+      estimatedWeeks: Joi.number().optional().min(1).max(10),
+      difficultyLevel: Joi.number().optional().min(1).max(5),
+      topics: Joi.array().items(Joi.string()).optional(),
+      learningObjectives: Joi.array().items(Joi.string()).optional(),
+      concepts: Joi.array().items(Joi.string()).optional(),
+    })
+  ).optional().messages({
+    'array.base': 'Pre-generated units must be an array',
+  }),
 });
 
 /**
