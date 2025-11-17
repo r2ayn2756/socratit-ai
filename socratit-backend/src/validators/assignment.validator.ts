@@ -70,7 +70,7 @@ export const updateAssignmentValidator = Joi.object({
   title: Joi.string().min(1).max(200),
   description: Joi.string().max(1000).allow(null, ''),
   instructions: Joi.string().max(2000).allow(null, ''),
-  type: Joi.string().valid('PRACTICE', 'TEST', 'HOMEWORK', 'ESSAY', 'INTERACTIVE_MATH'),
+  type: Joi.string().valid('PRACTICE', 'TEST', 'ESSAY', 'INTERACTIVE_MATH'),
   totalPoints: Joi.number().integer().min(1).max(1000),
   passingScore: Joi.number().integer().min(0).max(1000).allow(null),
   dueDate: Joi.date().iso().allow(null),
@@ -181,7 +181,7 @@ export const addTeacherFeedbackValidator = Joi.object({
 export const getAssignmentsQueryValidator = Joi.object({
   classId: Joi.string().uuid(),
   status: Joi.string().valid('DRAFT', 'SCHEDULED', 'ACTIVE', 'CLOSED', 'ARCHIVED'),
-  type: Joi.string().valid('PRACTICE', 'TEST', 'HOMEWORK', 'ESSAY', 'INTERACTIVE_MATH'),
+  type: Joi.string().valid('PRACTICE', 'TEST', 'ESSAY', 'INTERACTIVE_MATH'),
   includeQuestions: Joi.boolean().default(false),
   limit: Joi.number().integer().min(1).max(100).default(20),
   offset: Joi.number().integer().min(0).default(0),

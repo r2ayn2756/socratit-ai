@@ -1,0 +1,15 @@
+--- Lines 79-191 (curriculum schedule creation logic) should be replaced with:
+
+    // Note: Curriculum files are just stored as references in curriculumMaterialId
+    // No automatic curriculum schedule creation - teachers will create schedules manually
+    console.log('[DEBUG] Class created. Curriculum file reference:', body.curriculumMaterialId || 'none');
+
+--- Lines 227-234 (response with scheduleId) should be replaced with:
+
+    const response: ApiResponse = {
+      success: true,
+      data: classWithTeachers,
+      message: 'Class created successfully',
+    };
+
+    res.status(201).json(response);

@@ -87,8 +87,8 @@ export const generateAssignmentSchema = Joi.object({
     }),
 
   // Assignment settings (optional)
-  type: Joi.string().valid('PRACTICE', 'QUIZ', 'TEST', 'HOMEWORK', 'CHALLENGE').default('QUIZ').messages({
-    'any.only': 'Type must be: PRACTICE, QUIZ, TEST, HOMEWORK, or CHALLENGE',
+  type: Joi.string().valid('PRACTICE', 'TEST').default('PRACTICE').messages({
+    'any.only': 'Type must be: PRACTICE or TEST',
   }),
 
   totalPoints: Joi.number().integer().min(1).max(1000).default(100).messages({
