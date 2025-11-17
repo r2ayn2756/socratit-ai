@@ -8,7 +8,7 @@ const router = express.Router();
 
 /**
  * GET /api/v1/knowledge-graph/:studentId
- * Get student's complete knowledge graph
+ * Get student's complete knowledge graph with nodes and edges
  * Auth: Student (own data), Teacher (students in their class), Admin
  */
 router.get('/:studentId', authenticate, async (req: Request, res: Response) => {
@@ -40,10 +40,16 @@ router.get('/:studentId', authenticate, async (req: Request, res: Response) => {
       data: graph,
     });
   } catch (error: any) {
-    console.error('Error fetching knowledge graph:', error);
+    console.error('[Knowledge Graph Route] Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code,
+    });
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to fetch knowledge graph',
+      error: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 });
