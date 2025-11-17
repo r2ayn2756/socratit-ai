@@ -41,18 +41,13 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
     setError(null);
 
     try {
-      console.log('Starting class creation flow...');
-      console.log('[DEBUG] Full wizard state:', wizardState);
-
       // Step 1: Get curriculum file IDs (already uploaded in AI step if applicable)
       let curriculumMaterialIds: string[] = [];
       if (wizardState.curriculumMaterialIds && wizardState.curriculumMaterialIds.length > 0) {
         // Files were already uploaded during AI processing
         curriculumMaterialIds = wizardState.curriculumMaterialIds;
-        console.log('Using pre-uploaded curriculum files:', curriculumMaterialIds);
       } else if (wizardState.curriculumFiles.length > 0) {
         // Fallback: Upload files if they weren't uploaded yet (shouldn't happen normally)
-        console.log('Uploading curriculum files:', wizardState.curriculumFiles.map(f => f.name).join(', '));
         setLoadingMessage(`Uploading ${wizardState.curriculumFiles.length} file(s)...`);
         try {
           for (const file of wizardState.curriculumFiles) {
@@ -98,6 +93,9 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
 
       // Update wizard state with created class ID
       onUpdate({ classId: newClass.id });
+
+      // Wait a moment to ensure database commits complete
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Complete wizard and navigate to class dashboard
       if (onComplete) {

@@ -77,17 +77,13 @@ export const ClassDashboard: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('Loading class data for ID:', classId);
-
       // Load class info from both services to get complete data
       const classInfo = await classCurriculumService.getClass(classId!);
-      console.log('Class info loaded:', classInfo);
 
       // Also get class info from classService to get classCode and enrollment counts
       let classWithStats: any = null;
       try {
         classWithStats = await classService.getClassById(classId!);
-        console.log('Class stats loaded:', classWithStats);
       } catch (statsError: any) {
         console.warn('Class stats not available:', statsError);
       }
@@ -105,7 +101,6 @@ export const ClassDashboard: React.FC = () => {
       let pendingEnrollments: any[] = [];
       try {
         pendingEnrollments = await classService.getClassEnrollments(classId!, 'PENDING');
-        console.log('Pending enrollments loaded:', pendingEnrollments);
       } catch (enrollmentError: any) {
         console.warn('Pending enrollments not available:', enrollmentError);
       }
@@ -121,7 +116,6 @@ export const ClassDashboard: React.FC = () => {
 
       // Load curriculum schedule if it exists
       const schedule = await classCurriculumService.getClassSchedule(classId!);
-      console.log('Schedule loaded:', schedule);
 
       // Extract units from schedule response
       let currentUnit: any = null;
