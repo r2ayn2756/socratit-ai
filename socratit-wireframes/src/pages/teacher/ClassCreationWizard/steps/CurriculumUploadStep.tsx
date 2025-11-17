@@ -202,7 +202,7 @@ export const CurriculumUploadStep: React.FC<CurriculumUploadStepProps> = ({
         <GlassCard variant="elevated">
           <div className="p-8 text-center space-y-6">
             <div className="flex justify-center">
-              <CircularProgress value={progress} size={120} />
+              <CircularProgress progress={progress} size={120} />
             </div>
 
             <div className="space-y-2">
