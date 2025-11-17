@@ -98,30 +98,23 @@ export const CurriculumSection: React.FC<CurriculumSectionProps> = ({
               {allUnits.map((unit) => {
                 const isCurrent = currentUnit?.id === unit.id;
 
-                // DEBUG: Log unit data
-                console.log(`[CurriculumSection] Unit ${unit.unitNumber}:`, {
-                  hasSubUnits: !!unit.subUnits,
-                  subUnitsCount: unit.subUnits?.length || 0,
-                  hasTopics: !!unit.topics,
-                  topicsCount: unit.topics?.length || 0,
-                  topicsType: typeof unit.topics,
-                  firstTopic: unit.topics?.[0],
-                });
-
                 // Get sub-units from either the subUnits array or convert topics to pseudo-subunits
-                const subUnits = unit.subUnits || unit.topics?.map((topic, idx) => ({
+                // Check if subUnits has actual content, not just an empty array
+                const subUnits = (unit.subUnits && unit.subUnits.length > 0)
+                  ? unit.subUnits
+                  : unit.topics?.map((topic, idx) => ({
                   id: `topic-${unit.id}-${idx}`,
                   unitId: unit.id,
                   name: topic.name,
                   orderIndex: idx,
                   concepts: topic.concepts || [],
-                  learningObjectives: topic.learningObjectives || [],
-                  estimatedHours: 0,
-                  aiGenerated: unit.aiGenerated,
-                  teacherModified: unit.teacherModified,
-                  createdAt: unit.createdAt,
-                  updatedAt: unit.updatedAt,
-                })) || [];
+                    learningObjectives: topic.learningObjectives || [],
+                    estimatedHours: 0,
+                    aiGenerated: unit.aiGenerated,
+                    teacherModified: unit.teacherModified,
+                    createdAt: unit.createdAt,
+                    updatedAt: unit.updatedAt,
+                  })) || [];
 
                 return (
                   <Card
