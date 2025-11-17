@@ -67,8 +67,11 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         }
       }
 
-      // Step 2: Create class
+      // Step 2: Create class with curriculum schedule
       const currentYear = new Date().getFullYear();
+      const schoolYearStart = new Date(currentYear, 7, 1); // Aug 1
+      const schoolYearEnd = new Date(currentYear + 1, 5, 30); // June 30
+
       const classData: any = {
         name: wizardState.className,
         subject: wizardState.subject || '',
@@ -81,11 +84,16 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         classData.description = wizardState.description;
       }
 
-      // Add curriculum file IDs if uploaded
+      // Add curriculum schedule data
       if (curriculumMaterialIds.length > 0) {
-        console.log('[DEBUG] Adding curriculum file references');
-        // Just store the file IDs for later use - no schedule creation
         classData.curriculumMaterialId = curriculumMaterialIds[0];
+        classData.schoolYearStart = schoolYearStart.toISOString();
+        classData.schoolYearEnd = schoolYearEnd.toISOString();
+        classData.meetingPattern = 'daily';
+        classData.generateWithAI = false; // Units already generated
+        classData.preGeneratedUnits = wizardState.generatedUnits || [];
+
+        console.log('[DEBUG] Adding curriculum with', classData.preGeneratedUnits.length, 'units');
       }
 
       console.log('Creating class with data:', classData);

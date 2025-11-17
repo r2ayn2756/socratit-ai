@@ -76,10 +76,119 @@ export const createClass = async (
       },
     });
 
+    // Create curriculum schedule if data provided
+    let scheduleId: string | undefined;
+    console.log('[DEBUG] Checking curriculum data:', {
+      hasCurriculumMaterialId: !!body.curriculumMaterialId,
+      hasSchoolYearStart: !!body.schoolYearStart,
+      hasSchoolYearEnd: !!body.schoolYearEnd,
+      curriculumMaterialId: body.curriculumMaterialId,
+      schoolYearStart: body.schoolYearStart,
+      schoolYearEnd: body.schoolYearEnd,
+      generateWithAI: body.generateWithAI,
+    });
 
-    // Note: Curriculum files are just stored as references in curriculumMaterialId
-    // No automatic curriculum schedule creation - teachers will create schedules manually
-    console.log('[DEBUG] Class created. Curriculum file reference:', body.curriculumMaterialId || 'none');
+    if (body.curriculumMaterialId && body.schoolYearStart && body.schoolYearEnd) {
+      console.log('[DEBUG] Creating curriculum schedule...');
+      try {
+        const schoolYearStart = new Date(body.schoolYearStart);
+        const schoolYearEnd = new Date(body.schoolYearEnd);
+
+        // Calculate weeks and days
+        const diffTime = Math.abs(schoolYearEnd.getTime() - schoolYearStart.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const totalWeeks = Math.ceil(diffDays / 7);
+
+        // Create schedule in DRAFT status (AI will generate units)
+        const schedule = await prisma.curriculumSchedule.create({
+          data: {
+            classId: newClass.id,
+            teacherId: userId,
+            schoolId,
+            curriculumMaterialId: body.curriculumMaterialId,
+            schoolYearStart,
+            schoolYearEnd,
+            totalWeeks,
+            totalDays: diffDays,
+            meetingPattern: body.meetingPattern || 'daily',
+            title: `${body.name} - Curriculum Schedule`,
+            status: body.generateWithAI ? 'DRAFT' : 'PUBLISHED',
+            totalUnits: body.aiPreferences?.targetUnits || 0,
+            aiGenerated: false, // Will be set to true after AI generation
+          },
+        });
+
+        scheduleId = schedule.id;
+        console.log('[DEBUG] Curriculum schedule created successfully:', scheduleId);
+
+        // If pre-generated units are provided, create them immediately
+        console.log('[DEBUG] Checking for pre-generated units. Has preGeneratedUnits:', !!body.preGeneratedUnits, 'Length:', body.preGeneratedUnits?.length || 0);
+
+        if (body.preGeneratedUnits && body.preGeneratedUnits.length > 0) {
+          console.log('[DEBUG] Creating pre-generated units:', body.preGeneratedUnits.length);
+          console.log('[DEBUG] First unit sample:', JSON.stringify(body.preGeneratedUnits[0]).substring(0, 200));
+
+          // Calculate date ranges for each unit
+          let currentDate = new Date(schoolYearStart);
+
+          for (let i = 0; i < body.preGeneratedUnits.length; i++) {
+            const unit = body.preGeneratedUnits[i];
+            const weeks = unit.estimatedWeeks || 1;
+
+            // Calculate start and end dates for this unit
+            const startDate = new Date(currentDate);
+            const endDate = new Date(currentDate);
+            endDate.setDate(endDate.getDate() + (weeks * 7));
+
+            // Move to next unit's start date
+            currentDate = new Date(endDate);
+            currentDate.setDate(currentDate.getDate() + 1);
+
+            await prisma.curriculumUnit.create({
+              data: {
+                scheduleId: schedule.id,
+                schoolId,
+                title: unit.title || `Unit ${i + 1}`,
+                description: unit.description,
+                unitNumber: i + 1,
+                orderIndex: i + 1,
+                startDate,
+                endDate,
+                estimatedWeeks: weeks,
+                difficultyLevel: unit.difficultyLevel || 3, // Default to medium difficulty
+                topics: unit.topics || [],
+                learningObjectives: unit.learningObjectives || [],
+                concepts: unit.concepts || [],
+                status: 'SCHEDULED',
+                aiGenerated: true,
+              },
+            });
+          }
+
+          // Update schedule to PUBLISHED and mark as AI-generated
+          await prisma.curriculumSchedule.update({
+            where: { id: schedule.id },
+            data: {
+              status: 'PUBLISHED',
+              aiGenerated: true,
+              totalUnits: body.preGeneratedUnits.length,
+            },
+          });
+
+          console.log('[DEBUG] Pre-generated units created and schedule published');
+        }
+
+      } catch (scheduleError) {
+        console.error('[ERROR] Failed to create curriculum schedule:', scheduleError);
+        // Continue with class creation even if schedule fails
+        // Teacher can create schedule later
+      }
+
+      // Note: If no pre-generated units, AI generation will be triggered by frontend calling separate endpoint
+      // POST /api/curriculum-schedules/:scheduleId/generate-ai
+    } else {
+      console.log('[DEBUG] Skipping curriculum schedule creation - missing required fields');
+    }
 
     // Log audit event
     await logAudit({
@@ -96,13 +205,35 @@ export const createClass = async (
       },
     });
 
+    // Fetch complete class data with teachers
+    const classWithTeachers = await prisma.class.findUnique({
+      where: { id: newClass.id },
+      include: {
+        teachers: {
+          include: {
+            teacher: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
     const response: ApiResponse = {
       success: true,
-      data: classWithTeachers,
+      data: {
+        ...classWithTeachers,
+        scheduleId, // Include schedule ID if curriculum was added
+      },
       message: 'Class created successfully',
     };
 
+    console.log('[DEBUG] Sending response with scheduleId:', scheduleId);
     res.status(201).json(response);
   } catch (error) {
     throw error;

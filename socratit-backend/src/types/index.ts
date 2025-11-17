@@ -212,8 +212,13 @@ export interface CreateClassRequestBody {
   color?: 'blue' | 'purple' | 'orange';
   codeExpiresAt?: Date;
 
-  // Optional curriculum file reference (for later use)
-  curriculumMaterialId?: string; // Reference to uploaded file
+  // Curriculum schedule data
+  curriculumMaterialId?: string;
+  schoolYearStart?: string;
+  schoolYearEnd?: string;
+  meetingPattern?: string;
+  generateWithAI?: boolean;
+  preGeneratedUnits?: any[];
 }
 
 export interface UpdateClassRequestBody {

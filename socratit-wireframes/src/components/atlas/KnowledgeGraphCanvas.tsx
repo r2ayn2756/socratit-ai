@@ -27,6 +27,7 @@ interface KnowledgeGraphCanvasProps {
   onNodeClick: (nodeId: string) => void;
   layout?: 'hierarchical' | 'force';
   studentId: string;
+  highlightedConcepts?: string[];
 }
 
 /**
@@ -103,6 +104,7 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
   onNodeClick,
   layout = 'hierarchical',
   studentId,
+  highlightedConcepts = [],
 }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -132,7 +134,9 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
         masteryLevel: node.masteryLevel,
         trend: node.trend,
         attemptStats: node.attemptStats,
+        isHighlighted: highlightedConcepts.includes(node.id),
       },
+      className: highlightedConcepts.includes(node.id) ? 'highlighted-concept' : '',
     }));
 
     // Convert edges
@@ -168,7 +172,7 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       setNodes(flowNodes);
       setEdges(flowEdges);
     }
-  }, [graphData, layout, setNodes, setEdges, isLayouted]);
+  }, [graphData, layout, setNodes, setEdges, isLayouted, highlightedConcepts]);
 
   // Handle connection (for future editing features)
   const onConnect = useCallback(
@@ -203,6 +207,21 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
 
   return (
     <div className="w-full h-full bg-gray-50 rounded-lg overflow-hidden">
+      <style>{`
+        .highlighted-concept {
+          filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8));
+          animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% {
+            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8));
+          }
+          50% {
+            filter: drop-shadow(0 0 30px rgba(59, 130, 246, 1));
+          }
+        }
+      `}</style>
       <ReactFlow
         nodes={nodes}
         edges={edges}
