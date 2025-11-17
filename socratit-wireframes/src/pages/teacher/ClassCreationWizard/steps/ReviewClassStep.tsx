@@ -115,17 +115,6 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
     }
   };
 
-  const getMeetingPatternLabel = () => {
-    const patterns: Record<string, string> = {
-      daily: 'Daily (Monday - Friday)',
-      mwf: 'Monday, Wednesday, Friday',
-      tth: 'Tuesday, Thursday',
-      weekly: 'Weekly',
-      custom: 'Custom Schedule',
-    };
-    return patterns[wizardState.meetingPattern] || wizardState.meetingPattern;
-  };
-
   const handleEditUnit = (unit: any) => {
     setEditingUnitId(unit.id);
     setEditingUnit({ ...unit });

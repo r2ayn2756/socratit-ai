@@ -620,6 +620,17 @@ export class KnowledgeGraphService {
             },
           },
         });
+
+        // Emit milestone achievement event
+        try {
+          const { emitAtlasMilestoneAchieved } = await import('./websocket.service');
+          const concept = await prisma.conceptTaxonomy.findUnique({ where: { id: conceptId } });
+          if (concept) {
+            emitAtlasMilestoneAchieved(studentId, conceptId, concept.conceptName, 'MASTERED', classId);
+          }
+        } catch (wsError: any) {
+          console.error('⚠️ WebSocket milestone emit failed:', wsError.message);
+        }
       }
 
       // Check for first introduction (first time attempting)
@@ -637,6 +648,17 @@ export class KnowledgeGraphService {
             },
           },
         });
+
+        // Emit milestone achievement event
+        try {
+          const { emitAtlasMilestoneAchieved } = await import('./websocket.service');
+          const concept = await prisma.conceptTaxonomy.findUnique({ where: { id: conceptId } });
+          if (concept) {
+            emitAtlasMilestoneAchieved(studentId, conceptId, concept.conceptName, 'FIRST_INTRODUCED', classId);
+          }
+        } catch (wsError: any) {
+          console.error('⚠️ WebSocket milestone emit failed:', wsError.message);
+        }
       }
     } catch (error) {
       console.error('Error creating milestone:', error);

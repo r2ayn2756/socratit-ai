@@ -380,6 +380,39 @@ export class AITAService {
             conversation.class?.subject || undefined
           );
 
+          // ====================================================================
+          // ATLAS INTEGRATION: Link concepts discussed in chat to knowledge graph
+          // ====================================================================
+          if (concepts.length > 0 && studentId) {
+            try {
+              // Find concept IDs from taxonomy
+              const conceptRecords = await prisma.conceptTaxonomy.findMany({
+                where: {
+                  OR: concepts.map(name => ({
+                    OR: [
+                      { conceptName: name },
+                      { aliases: { has: name.toLowerCase() } },
+                    ]
+                  }))
+                },
+                select: { id: true, conceptName: true },
+              });
+
+              if (conceptRecords.length > 0) {
+                const conceptIds = conceptRecords.map(c => c.id);
+
+                // Emit WebSocket event to highlight concepts in Atlas
+                const { emitAtlasConceptDiscussed } = await import('./websocket.service');
+                emitAtlasConceptDiscussed(studentId, conceptIds, conversationId);
+
+                console.log(`✅ [ATLAS] Linked ${conceptIds.length} concepts to conversation ${conversationId}`);
+              }
+            } catch (atlasError: any) {
+              console.error('⚠️ Atlas concept linking failed (non-blocking):', atlasError.message);
+            }
+          }
+          // ====================================================================
+
           // Save AI response
           console.log('💾 [AI-TA] Saving AI response to database...');
           const aiResponse = await prisma.aIMessage.create({
