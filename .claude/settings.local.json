@@ -75,7 +75,11 @@
       "Bash(export DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/placeholder\")",
       "Bash(chmod:*)",
       "Bash(set DATABASE_URL=postgresql://test:test@localhost:5432/test)",
-      "Bash(PGPASSWORD=BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl psql:*)"
+      "Bash(PGPASSWORD=BvkLxszSzHtknoBqIQOVZDQfNaVeOWBl psql:*)",
+      "Bash(./node_modules/.bin/prisma validate:*)",
+      "Bash(npm --version)",
+      "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT cs.id, cs.title, cs.status, cs.total_units, cs.ai_generated, c.name as class_name FROM \"\"CurriculumSchedule\"\" cs JOIN \"\"Class\"\" c ON cs.class_id = c.id ORDER BY cs.created_at DESC LIMIT 5;\")",
+      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT cs.id, cs.title, cs.status, cs.total_units, cs.ai_generated, c.name as class_name FROM \"\"CurriculumSchedule\"\" cs JOIN \"\"Class\"\" c ON cs.class_id = c.id ORDER BY cs.created_at DESC LIMIT 5;\")"
     ],
     "deny": [],
     "ask": []

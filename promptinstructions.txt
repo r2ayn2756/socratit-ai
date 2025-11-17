@@ -154,4 +154,1127 @@ socratit-wireframes/
 4. Layout components → `components/layout/`
 5. Modals, popups → `components/shared/`
 
-[REST OF THE FILE CONTENT REMAINS THE SAME AS MY PREVIOUS WRITE ATTEMPT]
+================================================================================
+## ROUTING STRUCTURE - ALL APPLICATION ROUTES
+================================================================================
+
+### Public Routes (No Authentication)
+```
+/                 - Landing page (LandingPage.tsx)
+/login            - Login page (LoginPage.tsx)
+/signup           - Registration page (SignupPage.tsx)
+```
+
+### Teacher Routes (/teacher/...)
+```
+/teacher/dashboard                                    - Main teacher dashboard
+/teacher/classes                                      - List all classes
+/teacher/classes/:classId                             - Class dashboard/overview
+/teacher/classes/:classId/roster                      - Student enrollment management
+/teacher/assignments                                  - All assignments across classes
+/teacher/assignments/new                              - Create new assignment
+/teacher/assignments/:assignmentId/edit               - Edit existing assignment
+/teacher/assignments/:assignmentId/submissions        - View & grade submissions
+/teacher/messages                                     - Messaging interface
+/teacher/ai-tutor                                     - AI assistant for teacher
+```
+
+### Student Routes (/student/...)
+```
+/student/dashboard                                    - Main student dashboard
+/student/classes                                      - List enrolled classes
+/student/classes/:classId                             - Class view with announcements
+/student/classes/:classId/curriculum                  - Curriculum timeline view
+/student/assignments                                  - All assigned assignments
+/student/assignments/:assignmentId                    - Take/view assignment
+/student/grades                                       - View grades & performance
+/student/messages                                     - Messaging interface
+/student/ai-tutor                                     - AI tutor chat interface
+```
+
+### Admin Routes (/admin/...)
+```
+/admin/dashboard                                      - Admin dashboard
+```
+
+================================================================================
+## API ENDPOINTS - BACKEND INTEGRATION
+================================================================================
+
+**Base URL:** `/api/v1`
+**Authentication Header:** `Authorization: Bearer <access_token>`
+
+### Authentication (/auth)
+```
+POST   /auth/register              - Register new user
+POST   /auth/login                 - Login user
+POST   /auth/logout                - Logout user
+POST   /auth/refresh               - Refresh access token
+POST   /auth/verify-email          - Verify email address
+POST   /auth/forgot-password       - Request password reset
+POST   /auth/reset-password        - Reset password with token
+```
+
+### Class Management (/classes)
+```
+POST   /classes                              - Create new class (Teacher)
+GET    /classes                              - Get teacher's classes (Teacher)
+GET    /classes/:classId                     - Get class details
+PATCH  /classes/:classId                     - Update class (Teacher)
+DELETE /classes/:classId                     - Soft delete class (Teacher)
+POST   /classes/:classId/regenerate-code     - Regenerate class code (Teacher)
+GET    /classes/:classId/enrollments         - Get class enrollments (Teacher)
+POST   /classes/:classId/enrollments         - Add students manually (Teacher)
+PATCH  /classes/:classId/enrollments/:enrollmentId - Process enrollment (Teacher)
+DELETE /classes/:classId/enrollments/:enrollmentId - Remove student (Teacher)
+```
+
+### Assignment Management (/assignments)
+```
+POST   /assignments                      - Create assignment (Teacher)
+GET    /assignments                      - List assignments (filtered by role)
+GET    /assignments/:assignmentId        - Get single assignment
+PATCH  /assignments/:assignmentId        - Update assignment (Teacher)
+DELETE /assignments/:assignmentId        - Soft delete assignment (Teacher)
+POST   /assignments/:assignmentId/publish - Publish assignment (Teacher)
+POST   /assignments/generate             - Generate quiz with AI (Teacher)
+POST   /assignments/generate-from-lesson - Generate from lesson transcript (Teacher)
+```
+
+### Submissions & Grading (/submissions)
+```
+POST   /submissions                      - Submit assignment (Student)
+GET    /submissions                      - List submissions (filtered by role)
+GET    /submissions/:submissionId        - Get submission details
+PATCH  /submissions/:submissionId        - Update submission/add grades (Teacher)
+POST   /submissions/:submissionId/grade  - Grade submission (Teacher)
+```
+
+### Grades (/grades)
+```
+GET    /grades                           - Get grades (filtered by class/student)
+GET    /grades/student/:studentId        - Get student's grades (Teacher)
+GET    /grades/class/:classId            - Get class grades (Teacher)
+```
+
+### Analytics (/analytics)
+```
+GET    /analytics/student                - Student analytics (Student/Teacher)
+GET    /analytics/class/:classId         - Class analytics (Teacher)
+GET    /analytics/concept-mastery        - Concept mastery data
+GET    /analytics/learning-velocity      - Learning velocity trends
+```
+
+### Messaging (/messages)
+```
+POST   /messages                         - Send message
+GET    /messages                         - Get messages
+GET    /messages/:messageId              - Get single message
+PATCH  /messages/:messageId              - Update message
+DELETE /messages/:messageId              - Delete message
+GET    /messages/conversations           - Get conversations
+```
+
+### Progress Tracking (/progress)
+```
+GET    /progress/student                 - Student progress (Student/Teacher)
+GET    /progress/class/:classId          - Class progress (Teacher)
+GET    /progress/concept-mastery         - Concept mastery progress
+```
+
+### Curriculum Management (/curriculum)
+```
+POST   /curriculum/upload                - Upload curriculum file (Teacher)
+GET    /curriculum/materials             - List curriculum materials
+GET    /curriculum/:materialId           - Get material details
+DELETE /curriculum/:materialId           - Delete material (Teacher)
+POST   /curriculum/:materialId/process   - Process/extract content (Teacher)
+```
+
+### Curriculum Scheduling (/curriculum-schedules, /curriculum-units)
+```
+POST   /curriculum-schedules             - Create schedule (Teacher)
+GET    /curriculum-schedules             - List schedules
+GET    /curriculum-schedules/:scheduleId - Get schedule details
+PATCH  /curriculum-schedules/:scheduleId - Update schedule (Teacher)
+POST   /curriculum-units                 - Create unit (Teacher)
+GET    /curriculum-units                 - List units
+GET    /curriculum-units/:unitId         - Get unit details
+PATCH  /curriculum-units/:unitId         - Update unit (Teacher)
+```
+
+### AI Teaching Assistant (/ai-ta)
+```
+POST   /ai-ta/conversations                       - Create conversation
+GET    /ai-ta/conversations                       - List conversations
+GET    /ai-ta/conversations/:id                   - Get conversation with messages
+POST   /ai-ta/conversations/:id/messages          - Send message
+POST   /ai-ta/conversations/:id/share             - Share conversation with teacher
+POST   /ai-ta/conversations/:id/end               - End/close conversation
+POST   /ai-ta/messages/:id/feedback               - Rate message (helpful/not helpful)
+DELETE /ai-ta/messages/:id                        - Delete message
+GET    /ai-ta/insights/class/:classId             - Class AI insights (Teacher)
+GET    /ai-ta/insights/student/:studentId         - Student AI usage (Teacher)
+GET    /ai-ta/templates                           - List AI prompt templates
+POST   /ai-ta/templates                           - Create custom template (Teacher)
+PATCH  /ai-ta/templates/:id                       - Update template (Teacher)
+```
+
+### File Upload (/upload)
+```
+POST   /upload/curriculum                - Upload curriculum file (multipart/form-data)
+```
+
+### Lessons (/classes/:classId/lessons, /lessons/:lessonId)
+```
+POST   /classes/:classId/lessons         - Create lesson (Teacher)
+GET    /classes/:classId/lessons         - List lessons
+GET    /lessons/:lessonId                - Get lesson details
+PATCH  /lessons/:lessonId                - Update lesson (Teacher)
+DELETE /lessons/:lessonId                - Delete lesson (Teacher)
+```
+
+### Health & Status
+```
+GET    /health                           - Basic health check
+GET    /ready                            - Readiness check (includes DB)
+```
+
+================================================================================
+## DATABASE MODELS - KEY ENTITIES & RELATIONSHIPS
+================================================================================
+
+### Core Models (Prisma Schema: 2,282 lines)
+
+**Multi-Tenancy & Authentication:**
+- **School** - Multi-tenant base with unique school code
+- **User** - Role-based (TEACHER, STUDENT, ADMIN)
+- **Session** - JWT session management with refresh tokens
+- **AuditLog** - FERPA/COPPA compliance tracking
+
+**Class Management:**
+- **Class** - Course/subject grouping with unique class code
+- **ClassTeacher** - Junction table (supports co-teaching)
+- **ClassEnrollment** - Student enrollment with workflow (PENDING → APPROVED/REJECTED/REMOVED)
+- **ClassLesson** - AI-generated lesson notes from recorded sessions
+
+**Assignment & Assessment:**
+- **Assignment** - Types: PRACTICE, TEST, HOMEWORK, ESSAY, INTERACTIVE_MATH
+- **Question** - Multiple choice & free response with concept mapping
+- **Submission** - Student submission with attempt tracking
+- **Answer** - Individual question responses with AI/manual grading
+- **Grade** - Calculated grades by assignment/category/overall
+- **GradeCategory** - Weighted grading categories (Homework, Quizzes, Tests)
+- **AssignmentAttemptLog** - Security event logging (tab switches, copy attempts)
+- **Rubric** - Reusable grading rubrics with criteria
+- **AssignmentRubric** - Junction table linking assignments to rubrics
+
+**Analytics & Progress:**
+- **AnalyticsEvent** - Granular student interaction tracking
+- **StudentProgress** - Overall class progress metrics
+- **AssignmentProgress** - Per-assignment progress tracking
+- **ConceptMastery** - Concept proficiency tracking (NOT_STARTED → MASTERED)
+- **StudentInsight** - Calculated insights & alerts about student performance
+- **ConceptMasteryPath** - Learning path prerequisites
+- **LearningVelocityLog** - Weekly velocity tracking
+
+**Messaging & Communication:**
+- **Message** - Direct, class-group, and announcement messages
+- **Conversation** - Conversation metadata for quick access
+- **UserPresence** - Online/offline status tracking
+- **Notification** - System & event notifications
+
+**Curriculum & Scheduling:**
+- **CurriculumMaterial** - Uploaded curriculum files with AI extraction
+- **CurriculumSchedule** - Year-long curriculum plan per class
+- **CurriculumUnit** - Teaching units (1-12) with topics & learning objectives
+- **CurriculumSubUnit** - Specific topics within units
+- **UnitProgress** - Student progress through curriculum units
+- **CurriculumMilestone** - Assessment checkpoints (unit start/end, quarterly, semester)
+- **FileUploadLog** - FERPA audit trail for file operations
+
+**AI Teaching Assistant:**
+- **AIConversation** - Tutoring session management
+- **AIMessage** - Individual messages in conversations
+- **AIInteractionLog** - Analytics tracking for AI usage (FERPA audit)
+- **AITeacherInsight** - Aggregated insights for teachers from AI interactions
+- **AIPromptTemplate** - Reusable prompts (system-wide, school, teacher-level)
+
+**Key Enums:**
+```typescript
+enum UserRole { TEACHER, STUDENT, ADMIN }
+enum AssignmentType { PRACTICE, TEST, HOMEWORK, ESSAY, INTERACTIVE_MATH }
+enum AssignmentStatus { DRAFT, SCHEDULED, ACTIVE, CLOSED, ARCHIVED }
+enum SubmissionStatus { NOT_STARTED, IN_PROGRESS, SUBMITTED, GRADED }
+enum EnrollmentStatus { PENDING, APPROVED, REJECTED, REMOVED }
+enum MasteryLevel { NOT_STARTED, BEGINNING, DEVELOPING, PROFICIENT, MASTERED }
+enum UnitStatus { SCHEDULED, IN_PROGRESS, COMPLETED, SKIPPED, POSTPONED }
+enum MilestoneType { UNIT_START, UNIT_MIDPOINT, UNIT_END, QUARTER_REVIEW, SEMESTER_EXAM, YEAR_END_REVIEW, CUSTOM }
+```
+
+**Entity Relationships:**
+```
+School
+├── Users (teachers, students, admins)
+├── Classes
+│   ├── ClassTeachers (co-teaching support)
+│   ├── ClassEnrollments (students)
+│   ├── Assignments
+│   │   ├── Questions → Answers (in submissions)
+│   │   └── Submissions (per student, per attempt)
+│   ├── Grades (calculated from submissions)
+│   ├── GradeCategories (weighted categories)
+│   ├── ConceptMasteries (per student, per concept)
+│   ├── StudentInsights (auto-generated alerts)
+│   ├── Messages (class announcements)
+│   ├── CurriculumSchedules
+│   │   ├── CurriculumUnits (1-12 units)
+│   │   │   ├── CurriculumSubUnits (topics)
+│   │   │   └── Assignments (linked)
+│   │   └── CurriculumMilestones (checkpoints)
+│   └── UnitProgress (per student)
+├── CurriculumMaterials (uploaded files)
+├── AIConversations (per student)
+│   ├── AIMessages
+│   └── AIInteractionLogs
+└── AuditLogs (all activities)
+```
+
+================================================================================
+## KEY FEATURES - WHAT THE PLATFORM DOES
+================================================================================
+
+### 1. Authentication & User Management
+- JWT Authentication (access tokens: 15 min, refresh tokens: 7 days)
+- Role-Based Access Control (Teacher, Student, Admin)
+- Multi-tenancy with school-based data isolation
+- Email verification before account activation
+- Token-based password reset with expiration
+- Account audit trail for FERPA compliance
+
+### 2. Class & Course Management
+- Teachers create classes with metadata (subject, grade level, year, period, room)
+- Auto-generated unique class codes for student self-enrollment
+- Multi-teacher support (co-teaching with primary/secondary designation)
+- Student enrollment workflow: PENDING → APPROVED/REJECTED/REMOVED
+- Soft deletion for historical records
+
+**Components:**
+- `TeacherClasses.tsx` - List all teacher's classes
+- `ClassDashboard.tsx` - Class overview & management
+- `ClassRoster.tsx` - Student enrollment & management
+- `CreateClass.tsx` - Class creation wizard
+
+### 3. Assignment System
+**Assignment Types:**
+- PRACTICE - Low-stakes practice
+- TEST - High-stakes assessment
+- HOMEWORK - Take-home work
+- ESSAY - Written responses
+- INTERACTIVE_MATH - Math problems with symbolic input
+
+**Question Types:**
+- MULTIPLE_CHOICE (A/B/C/D options)
+- FREE_RESPONSE (with AI grading support)
+- Concept mapping for mastery tracking
+
+**Features:**
+- Scheduling: Draft → Scheduled → Active → Closed → Archived
+- Time limits (optional)
+- Max attempts (configurable)
+- Late submission policy
+- Automatic answer revealing
+- Question shuffling
+- AI generation from curriculum or descriptions
+- Rubric-based grading
+
+**Components:**
+- `CreateAssignment.tsx` - Rich assignment editor with AI modal
+- `TeacherAssignments.tsx` - Assignment management
+- `Assignments.tsx` (student) - Student assignment list
+- `TakeAssignment.tsx` - Full-screen assignment interface
+- `MathQuestionEditor.tsx` - For INTERACTIVE_MATH
+- `ConceptMapper.tsx` - Map questions to concepts
+- `RubricBuilder.tsx` - Create grading rubrics
+
+### 4. Submission & Grading System
+**Student Submissions:**
+- Multiple attempts (configurable)
+- Status tracking: NOT_STARTED → IN_PROGRESS → SUBMITTED → GRADED
+- Time spent tracking
+- Late submission detection
+- Security event logging (tab switches, copy attempts)
+
+**AI Grading (Free Response):**
+- Automatic scoring with confidence levels
+- Feedback generation
+- Teacher override capability
+
+**Manual Grading:**
+- Teacher feedback & notes
+- Point adjustment
+- Curve support
+- Letter grades (A+ through F)
+
+**Components:**
+- `ViewSubmissions.tsx` - Teacher submission review interface
+- `TakeAssignment.tsx` - Student submission interface
+
+### 5. Analytics & Progress Tracking
+**Student Analytics:**
+- Completion rates
+- Average scores & class ranking
+- Percentile scoring
+- Time-on-task metrics
+- Concept mastery visualization
+- Performance trends over time
+- Risk scoring for struggling students
+
+**Class Analytics:**
+- Class-wide averages
+- Performance distribution charts
+- Struggling concept identification
+- Student comparison views
+- Engagement metrics
+
+**Concept Mastery Tracking:**
+- 5-level mastery: NOT_STARTED (0%), BEGINNING (1-39%), DEVELOPING (40-69%), PROFICIENT (70-89%), MASTERED (90-100%)
+- Mastery percentages
+- Trend analysis (IMPROVING, STABLE, DECLINING)
+- Prerequisite tracking
+- Recommended next concepts
+
+**Learning Velocity:**
+- Assignments completed per week
+- Velocity trends
+- Quality metrics (average score + time)
+
+**Components:**
+- `TeacherAnalytics.tsx` - Teacher class analytics dashboard
+- `StudentAnalytics.tsx` - Student personal analytics
+- `PerformanceChart.tsx` - Time-series performance
+- `ConceptMasteryHeatmap.tsx` - Concept mastery matrix
+- `PerformanceDistributionChart.tsx` - Score distribution
+- `AssignmentBreakdownChart.tsx` - By-assignment breakdown
+
+### 6. AI Teaching Assistant
+**Conversational Tutoring:**
+- Context-aware responses based on:
+  - Student's grade level
+  - Recent grades
+  - Struggling concepts
+  - Class curriculum
+  - Specific assignments
+- Socratic method for hint-based learning
+- No direct answer giving (academic integrity)
+
+**Conversation Types:**
+- GENERAL_HELP - General tutoring
+- ASSIGNMENT_HELP - Help with specific assignment
+- CONCEPT_REVIEW - Reviewing specific concept
+- HOMEWORK_HELP - Homework assistance
+- EXAM_PREP - Test/exam preparation
+
+**AI Models Supported:**
+- Google Gemini (primary)
+- Anthropic Claude (fallback)
+- OpenAI GPT (fallback)
+
+**Safety & Compliance:**
+- Content moderation flagging
+- Teacher review capability
+- Student sharing with teacher
+- 90-day data retention (FERPA)
+- Usage analytics for teachers
+
+**Components:**
+- `ChatPage.tsx` (Student) - Full-screen ChatGPT-style interface
+- `TeacherChatPage.tsx` (Teacher) - Teacher AI access
+- `AITutorChat.tsx` - Embedded chat component
+- `StudentConversationViewer.tsx` - View shared conversations
+
+### 7. Messaging System
+**Message Types:**
+- DIRECT - One-to-one messages
+- CLASS_GROUP - Teacher to entire class
+- ANNOUNCEMENT - Persistent class announcements
+
+**Features:**
+- Real-time delivery (WebSocket)
+- Read status tracking
+- Message pinning
+- Threaded replies
+- Soft deletion (keep history)
+
+**Components:**
+- `TeacherMessages.tsx` - Teacher messaging interface
+- `Messages.tsx` (Student) - Student messages & announcements
+- `NotificationCenter.tsx` - Notification display
+
+### 8. Curriculum Management
+**File Upload & Processing:**
+- Supported: PDF, DOCX, TXT, images (10MB limit)
+- Automatic text extraction
+- Processing status tracking
+- Error logging
+
+**AI Analysis:**
+- Content summarization
+- Topic/concept extraction
+- Learning objectives generation
+- Suggested assessment types
+
+**Curriculum Integration:**
+- Link to assignments for generation
+- Usage tracking
+- Auto-expiration (configurable)
+
+**Components:**
+- `CurriculumManagement.tsx` - Upload & management
+- `CurriculumSection.tsx` - Curriculum display
+- `FileUpload.tsx` - File upload component
+
+### 9. Curriculum Scheduling
+**Year-Long Planning:**
+- School year date configuration
+- Total instructional weeks/days
+- Meeting pattern (Daily, MWF, TTh, etc.)
+
+**Unit Structure (1-12 units per year):**
+- Title, description, learning objectives
+- Topics with subtopics
+- Estimated duration (weeks/hours)
+- Difficulty level (1-5)
+- Unit type: CORE, ENRICHMENT, REVIEW, ASSESSMENT, PROJECT
+- Optional vs required
+
+**Sub-units (topics within units):**
+- Name, description
+- Concepts covered
+- Learning objectives
+- Estimated hours
+
+**Milestones (checkpoints):**
+- Types: Unit start/midpoint/end, quarterly, semester, year-end
+- Suggested assessment recommendations
+- Status tracking
+
+**Student Progress Through Units:**
+- Status: NOT_STARTED, IN_PROGRESS, REVIEW_NEEDED, COMPLETED, MASTERED
+- Assignment completion tracking
+- Concept mastery per unit
+- Time spent tracking
+
+**Components:**
+- `ScheduleWizard/` - Multi-step creation wizard
+- `UnitCard.tsx` - Unit display & editing
+- `UnitDetailsModal.tsx` - Detailed unit information
+- `SortableUnitGrid.tsx` - Drag-and-drop reordering
+- `StudentProgressDashboard.tsx` - Student curriculum progress
+- `StudentCurriculumView.tsx` - Student curriculum view
+
+### 10. Academic Integrity & Security
+- AssignmentAttemptLog for security event tracking
+- Tab-switch detection, copy attempt detection
+- Fullscreen enforcement options
+- Plagiarism detection via AI analysis
+- Time-on-task monitoring
+
+================================================================================
+## COMMON DEVELOPMENT PATTERNS
+================================================================================
+
+### Pattern 1: Creating a New Page Component
+```typescript
+// 1. Create file in appropriate directory
+// src/pages/teacher/MyNewPage.tsx
+
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { myService } from '../../services/my.service';
+import { MyType } from '../../types';
+
+const MyNewPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['myData'],
+    queryFn: () => myService.getData(),
+  });
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorState error={error} />;
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">My Page</h1>
+      {/* Content */}
+    </div>
+  );
+};
+
+export default MyNewPage;
+
+// 2. Add route in App.tsx
+<Route path="/teacher/my-new-page" element={<MyNewPage />} />
+
+// 3. Add link in Sidebar.tsx (if needed)
+{ path: '/teacher/my-new-page', label: 'My Page', icon: Star }
+```
+
+### Pattern 2: Creating an API Service
+```typescript
+// 1. Create service file
+// src/services/my.service.ts
+
+import api from './api.service';
+import { MyType, CreateMyTypeDTO } from '../types';
+
+export const myService = {
+  getAll: async (): Promise<MyType[]> => {
+    const response = await api.get<MyType[]>('/my-endpoint');
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<MyType> => {
+    const response = await api.get<MyType>(`/my-endpoint/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateMyTypeDTO): Promise<MyType> => {
+    const response = await api.post<MyType>('/my-endpoint', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: Partial<MyType>): Promise<MyType> => {
+    const response = await api.patch<MyType>(`/my-endpoint/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/my-endpoint/${id}`);
+  },
+};
+
+// 2. Use in component with React Query
+const { data } = useQuery({
+  queryKey: ['myData', id],
+  queryFn: () => myService.getById(id),
+});
+
+const mutation = useMutation({
+  mutationFn: myService.create,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['myData'] });
+  },
+});
+```
+
+### Pattern 3: Creating a Reusable Component
+```typescript
+// src/components/common/MyComponent.tsx
+
+import React from 'react';
+
+interface MyComponentProps {
+  title: string;
+  description?: string;
+  onAction?: () => void;
+  variant?: 'primary' | 'secondary';
+  className?: string;
+}
+
+const MyComponent: React.FC<MyComponentProps> = ({
+  title,
+  description,
+  onAction,
+  variant = 'primary',
+  className = '',
+}) => {
+  return (
+    <div className={`p-4 rounded-lg ${className}`}>
+      <h3 className="text-lg font-semibold">{title}</h3>
+      {description && <p className="text-sm text-gray-600">{description}</p>}
+      {onAction && (
+        <button
+          onClick={onAction}
+          className={`mt-2 px-4 py-2 rounded ${
+            variant === 'primary' ? 'bg-blue-500' : 'bg-gray-500'
+          } text-white`}
+        >
+          Action
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default MyComponent;
+```
+
+### Pattern 4: Form Handling with React Hook Form
+```typescript
+import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+
+interface FormData {
+  title: string;
+  description: string;
+}
+
+const MyForm: React.FC = () => {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+
+  const mutation = useMutation({
+    mutationFn: myService.create,
+    onSuccess: () => {
+      toast.success('Created successfully!');
+      navigate('/success-page');
+    },
+    onError: (error) => {
+      toast.error('Failed to create');
+    },
+  });
+
+  const onSubmit = (data: FormData) => {
+    mutation.mutate(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Title</label>
+        <input
+          {...register('title', { required: 'Title is required' })}
+          className="w-full px-3 py-2 border rounded"
+        />
+        {errors.title && (
+          <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={mutation.isPending}
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        {mutation.isPending ? 'Submitting...' : 'Submit'}
+      </button>
+    </form>
+  );
+};
+```
+
+### Pattern 5: WebSocket Real-time Updates
+```typescript
+import { useEffect } from 'react';
+import { websocketService } from '../services/websocket.service';
+import { useQueryClient } from '@tanstack/react-query';
+
+const MyComponent: React.FC = () => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Connect to WebSocket
+    websocketService.connect();
+
+    // Listen for events
+    const handleUpdate = (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['myData'] });
+    };
+
+    websocketService.on('myEvent', handleUpdate);
+
+    // Cleanup
+    return () => {
+      websocketService.off('myEvent', handleUpdate);
+    };
+  }, [queryClient]);
+
+  return <div>Real-time content</div>;
+};
+```
+
+================================================================================
+## STYLING GUIDELINES
+================================================================================
+
+### Tailwind CSS Best Practices
+```typescript
+// ✅ GOOD: Responsive, accessible, consistent
+<div className="
+  flex flex-col md:flex-row
+  gap-4 p-6
+  bg-white rounded-lg shadow-sm
+  hover:shadow-md transition-shadow
+">
+  <button className="
+    px-4 py-2
+    bg-blue-500 hover:bg-blue-600
+    text-white font-medium
+    rounded-md
+    disabled:opacity-50 disabled:cursor-not-allowed
+    focus:outline-none focus:ring-2 focus:ring-blue-500
+    transition-colors
+  ">
+    Action
+  </button>
+</div>
+
+// ❌ BAD: Hardcoded colors, no responsiveness
+<div className="bg-[#3b82f6] w-[500px] h-[300px]">
+  <button style={{ backgroundColor: '#ff0000' }}>Action</button>
+</div>
+```
+
+### Color Palette (Use Tailwind classes)
+- Primary: `blue-500`, `blue-600`, `blue-700`
+- Success: `green-500`, `green-600`
+- Warning: `yellow-500`, `yellow-600`
+- Danger: `red-500`, `red-600`
+- Neutral: `gray-100` through `gray-900`
+
+### Spacing Scale
+- Use `gap-*`, `p-*`, `m-*` with values: 0, 1, 2, 3, 4, 6, 8, 12, 16, 24
+- Consistent spacing creates visual rhythm
+
+### Typography
+```typescript
+// Headings
+<h1 className="text-3xl font-bold">Page Title</h1>
+<h2 className="text-2xl font-semibold">Section Title</h2>
+<h3 className="text-xl font-medium">Subsection</h3>
+
+// Body text
+<p className="text-base text-gray-700">Regular text</p>
+<p className="text-sm text-gray-600">Secondary text</p>
+<p className="text-xs text-gray-500">Tertiary text</p>
+```
+
+================================================================================
+## TESTING & DEBUGGING
+================================================================================
+
+### Manual Testing Checklist
+Before committing ANY change:
+1. ✅ Component renders without errors
+2. ✅ All TypeScript errors resolved
+3. ✅ API calls work as expected
+4. ✅ Loading states display correctly
+5. ✅ Error states display correctly
+6. ✅ Forms validate properly
+7. ✅ Navigation works
+8. ✅ Responsive on mobile/tablet/desktop
+9. ✅ Accessibility (keyboard navigation, screen readers)
+10. ✅ No console errors or warnings
+
+### Common Debugging Steps
+```bash
+# 1. Check TypeScript errors
+npx tsc --noEmit
+
+# 2. Check for build errors
+npm run build
+
+# 3. Check React Query cache
+# In browser console:
+window.__REACT_QUERY_DEVTOOLS_GLOBAL_HOOK__.queries
+
+# 4. Check API responses
+# In browser Network tab, filter by XHR
+
+# 5. Clear cache and restart
+rm -rf node_modules package-lock.json
+npm install
+npm start
+```
+
+================================================================================
+## GIT WORKFLOW - DEPLOYMENT PROTOCOL
+================================================================================
+
+### CRITICAL: Final Step After ALL Changes
+**Step 7 from Error Prevention Protocols:**
+```bash
+# After finishing all changes, BEFORE marking task complete:
+
+# 1. Stage all changes
+git add .
+
+# 2. Commit with descriptive message
+git commit -m "feat: Add [feature name] with [key details]
+
+- Detailed change 1
+- Detailed change 2
+- Detailed change 3"
+
+# 3. Push to main branch (triggers Vercel deploy)
+git push origin main
+```
+
+### Commit Message Format
+```
+<type>: <subject>
+
+<body>
+
+Types: feat, fix, docs, style, refactor, test, chore
+```
+
+**Examples:**
+```bash
+git commit -m "feat: Add AI-powered quiz generation modal
+
+- Created AIAssignmentModal component
+- Integrated with OpenAI API
+- Added loading states and error handling
+- Updated CreateAssignment page to use modal"
+
+git commit -m "fix: Resolve TypeScript errors in assignment service
+
+- Updated Assignment type to include new fields
+- Fixed API response mapping
+- Added proper error types"
+```
+
+================================================================================
+## ACCESSIBILITY REQUIREMENTS
+================================================================================
+
+### WCAG 2.1 AA Compliance (Minimum)
+1. **Semantic HTML**: Use proper heading hierarchy (h1 → h2 → h3)
+2. **ARIA Labels**: Add `aria-label` to icon-only buttons
+3. **Keyboard Navigation**: All interactive elements must be keyboard accessible
+4. **Focus Indicators**: Visible focus states on all interactive elements
+5. **Color Contrast**: Minimum 4.5:1 for text, 3:1 for UI components
+6. **Alt Text**: All images must have descriptive alt text
+7. **Form Labels**: All inputs must have associated labels
+
+**Example:**
+```typescript
+// ✅ GOOD
+<button
+  aria-label="Close modal"
+  onClick={onClose}
+  className="focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  <X className="w-5 h-5" />
+</button>
+
+// ❌ BAD
+<div onClick={onClose}>
+  <X />
+</div>
+```
+
+================================================================================
+## PERFORMANCE OPTIMIZATION
+================================================================================
+
+### React Query Best Practices
+```typescript
+// ✅ Cache data appropriately
+const { data } = useQuery({
+  queryKey: ['assignments', classId],
+  queryFn: () => assignmentService.getByClass(classId),
+  staleTime: 5 * 60 * 1000, // 5 minutes
+  gcTime: 10 * 60 * 1000, // 10 minutes
+});
+
+// ✅ Prefetch for better UX
+const queryClient = useQueryClient();
+queryClient.prefetchQuery({
+  queryKey: ['assignment', assignmentId],
+  queryFn: () => assignmentService.getById(assignmentId),
+});
+
+// ✅ Optimistic updates for instant feedback
+const mutation = useMutation({
+  mutationFn: assignmentService.update,
+  onMutate: async (newData) => {
+    await queryClient.cancelQueries({ queryKey: ['assignments'] });
+    const previousData = queryClient.getQueryData(['assignments']);
+    queryClient.setQueryData(['assignments'], (old) => ({
+      ...old,
+      ...newData,
+    }));
+    return { previousData };
+  },
+  onError: (err, newData, context) => {
+    queryClient.setQueryData(['assignments'], context.previousData);
+  },
+  onSettled: () => {
+    queryClient.invalidateQueries({ queryKey: ['assignments'] });
+  },
+});
+```
+
+### Component Optimization
+```typescript
+// ✅ Memoize expensive computations
+const sortedAssignments = useMemo(
+  () => assignments.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate)),
+  [assignments]
+);
+
+// ✅ Memoize callbacks
+const handleSubmit = useCallback(
+  (data) => {
+    mutation.mutate(data);
+  },
+  [mutation]
+);
+
+// ✅ Code splitting for large components
+const TeacherAnalytics = lazy(() => import('./pages/teacher/TeacherAnalytics'));
+```
+
+================================================================================
+## SECURITY BEST PRACTICES
+================================================================================
+
+### 1. Input Validation
+```typescript
+// ✅ Validate all user input
+import { z } from 'zod';
+
+const schema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().max(1000),
+  points: z.number().min(0).max(1000),
+});
+
+const validated = schema.parse(formData);
+```
+
+### 2. XSS Prevention
+```typescript
+// ✅ React auto-escapes by default
+<div>{userInput}</div>  // Safe
+
+// ❌ NEVER use dangerouslySetInnerHTML with user input
+<div dangerouslySetInnerHTML={{ __html: userInput }} />  // DANGEROUS!
+
+// ✅ If you must render HTML, sanitize it first
+import DOMPurify from 'dompurify';
+<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(userInput) }} />
+```
+
+### 3. Authentication
+```typescript
+// ✅ Always check auth state
+const { user, isAuthenticated } = useAuth();
+
+if (!isAuthenticated) {
+  return <Navigate to="/login" />;
+}
+
+// ✅ Include auth token in API calls (handled in api.service.ts)
+// ✅ Handle 401 responses (redirect to login)
+```
+
+### 4. Sensitive Data
+```typescript
+// ✅ Never log sensitive data
+console.log('User logged in:', user.id);  // Safe
+
+// ❌ NEVER log passwords, tokens, or PII
+console.log('User password:', password);  // DANGEROUS!
+```
+
+================================================================================
+## ERROR HANDLING PATTERNS
+================================================================================
+
+### API Error Handling
+```typescript
+const { data, error, isError } = useQuery({
+  queryKey: ['assignments'],
+  queryFn: assignmentService.getAll,
+  retry: 3,
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+});
+
+if (isError) {
+  if (error.response?.status === 404) {
+    return <EmptyState message="No assignments found" />;
+  }
+  if (error.response?.status === 403) {
+    return <ErrorState message="Access denied" />;
+  }
+  return <ErrorState message="Failed to load assignments" />;
+}
+```
+
+### Form Validation Errors
+```typescript
+const { register, formState: { errors }, setError } = useForm();
+
+const mutation = useMutation({
+  mutationFn: assignmentService.create,
+  onError: (error) => {
+    if (error.response?.data?.errors) {
+      // Server-side validation errors
+      Object.entries(error.response.data.errors).forEach(([field, message]) => {
+        setError(field, { message });
+      });
+    } else {
+      toast.error('Failed to create assignment');
+    }
+  },
+});
+```
+
+================================================================================
+## FINAL CHECKLIST - BEFORE COMPLETING ANY TASK
+================================================================================
+
+**MANDATORY VERIFICATION:**
+- [ ] Read all files before modifying
+- [ ] Checked TypeScript types match backend
+- [ ] Verified API endpoints are correct
+- [ ] No TypeScript errors (`npx tsc --noEmit`)
+- [ ] No build errors (`npm run build`)
+- [ ] Tested locally in browser
+- [ ] Checked responsive design (mobile/tablet/desktop)
+- [ ] Verified accessibility (keyboard navigation, ARIA labels)
+- [ ] No console errors or warnings
+- [ ] Followed existing code patterns exactly
+- [ ] Added proper error handling
+- [ ] Added loading states
+- [ ] Added proper TypeScript types
+- [ ] Committed and pushed to main branch
+
+**DEPLOYMENT:**
+- [ ] `git add .`
+- [ ] `git commit -m "descriptive message"`
+- [ ] `git push origin main`
+- [ ] Vercel auto-deploys from main branch
+- [ ] Check deployment status on Vercel dashboard
+
+================================================================================
+## QUICK REFERENCE - MOST USED COMMANDS
+================================================================================
+
+```bash
+# Development
+npm start                    # Start dev server (port 3000)
+npm run build                # Production build
+npx tsc --noEmit             # Check TypeScript errors
+
+# Git
+git status                   # Check status
+git add .                    # Stage all changes
+git commit -m "message"      # Commit changes
+git push origin main         # Push to main (triggers deploy)
+
+# Database (Backend only - for reference)
+npx prisma generate          # Generate Prisma client
+npx prisma migrate dev       # Run migrations
+npx prisma studio            # Open database GUI
+```
+
+================================================================================
+END OF INSTRUCTIONS - YOU ARE NOW READY TO BUILD
+================================================================================

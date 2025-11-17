@@ -94,10 +94,8 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
       if (curriculumMaterialIds.length > 0 && wizardState.schoolYearStart && wizardState.schoolYearEnd) {
         console.log('[DEBUG] Adding curriculum fields to classData');
         try {
-          // Use the first file as primary curriculum material for now
-          // In the future, the backend could support multiple files
+          // Use the first file as primary curriculum material
           classData.curriculumMaterialId = curriculumMaterialIds[0];
-          classData.curriculumMaterialIds = curriculumMaterialIds; // Pass all IDs for future use
           classData.schoolYearStart = wizardState.schoolYearStart.toISOString();
           classData.schoolYearEnd = wizardState.schoolYearEnd.toISOString();
           classData.meetingPattern = wizardState.meetingPattern;
@@ -111,6 +109,15 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
           }
 
           console.log('[DEBUG] Curriculum fields added successfully');
+          console.log('[DEBUG] Final classData curriculum fields:', {
+            curriculumMaterialId: classData.curriculumMaterialId,
+            schoolYearStart: classData.schoolYearStart,
+            schoolYearEnd: classData.schoolYearEnd,
+            meetingPattern: classData.meetingPattern,
+            generateWithAI: classData.generateWithAI,
+            hasPreGeneratedUnits: !!classData.preGeneratedUnits,
+            preGeneratedUnitsCount: classData.preGeneratedUnits?.length || 0,
+          });
         } catch (dateError) {
           console.error('[ERROR] Failed to convert dates to ISO string:', dateError);
           console.error('[ERROR] schoolYearStart type:', typeof wizardState.schoolYearStart);
@@ -119,6 +126,11 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
         }
       } else {
         console.log('[DEBUG] Skipping curriculum fields - condition not met');
+        console.log('[DEBUG] Curriculum condition details:', {
+          hasCurriculumMaterialIds: curriculumMaterialIds.length > 0,
+          hasSchoolYearStart: !!wizardState.schoolYearStart,
+          hasSchoolYearEnd: !!wizardState.schoolYearEnd,
+        });
       }
 
       console.log('Creating class with data:', classData);
@@ -323,7 +335,7 @@ export const ReviewClassStep: React.FC<ReviewClassStepProps> = ({
               </div>
             </div>
 
-            <div className="space-y-2 max-h-80 overflow-y-auto modal-scroll">
+            <div className="grid grid-cols-2 gap-3">
               {wizardState.generatedUnits.map((unit: any, index: number) => {
                 const isEditing = editingUnitId === unit.id;
                 const displayUnit = isEditing ? editingUnit : unit;

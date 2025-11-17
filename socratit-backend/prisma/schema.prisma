@@ -162,6 +162,10 @@ model School {
   // Lesson Recording Relations
   lessons ClassLesson[]
 
+  // Atlas - Multi-Year Knowledge Graph Relations
+  studentConceptMasteries StudentConceptMastery[]
+  learningJourneys        StudentLearningJourney[]
+
   @@index([schoolCode])
   @@index([districtName])
   @@map("schools")
@@ -245,6 +249,11 @@ model User {
 
   // Rubric Relations
   rubrics Rubric[] @relation("TeacherRubrics")
+
+  // Atlas - Multi-Year Knowledge Graph Relations
+  studentConceptMasteries StudentConceptMastery[] @relation("StudentConceptMasteries")
+  learningJourney         StudentLearningJourney?
+  gradeHistory            StudentGradeHistory[]
 
   @@index([email])
   @@index([schoolId])
@@ -366,6 +375,9 @@ model Class {
   // Lesson Recording Relations
   lessons ClassLesson[]
 
+  // Atlas - Multi-Year Knowledge Graph Relations
+  classConceptMasteries ClassConceptMastery[]
+
   @@index([schoolId])
   @@index([classCode])
   @@index([academicYear])
@@ -416,6 +428,17 @@ model ClassEnrollment {
   processedBy     String?   @map("processed_by") // Teacher ID who approved/rejected/removed
   rejectionReason String?   @map("rejection_reason") // Optional reason for rejection
 
+  // Atlas - Enrollment History Tracking
+  enrollmentStartDate DateTime  @default(now()) @map("enrollment_start_date")
+  enrollmentEndDate   DateTime? @map("enrollment_end_date")
+  isActive            Boolean   @default(true) @map("is_active")
+  exitReason          String?   @map("exit_reason")
+  // Exit reasons: "COMPLETED_COURSE", "TRANSFERRED", "DROPPED", "PROMOTED"
+
+  // Performance summary at end of enrollment
+  finalGrade        String? @map("final_grade")
+  finalGradePercent Float?  @map("final_grade_percent")
+
   // Timestamps
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -429,6 +452,8 @@ model ClassEnrollment {
   @@index([classId])
   @@index([studentId])
   @@index([status])
+  @@index([studentId, isActive])
+  @@index([studentId, enrollmentStartDate])
   @@map("class_enrollments")
 }
 
