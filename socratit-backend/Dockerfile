@@ -25,11 +25,11 @@ RUN echo "=== Package files ===" && ls -la package*.json
 RUN echo "=== Checking for pdfjs in package.json ===" && (grep -i pdf package.json || echo "No PDF packages found")
 
 # Install all dependencies (including devDependencies for build)
-# Use npm install if package-lock.json doesn't exist, otherwise use npm ci
+# Use --ignore-scripts to prevent postinstall from running before Prisma schema is copied
 RUN if [ -f package-lock.json ]; then \
-      echo "=== Using npm ci ===" && npm ci --legacy-peer-deps; \
+      echo "=== Using npm ci ===" && npm ci --legacy-peer-deps --ignore-scripts; \
     else \
-      echo "=== Using npm install ===" && npm install --legacy-peer-deps; \
+      echo "=== Using npm install ===" && npm install --legacy-peer-deps --ignore-scripts; \
     fi
 
 # Debug: Verify pdfjs-dist was NOT installed
