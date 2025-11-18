@@ -44,7 +44,7 @@ export const LandingPage: React.FC = () => {
 
       {/* HEADER / NAVIGATION */}
       <motion.header
-        className="sticky top-0 z-50 border-b border-white/20 bg-slate-950/95 backdrop-blur-xl"
+        className="sticky top-0 z-50 glass border-b border-white/20"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -123,7 +123,7 @@ export const LandingPage: React.FC = () => {
                   onClick={() => navigate('/signup')}
                   className="shadow-2xl shadow-blue-500/50"
                 >
-                  Get Started Free →
+                  Try Digitizing Your Curriculum →
                 </Button>
                 <Button
                   variant="secondary"
@@ -454,7 +454,7 @@ export const LandingPage: React.FC = () => {
                 onClick={() => navigate('/signup')}
                 className="shadow-2xl shadow-blue-500/50"
               >
-                Get Started Free
+                Try Digitizing Your Curriculum
               </Button>
               <Button
                 variant="secondary"
