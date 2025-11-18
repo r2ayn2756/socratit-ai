@@ -193,7 +193,7 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
-      type: 'smoothstep',
+      type: 'straight', // Changed from 'smoothstep' to 'straight' for direct connections
       animated: edge.type === 'prerequisite',
       style: getEdgeStyle(edge.strength, edge.type),
       markerEnd: {
@@ -216,11 +216,11 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
     flowEdges,
     canvasDimensions,
     {
-      repulsion: -800, // Reduced for smaller nodes
-      linkDistance: 100, // Shorter links for tighter clustering
-      linkStrength: 0.8,
-      collisionPadding: 10, // Small padding for dot nodes
-      centerStrength: 0.4, // Strong pull toward center
+      repulsion: -600, // Reduced repulsion for tighter clustering
+      linkDistance: 80, // Shorter links for tighter connections
+      linkStrength: 1.0, // Maximum link strength
+      collisionPadding: 8, // Minimal padding for dot nodes
+      centerStrength: 0.8, // Very strong pull toward center (doubled)
     }
   );
 
@@ -331,7 +331,7 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
         onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
-        connectionLineType={ConnectionLineType.SmoothStep}
+        connectionLineType={ConnectionLineType.Straight}
         fitView
         fitViewOptions={{
           padding: 0.2,
