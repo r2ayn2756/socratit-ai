@@ -18,7 +18,6 @@ export { AIChatAssistant } from './AIChatAssistant';
 
 // Dashboard Components
 export { StudentProgressDashboard } from '../progress/StudentProgressDashboard';
-export { TeacherDashboard } from './TeacherDashboard';
 
 // Wizard
 export { ScheduleWizard } from './ScheduleWizard/ScheduleWizard';
