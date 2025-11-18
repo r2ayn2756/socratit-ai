@@ -193,18 +193,19 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
-      type: 'straight', // Changed from 'smoothstep' to 'straight' for direct connections
+      type: 'straight', // Direct straight lines
       animated: edge.type === 'prerequisite',
-      style: getEdgeStyle(edge.strength, edge.type),
+      style: {
+        ...getEdgeStyle(edge.strength, edge.type),
+        strokeWidth: 1.5, // Thinner lines for cleaner look
+      },
       markerEnd: {
         type: MarkerType.ArrowClosed,
         color: getEdgeColor(edge.type),
+        width: 12,
+        height: 12,
       },
-      label: edge.label,
-      labelStyle: { fill: '#64748b', fontSize: 10, fontWeight: 500 },
-      labelBgPadding: [4, 2] as [number, number],
-      labelBgBorderRadius: 4,
-      labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
+      // Remove labels to ensure truly straight lines
     }));
 
     return { flowNodes, flowEdges };
