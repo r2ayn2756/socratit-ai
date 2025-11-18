@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { MasteryLevel, TrendDirection } from '../../types/knowledgeGraph';
 import { TrendingUp, TrendingDown, Minus, CheckCircle2, Circle } from 'lucide-react';
@@ -17,7 +17,29 @@ interface ConceptNodeData {
 }
 
 /**
- * Get color based on mastery level
+ * Get color based on mastery level (for dot)
+ */
+const getMasteryDotColor = (masteryLevel: MasteryLevel): string => {
+  switch (masteryLevel) {
+    case 'EXPERT':
+      return 'bg-purple-500 border-purple-600';
+    case 'MASTERED':
+      return 'bg-green-500 border-green-600';
+    case 'PROFICIENT':
+      return 'bg-blue-500 border-blue-600';
+    case 'DEVELOPING':
+      return 'bg-yellow-500 border-yellow-600';
+    case 'INTRODUCED':
+      return 'bg-orange-500 border-orange-600';
+    case 'NOT_STARTED':
+      return 'bg-gray-400 border-gray-500';
+    default:
+      return 'bg-gray-400 border-gray-500';
+  }
+};
+
+/**
+ * Get color based on mastery level (for expanded card)
  */
 const getMasteryColor = (masteryLevel: MasteryLevel): string => {
   switch (masteryLevel) {
@@ -73,79 +95,133 @@ const getTrendIcon = (trend: TrendDirection) => {
 
 /**
  * Custom Concept Node Component for React Flow
- * Displays concept with mastery level, trend, and statistics
+ * Displays as a small dot by default, expands to full card on hover
  */
 const ConceptNode = memo(({ data, selected }: NodeProps<ConceptNodeData>) => {
-  const colorClasses = getMasteryColor(data.masteryLevel);
+  const [isHovered, setIsHovered] = useState(false);
+  const dotColorClasses = getMasteryDotColor(data.masteryLevel);
+  const cardColorClasses = getMasteryColor(data.masteryLevel);
   const accuracyPercent = data.attemptStats.total > 0
     ? Math.round((data.attemptStats.correct / data.attemptStats.total) * 100)
     : 0;
 
+  const shouldExpand = isHovered || selected;
+
   return (
-    <>
-      {/* Connection handles */}
-      <Handle type="target" position={Position.Top} className="w-3 h-3" />
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative"
+    >
+      {/* Connection handles - always visible but invisible */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-2 h-2 opacity-0"
+        style={{ top: shouldExpand ? -8 : -4 }}
+      />
 
-      <div
-        className={`
-          px-4 py-3 rounded-lg border-2 shadow-md min-w-[200px] max-w-[250px]
-          transition-all duration-200 cursor-pointer
-          ${colorClasses}
-          ${selected ? 'ring-4 ring-blue-400 ring-opacity-50 scale-105' : 'hover:shadow-lg'}
-        `}
-      >
-        {/* Header: Icon + Label */}
-        <div className="flex items-start gap-2 mb-2">
-          <div className="mt-0.5">
-            {getMasteryIcon(data.masteryLevel)}
-          </div>
-          <div className="flex-1">
-            <div className="font-semibold text-sm leading-tight">
-              {data.label}
+      {/* Dot mode (default) */}
+      {!shouldExpand && (
+        <div
+          className={`
+            w-3 h-3 rounded-full border-2 shadow-lg
+            transition-all duration-200 cursor-pointer
+            ${dotColorClasses}
+            hover:scale-150
+          `}
+          style={{
+            boxShadow: selected ? '0 0 0 4px rgba(59, 130, 246, 0.5)' : '0 2px 8px rgba(0,0,0,0.3)',
+          }}
+        />
+      )}
+
+      {/* Expanded card mode (on hover or selected) */}
+      {shouldExpand && (
+        <div
+          className={`
+            absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+            px-4 py-3 rounded-lg border-2 shadow-xl min-w-[200px] max-w-[250px]
+            transition-all duration-200 cursor-pointer z-50
+            ${cardColorClasses}
+            ${selected ? 'ring-4 ring-blue-400 ring-opacity-50 scale-105' : ''}
+          `}
+          style={{
+            animation: 'expandIn 0.2s ease-out',
+          }}
+        >
+          {/* Header: Icon + Label */}
+          <div className="flex items-start gap-2 mb-2">
+            <div className="mt-0.5">
+              {getMasteryIcon(data.masteryLevel)}
             </div>
-            <div className="text-xs opacity-75 mt-0.5">
-              {data.subject}
+            <div className="flex-1">
+              <div className="font-semibold text-sm leading-tight">
+                {data.label}
+              </div>
+              <div className="text-xs opacity-75 mt-0.5">
+                {data.subject}
+              </div>
+            </div>
+            <div className="mt-0.5">
+              {getTrendIcon(data.trend)}
             </div>
           </div>
-          <div className="mt-0.5">
-            {getTrendIcon(data.trend)}
-          </div>
-        </div>
 
-        {/* Mastery Progress Bar */}
-        <div className="mb-2">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-medium">Mastery</span>
-            <span className="font-bold">{Math.round(data.mastery)}%</span>
+          {/* Mastery Progress Bar */}
+          <div className="mb-2">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="font-medium">Mastery</span>
+              <span className="font-bold">{Math.round(data.mastery)}%</span>
+            </div>
+            <div className="w-full bg-white bg-opacity-50 rounded-full h-2 overflow-hidden">
+              <div
+                className="h-full transition-all duration-500 rounded-full"
+                style={{
+                  width: `${data.mastery}%`,
+                  backgroundColor: data.mastery >= 90 ? '#10b981' :
+                    data.mastery >= 70 ? '#3b82f6' :
+                    data.mastery >= 50 ? '#f59e0b' : '#ef4444'
+                }}
+              />
+            </div>
           </div>
-          <div className="w-full bg-white bg-opacity-50 rounded-full h-2 overflow-hidden">
-            <div
-              className="h-full transition-all duration-500 rounded-full"
-              style={{
-                width: `${data.mastery}%`,
-                backgroundColor: data.mastery >= 90 ? '#10b981' :
-                  data.mastery >= 70 ? '#3b82f6' :
-                  data.mastery >= 50 ? '#f59e0b' : '#ef4444'
-              }}
-            />
-          </div>
-        </div>
 
-        {/* Statistics */}
-        <div className="flex items-center justify-between text-xs opacity-75">
-          <span>
-            {data.attemptStats.total} attempt{data.attemptStats.total !== 1 ? 's' : ''}
-          </span>
-          {data.attemptStats.total > 0 && (
-            <span className="font-medium">
-              {accuracyPercent}% accuracy
+          {/* Statistics */}
+          <div className="flex items-center justify-between text-xs opacity-75">
+            <span>
+              {data.attemptStats.total} attempt{data.attemptStats.total !== 1 ? 's' : ''}
             </span>
-          )}
+            {data.attemptStats.total > 0 && (
+              <span className="font-medium">
+                {accuracyPercent}% accuracy
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
-    </>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-2 h-2 opacity-0"
+        style={{ bottom: shouldExpand ? -8 : -4 }}
+      />
+
+      {/* Add expand animation */}
+      <style>{`
+        @keyframes expandIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.3);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+      `}</style>
+    </div>
   );
 });
 

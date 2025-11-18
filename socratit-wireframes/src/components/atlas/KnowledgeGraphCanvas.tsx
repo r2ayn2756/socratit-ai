@@ -184,6 +184,9 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
         isHighlighted: highlightedConcepts.includes(node.id),
       },
       className: highlightedConcepts.includes(node.id) ? 'highlighted-concept' : '',
+      // Smaller dimensions for dot nodes
+      width: 12,
+      height: 12,
     }));
 
     const flowEdges: Edge[] = graphData.edges.map((edge) => ({
@@ -213,11 +216,11 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
     flowEdges,
     canvasDimensions,
     {
-      repulsion: -1500,
-      linkDistance: 150,
-      linkStrength: 0.5,
-      collisionPadding: 20,
-      centerStrength: 0.05,
+      repulsion: -800, // Reduced for smaller nodes
+      linkDistance: 100, // Shorter links for tighter clustering
+      linkStrength: 0.8,
+      collisionPadding: 10, // Small padding for dot nodes
+      centerStrength: 0.4, // Strong pull toward center
     }
   );
 

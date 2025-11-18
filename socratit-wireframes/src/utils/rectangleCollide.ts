@@ -33,15 +33,15 @@ export function rectangleCollide(padding = 10) {
 
     for (let i = 0; i < iterations; ++i) {
       for (const node of nodes) {
-        const nodeWidth = (node.width || 250) + padding;
-        const nodeHeight = (node.height || 120) + padding;
+        const nodeWidth = (node.width || 12) + padding;
+        const nodeHeight = (node.height || 12) + padding;
 
         // Check collision with all other nodes
         for (const otherNode of nodes) {
           if (node === otherNode) continue;
 
-          const otherWidth = (otherNode.width || 250) + padding;
-          const otherHeight = (otherNode.height || 120) + padding;
+          const otherWidth = (otherNode.width || 12) + padding;
+          const otherHeight = (otherNode.height || 12) + padding;
 
           // Calculate distance between node centers
           const dx = otherNode.x - node.x;

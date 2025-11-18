@@ -64,8 +64,8 @@ export function useForceLayout(
       fy: null,
       vx: 0,
       vy: 0,
-      width: 250,
-      height: 120,
+      width: node.width || 12, // Use node width or default to small dot
+      height: node.height || 12, // Use node height or default to small dot
     }));
 
     // Convert React Flow edges to d3 links
