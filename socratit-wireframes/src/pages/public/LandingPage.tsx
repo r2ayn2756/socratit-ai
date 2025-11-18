@@ -14,7 +14,6 @@ import {
   Upload,
   FileText,
   ChevronRight,
-  Star,
   Layers,
   Zap
 } from 'lucide-react';
@@ -110,7 +109,7 @@ export const LandingPage: React.FC = () => {
                 className="text-xl text-white/80 mb-8 leading-relaxed"
               >
                 Upload your curriculum. AI breaks it into units. Generate quizzes with one click.
-                Track every outcome. Whether you're training employees or teaching students.
+                Track every student's progress. Built for teachers who want to focus on teaching.
               </motion.p>
 
               <motion.div
@@ -135,24 +134,6 @@ export const LandingPage: React.FC = () => {
                 </Button>
               </motion.div>
 
-              {/* Trust Signals */}
-              <motion.div
-                variants={fadeInUp}
-                className="flex flex-col sm:flex-row gap-6 mt-8 text-sm text-white/60"
-              >
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span>500+ educators</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span>10,000+ PDFs processed</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span>4.9/5 stars</span>
-                </div>
-              </motion.div>
             </motion.div>
 
             {/* Right: PDF to Quiz Workflow Animation */}
@@ -188,8 +169,8 @@ export const LandingPage: React.FC = () => {
                       <div className="flex-1">
                         <div className="rounded-lg p-4 border border-blue-400/40 bg-blue-950/80 backdrop-blur-sm">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-bold text-white">Training_Manual.pdf</span>
-                            <Badge variant="info" size="sm">47 pages</Badge>
+                            <span className="text-sm font-bold text-white">World_History_Textbook.pdf</span>
+                            <Badge variant="info" size="sm">284 pages</Badge>
                           </div>
                           <div className="w-full bg-blue-900/60 rounded-full h-2">
                             <motion.div
@@ -225,15 +206,15 @@ export const LandingPage: React.FC = () => {
                         <div className="rounded-lg p-4 border border-purple-400/40 bg-purple-950/80 backdrop-blur-sm">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-200">Chapter 1: Safety Basics</span>
+                              <span className="text-xs font-semibold text-purple-200">Unit 1: Ancient Civilizations</span>
                               <CheckCircle className="w-4 h-4 text-purple-300" />
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-200">Chapter 2: Equipment</span>
+                              <span className="text-xs font-semibold text-purple-200">Unit 2: Medieval Europe</span>
                               <CheckCircle className="w-4 h-4 text-purple-300" />
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-200">Chapter 3: Procedures</span>
+                              <span className="text-xs font-semibold text-purple-200">Unit 3: Age of Exploration</span>
                               <CheckCircle className="w-4 h-4 text-purple-300" />
                             </div>
                           </div>
@@ -299,21 +280,21 @@ export const LandingPage: React.FC = () => {
                       <div className="flex-1">
                         <div className="rounded-lg p-4 border border-orange-400/40 bg-orange-950/80 backdrop-blur-sm">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-bold text-white">Team Performance</span>
+                            <span className="text-xs font-bold text-white">Class Performance</span>
                             <Badge variant="warning" size="sm">Live</Badge>
                           </div>
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-white/90">Avg Score:</span>
+                              <span className="text-white/90">Class Average:</span>
                               <span className="font-bold text-orange-300">87%</span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
                               <span className="text-white/90">Completion:</span>
-                              <span className="font-bold text-orange-300">23/25</span>
+                              <span className="font-bold text-orange-300">23/28 students</span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-white/90">Struggling Area:</span>
-                              <span className="font-bold text-red-300">Ch. 2.3</span>
+                              <span className="text-white/90">Need Help:</span>
+                              <span className="font-bold text-red-300">Unit 2.3</span>
                             </div>
                           </div>
                         </div>
@@ -384,56 +365,56 @@ export const LandingPage: React.FC = () => {
           >
             {/* Step 1 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-blue-400/60 transition-all bg-slate-900/80 backdrop-blur-xl">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">
+              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-blue-400/60 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/60 group-hover:scale-110 transition-all duration-300">
                   <Upload className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-blue-300 mb-2">STEP 1</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Drop Your PDF</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Upload Your Materials</h3>
                 <p className="text-white/80 text-sm">
-                  Training manual, textbook, curriculum guide—whatever. We speak PDF.
+                  Textbook chapters, curriculum guides, lesson plans—any PDF works. Your content, digitized.
                 </p>
               </div>
             </motion.div>
 
             {/* Step 2 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-purple-400/60 transition-all bg-slate-900/80 backdrop-blur-xl">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30">
+              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/60 group-hover:scale-110 transition-all duration-300">
                   <Layers className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-purple-300 mb-2">STEP 2</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Auto-Organize Content</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">AI Organizes Into Units</h3>
                 <p className="text-white/80 text-sm">
-                  We chunk it into logical units and sub-units. You review, edit, approve.
+                  Automatically breaks content into teaching units and lessons. Review, customize, perfect.
                 </p>
               </div>
             </motion.div>
 
             {/* Step 3 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-pink-400/60 transition-all bg-slate-900/80 backdrop-blur-xl">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-pink-500/30">
+              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-pink-400/60 hover:shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-pink-500/30 group-hover:shadow-pink-500/60 group-hover:scale-110 transition-all duration-300">
                   <FileText className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-pink-300 mb-2">STEP 3</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Generate Quizzes</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Create Assessments</h3>
                 <p className="text-white/80 text-sm">
-                  One click. Quiz appears. Multiple choice, short answer, scenarios—all aligned.
+                  One click generates quizzes. Multiple choice, short answer, essay prompts—all aligned to your content.
                 </p>
               </div>
             </motion.div>
 
             {/* Step 4 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-orange-400/60 transition-all bg-slate-900/80 backdrop-blur-xl">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30">
+              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-orange-400/60 hover:shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/60 group-hover:scale-110 transition-all duration-300">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-orange-300 mb-2">STEP 4</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Track Outcomes</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Track Student Progress</h3>
                 <p className="text-white/80 text-sm">
-                  Real-time dashboards show gaps, strengths, and who needs help. Per person. Per topic.
+                  Live dashboards show class performance, identify struggling students, and reveal knowledge gaps by topic.
                 </p>
               </div>
             </motion.div>
