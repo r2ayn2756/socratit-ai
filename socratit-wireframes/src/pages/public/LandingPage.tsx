@@ -150,127 +150,191 @@ export const LandingPage: React.FC = () => {
               </motion.div>
             </motion.div>
 
-            {/* Right: Screenshot/Visual */}
+            {/* Right: Knowledge Map Visualization */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              {/* iPhone Mockup */}
-              <div className="relative mx-auto w-[340px]">
-                {/* Phone Frame */}
-                <div className="relative bg-slate-900 rounded-[3rem] p-3 shadow-2xl border-8 border-slate-800">
-                  {/* Notch */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-slate-900 rounded-b-3xl z-10"></div>
+              {/* Mind Map Container */}
+              <div className="relative bg-white rounded-3xl p-6 shadow-2xl border border-slate-200">
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-slate-700">Student Knowledge Map</h3>
+                  <p className="text-xs text-slate-500">Real-time concept mastery tracking</p>
+                </div>
 
-                  {/* Screen */}
-                  <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 rounded-[2.5rem] overflow-hidden h-[600px]">
-                    {/* Status Bar */}
-                    <div className="absolute top-0 left-0 right-0 h-12 flex items-center justify-between px-8 text-white text-xs z-20">
-                      <span className="font-semibold">9:41</span>
-                      <div className="flex items-center gap-1">
-                        <div className="w-4 h-3 border border-white rounded-sm"></div>
-                        <div className="w-1 h-2 bg-white rounded-sm"></div>
+                {/* Mind Map Visualization */}
+                <div className="relative h-[500px] bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl overflow-hidden">
+                  {/* Center Node */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+                  >
+                    <div className="relative">
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                        <Brain className="w-12 h-12 text-white" />
+                      </div>
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-xs font-bold text-slate-900">Calculus I</span>
                       </div>
                     </div>
+                  </motion.div>
 
-                    {/* Lock Screen with Notifications */}
-                    <div className="pt-16 px-4 space-y-3">
-                      {/* Time Display */}
-                      <div className="text-center text-white mb-8">
-                        <div className="text-6xl font-light mb-1">9:41</div>
-                        <div className="text-lg font-light opacity-90">Monday, October 20</div>
+                  {/* Concept Nodes - Mastered (Green) */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="absolute top-[15%] left-[20%]"
+                  >
+                    <div className="relative group">
+                      <svg className="absolute top-12 left-12 w-32 h-32 -z-10" style={{ overflow: 'visible' }}>
+                        <line x1="0" y1="0" x2="100" y2="80" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
+                      </svg>
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                        <CheckCircle className="w-8 h-8 text-white" />
                       </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-green-700">Limits</span>
+                        <div className="text-[8px] text-green-600">100% Mastery</div>
+                      </div>
+                    </div>
+                  </motion.div>
 
-                      {/* Notification 1 */}
-                      <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="bg-white/95 backdrop-blur rounded-2xl p-3 shadow-lg"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-semibold text-slate-900">Socratit.ai</span>
-                              <span className="text-xs text-slate-600">6:00 AM</span>
-                            </div>
-                            <div className="text-sm text-slate-900 font-medium mb-0.5">
-                              ✓ Submitted attendance reports
-                            </div>
-                            <div className="text-xs text-slate-600">
-                              All 5 classes marked complete
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="absolute top-[10%] right-[15%]"
+                  >
+                    <div className="relative group">
+                      <svg className="absolute top-12 right-12 w-32 h-32 -z-10" style={{ overflow: 'visible' }}>
+                        <line x1="64" y1="64" x2="-40" y2="80" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
+                      </svg>
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                        <CheckCircle className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-green-700">Derivatives</span>
+                        <div className="text-[8px] text-green-600">95% Mastery</div>
+                      </div>
+                    </div>
+                  </motion.div>
 
-                      {/* Notification 2 */}
-                      <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
-                        className="bg-white/95 backdrop-blur rounded-2xl p-3 shadow-lg"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center flex-shrink-0">
-                            <MessageSquare className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-semibold text-slate-900">Socratit.ai</span>
-                              <span className="text-xs text-slate-600">6:15 AM</span>
-                            </div>
-                            <div className="text-sm text-slate-900 font-medium mb-0.5">
-                              Sent feedback to 24 students
-                            </div>
-                            <div className="text-xs text-slate-600">
-                              Personalized comments on last week's quiz
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
+                  {/* Concept Nodes - In Progress (Yellow) */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="absolute bottom-[20%] left-[15%]"
+                  >
+                    <div className="relative group">
+                      <svg className="absolute bottom-12 left-12 w-32 h-32 -z-10" style={{ overflow: 'visible' }}>
+                        <line x1="0" y1="64" x2="100" y2="-40" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
+                      </svg>
+                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                        <TrendingUp className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-orange-700">Integrals</span>
+                        <div className="text-[8px] text-orange-600">68% Mastery</div>
+                      </div>
+                    </div>
+                  </motion.div>
 
-                      {/* Notification 3 - Action Required */}
-                      <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.9 }}
-                        className="bg-white/95 backdrop-blur rounded-2xl p-3 shadow-lg"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-orange to-red-500 flex items-center justify-center flex-shrink-0">
-                            <TrendingUp className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-semibold text-slate-900">Socratit.ai</span>
-                              <span className="text-xs text-slate-600">6:30 AM</span>
-                            </div>
-                            <div className="text-sm text-slate-900 font-medium mb-0.5">
-                              ⚠️ 18 students struggling with Triangle Proofs
-                            </div>
-                            <div className="text-xs text-slate-600 mb-2">
-                              Suggested: Re-format tomorrow's lesson
-                            </div>
-                            <div className="flex gap-2">
-                              <button className="flex-1 px-3 py-1.5 bg-brand-blue text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors">
-                                View Details
-                              </button>
-                              <button className="flex-1 px-3 py-1.5 bg-slate-200 text-slate-900 rounded-lg text-xs font-semibold hover:bg-slate-300 transition-colors">
-                                Edit Lesson
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="absolute bottom-[15%] right-[20%]"
+                  >
+                    <div className="relative group">
+                      <svg className="absolute bottom-12 right-12 w-32 h-32 -z-10" style={{ overflow: 'visible' }}>
+                        <line x1="64" y1="64" x2="-40" y2="-40" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" />
+                      </svg>
+                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                        <TrendingUp className="w-8 h-8 text-white" />
+                      </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-orange-700">Chain Rule</span>
+                        <div className="text-[8px] text-orange-600">72% Mastery</div>
+                      </div>
+                    </div>
+                  </motion.div>
 
+                  {/* Concept Nodes - Struggling (Red) */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.9 }}
+                    className="absolute top-[45%] right-[8%]"
+                  >
+                    <div className="relative group">
+                      <svg className="absolute top-8 right-12 w-24 h-24 -z-10" style={{ overflow: 'visible' }}>
+                        <line x1="64" y1="32" x2="-40" y2="0" stroke="#ef4444" strokeWidth="2" strokeDasharray="5,5" />
+                      </svg>
+                      <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform animate-pulse">
+                        <AlertCircle className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-red-700">U-Substitution</span>
+                        <div className="text-[8px] text-red-600">42% Mastery</div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.0 }}
+                    className="absolute top-[45%] left-[8%]"
+                  >
+                    <div className="relative group">
+                      <svg className="absolute top-8 left-12 w-24 h-24 -z-10" style={{ overflow: 'visible' }}>
+                        <line x1="0" y1="32" x2="80" y2="0" stroke="#ef4444" strokeWidth="2" strokeDasharray="5,5" />
+                      </svg>
+                      <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                        <AlertCircle className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-red-700">Related Rates</span>
+                        <div className="text-[8px] text-red-600">38% Mastery</div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Legend */}
+                  <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg p-3 shadow-md">
+                    <div className="flex items-center gap-4 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 bg-gradient-to-br from-green-400 to-green-600 rounded-full"></div>
+                        <span className="text-slate-600">Mastered</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full"></div>
+                        <span className="text-slate-600">Learning</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 bg-gradient-to-br from-red-400 to-red-600 rounded-full"></div>
+                        <span className="text-slate-600">Needs Help</span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Stats Badge */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.1 }}
+                    className="absolute top-4 right-4 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg p-3 shadow-lg"
+                  >
+                    <div className="text-xs font-semibold mb-1">Overall Progress</div>
+                    <div className="text-2xl font-bold">73%</div>
+                    <div className="text-[10px] opacity-90">6/8 concepts mastered</div>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
