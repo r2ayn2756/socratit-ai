@@ -217,11 +217,11 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
     flowEdges,
     canvasDimensions,
     {
-      repulsion: -600, // Reduced repulsion for tighter clustering
-      linkDistance: 80, // Shorter links for tighter connections
-      linkStrength: 1.0, // Maximum link strength
+      repulsion: -300, // Moderate repulsion to prevent overlap
+      linkDistance: 50, // Very short links for tight spring connections
+      linkStrength: 1.5, // Extra strong spring force to pull connected nodes together
       collisionPadding: 8, // Minimal padding for dot nodes
-      centerStrength: 2.5, // Extremely strong pull toward center
+      centerStrength: 0.3, // Moderate center pull (let springs do the work)
     }
   );
 
