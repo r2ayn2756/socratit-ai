@@ -4,9 +4,8 @@ import { io, Socket } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
 import Confetti from 'react-confetti';
 import { DashboardLayout } from '../../components/layout';
-import KnowledgeGraphCanvas from '../../components/atlas/KnowledgeGraphCanvas';
+import SubjectProgressFlow from '../../components/atlas/SubjectProgressFlow';
 import ConceptDetailPanel from '../../components/atlas/ConceptDetailPanel';
-import AtlasControls from '../../components/atlas/AtlasControls';
 import KnowledgeStats from '../../components/atlas/KnowledgeStats';
 import knowledgeGraphService, {
   KnowledgeGraph,
@@ -117,7 +116,6 @@ const Atlas: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<AtlasFilters>({});
-  const [layout, setLayout] = useState<'hierarchical' | 'force'>('force');
   const [highlightedConcepts, setHighlightedConcepts] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const socketRef = useRef<Socket | null>(null);
@@ -355,7 +353,7 @@ const Atlas: React.FC = () => {
     setSelectedNode(node || null);
   };
 
-  // Get unique subjects for filter
+  // Get unique subjects for filter (currently not used, but available for future enhancements)
   const availableSubjects = graphData
     ? Array.from(new Set(graphData.nodes.map((n) => n.subject)))
     : [];
@@ -454,25 +452,50 @@ const Atlas: React.FC = () => {
         {/* Statistics Overview */}
         <KnowledgeStats metadata={graphData.metadata} />
 
-        {/* Filters and Controls */}
-        <AtlasControls
-          filters={filters}
-          onFiltersChange={setFilters}
-          availableSubjects={availableSubjects}
-          layout={layout}
-          onLayoutChange={setLayout}
-        />
+        {/* Filters */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center gap-4">
+            {filters.subject && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm">
+                <span>Subject: {filters.subject}</span>
+                <button
+                  onClick={() => setFilters({ ...filters, subject: undefined })}
+                  className="hover:text-blue-900"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            {filters.masteryLevel && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm">
+                <span>Mastery: {filters.masteryLevel}</span>
+                <button
+                  onClick={() => setFilters({ ...filters, masteryLevel: undefined })}
+                  className="hover:text-green-900"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            {(filters.subject || filters.masteryLevel) && (
+              <button
+                onClick={() => setFilters({})}
+                className="text-sm text-gray-600 hover:text-gray-900"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+        </div>
 
-        {/* Main Content: Graph + Detail Panel */}
+        {/* Main Content: Subject Progress Flow + Detail Panel */}
         <div className="flex-1 flex overflow-hidden min-h-0">
-          {/* Knowledge Graph Canvas */}
+          {/* Subject Progress Flow */}
           <div className="flex-1 relative">
-            <KnowledgeGraphCanvas
-              graphData={graphData}
+            <SubjectProgressFlow
+              nodes={graphData.nodes}
               onNodeClick={handleNodeClick}
-              layout={layout}
-              studentId={user?.id || ''}
-              highlightedConcepts={highlightedConcepts}
+              selectedNodeId={selectedNode?.id}
             />
           </div>
 
