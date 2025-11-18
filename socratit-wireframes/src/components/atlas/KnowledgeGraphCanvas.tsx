@@ -221,7 +221,7 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       linkDistance: 80, // Shorter links for tighter connections
       linkStrength: 1.0, // Maximum link strength
       collisionPadding: 8, // Minimal padding for dot nodes
-      centerStrength: 0.8, // Very strong pull toward center (doubled)
+      centerStrength: 2.5, // Extremely strong pull toward center
     }
   );
 

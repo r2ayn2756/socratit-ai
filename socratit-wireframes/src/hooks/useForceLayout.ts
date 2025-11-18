@@ -29,7 +29,7 @@ const DEFAULT_CONFIG: Required<ForceLayoutConfig> = {
   linkDistance: 150,
   linkStrength: 0.5,
   collisionPadding: 20,
-  centerStrength: 0.05,
+  centerStrength: 2.0,
   alphaDecay: 0.01,
   velocityDecay: 0.4,
 };

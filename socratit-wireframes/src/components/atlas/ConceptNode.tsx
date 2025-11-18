@@ -18,24 +18,10 @@ interface ConceptNodeData {
 
 /**
  * Get color based on mastery level (for dot)
+ * All dots are blue for consistent visual appearance
  */
 const getMasteryDotColor = (masteryLevel: MasteryLevel): string => {
-  switch (masteryLevel) {
-    case 'EXPERT':
-      return 'bg-purple-500 border-purple-600';
-    case 'MASTERED':
-      return 'bg-green-500 border-green-600';
-    case 'PROFICIENT':
-      return 'bg-blue-500 border-blue-600';
-    case 'DEVELOPING':
-      return 'bg-yellow-500 border-yellow-600';
-    case 'INTRODUCED':
-      return 'bg-orange-500 border-orange-600';
-    case 'NOT_STARTED':
-      return 'bg-gray-400 border-gray-500';
-    default:
-      return 'bg-gray-400 border-gray-500';
-  }
+  return 'bg-blue-500 border-blue-600';
 };
 
 /**
