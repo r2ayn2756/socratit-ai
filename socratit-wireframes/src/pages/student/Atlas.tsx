@@ -117,7 +117,7 @@ const Atlas: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<AtlasFilters>({});
-  const [layout, setLayout] = useState<'hierarchical' | 'force'>('hierarchical');
+  const [layout, setLayout] = useState<'hierarchical' | 'force'>('force');
   const [highlightedConcepts, setHighlightedConcepts] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const socketRef = useRef<Socket | null>(null);

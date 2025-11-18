@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -12,12 +12,14 @@ import ReactFlow, {
   NodeTypes,
   MarkerType,
   ConnectionLineType,
+  useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import dagre from 'dagre';
 import ConceptNode from './ConceptNode';
 import { KnowledgeGraphNode, KnowledgeGraphEdge } from '../../services/knowledgeGraph.service';
 import knowledgeGraphService from '../../services/knowledgeGraph.service';
+import { useForceLayout } from '../../hooks/useForceLayout';
 
 interface KnowledgeGraphCanvasProps {
   graphData: {
@@ -137,6 +139,8 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isLayouted, setIsLayouted] = useState(false);
+  const [canvasDimensions, setCanvasDimensions] = useState({ width: 1000, height: 800 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Define custom node types
   const nodeTypes: NodeTypes = useMemo(
@@ -146,15 +150,30 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
     []
   );
 
-  // Transform graph data to React Flow format
+  // Track canvas dimensions for force layout centering
   useEffect(() => {
-    if (!graphData) return;
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setCanvasDimensions({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight,
+        });
+      }
+    };
 
-    // Convert nodes
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  // Prepare initial flow nodes and edges (before layout)
+  const { flowNodes, flowEdges } = useMemo(() => {
+    if (!graphData) return { flowNodes: [], flowEdges: [] };
+
     const flowNodes: Node[] = graphData.nodes.map((node) => ({
       id: node.id,
       type: 'conceptNode',
-      position: node.position || { x: 0, y: 0 },
+      position: node.position || { x: Math.random() * canvasDimensions.width, y: Math.random() * canvasDimensions.height },
       data: {
         label: node.label,
         subject: node.subject,
@@ -167,13 +186,12 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       className: highlightedConcepts.includes(node.id) ? 'highlighted-concept' : '',
     }));
 
-    // Convert edges
     const flowEdges: Edge[] = graphData.edges.map((edge) => ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
       type: 'smoothstep',
-      animated: edge.type === 'prerequisite', // Animate prerequisites
+      animated: edge.type === 'prerequisite',
       style: getEdgeStyle(edge.strength, edge.type),
       markerEnd: {
         type: MarkerType.ArrowClosed,
@@ -186,8 +204,34 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       labelBgStyle: { fill: '#ffffff', fillOpacity: 0.8 },
     }));
 
-    // Apply layout if enabled
-    if (layout === 'hierarchical' && !isLayouted) {
+    return { flowNodes, flowEdges };
+  }, [graphData, highlightedConcepts, canvasDimensions]);
+
+  // Apply force layout when enabled
+  const forceLayoutResult = useForceLayout(
+    flowNodes,
+    flowEdges,
+    canvasDimensions,
+    {
+      repulsion: -1500,
+      linkDistance: 150,
+      linkStrength: 0.5,
+      collisionPadding: 20,
+      centerStrength: 0.05,
+    }
+  );
+
+  // Apply layout based on mode and update nodes/edges
+  useEffect(() => {
+    if (!flowNodes.length) return;
+
+    if (layout === 'force') {
+      // Use force-directed layout from hook
+      setNodes(forceLayoutResult.nodes);
+      setEdges(flowEdges);
+      setIsLayouted(false); // Reset for potential switch back to hierarchical
+    } else if (layout === 'hierarchical') {
+      // Use hierarchical dagre layout
       const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
         flowNodes,
         flowEdges,
@@ -196,11 +240,8 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
       setIsLayouted(true);
-    } else {
-      setNodes(flowNodes);
-      setEdges(flowEdges);
     }
-  }, [graphData, layout, setNodes, setEdges, isLayouted, highlightedConcepts]);
+  }, [layout, flowNodes, flowEdges, forceLayoutResult.nodes, setNodes, setEdges]);
 
   // Handle connection (for future editing features)
   const onConnect = useCallback(
@@ -216,9 +257,35 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
     [onNodeClick]
   );
 
+  // Handle node drag start (for force layout)
+  const onNodeDragStart = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (layout === 'force' && forceLayoutResult.handleNodeDragStart) {
+        forceLayoutResult.handleNodeDragStart(node.id);
+      }
+    },
+    [layout, forceLayoutResult]
+  );
+
+  // Handle node drag (for force layout)
+  const onNodeDrag = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (layout === 'force' && forceLayoutResult.handleNodeDrag) {
+        forceLayoutResult.handleNodeDrag(node.id, node.position);
+      }
+    },
+    [layout, forceLayoutResult]
+  );
+
   // Save node position when dragging ends
   const onNodeDragStop = useCallback(
     async (_event: React.MouseEvent, node: Node) => {
+      // End force simulation drag
+      if (layout === 'force' && forceLayoutResult.handleNodeDragEnd) {
+        forceLayoutResult.handleNodeDragEnd(node.id);
+      }
+
+      // Save position to backend
       try {
         await knowledgeGraphService.updateNodePosition(
           studentId,
@@ -230,11 +297,11 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
         console.error('Failed to save node position:', error);
       }
     },
-    [studentId]
+    [studentId, layout, forceLayoutResult]
   );
 
   return (
-    <div className="w-full h-full bg-gray-50 rounded-lg overflow-hidden">
+    <div ref={containerRef} className="w-full h-full bg-gray-50 rounded-lg overflow-hidden">
       <style>{`
         .highlighted-concept {
           filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8));
@@ -257,6 +324,8 @@ const KnowledgeGraphCanvas: React.FC<KnowledgeGraphCanvasProps> = ({
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
+        onNodeDragStart={onNodeDragStart}
+        onNodeDrag={onNodeDrag}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         connectionLineType={ConnectionLineType.SmoothStep}
