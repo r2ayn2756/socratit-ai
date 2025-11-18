@@ -18,10 +18,24 @@ interface ConceptNodeData {
 
 /**
  * Get color based on mastery level (for dot)
- * All dots are blue for consistent visual appearance
+ * Color-coded by mastery percentage
  */
 const getMasteryDotColor = (masteryLevel: MasteryLevel): string => {
-  return 'bg-blue-500 border-blue-600';
+  switch (masteryLevel) {
+    case 'EXPERT':
+    case 'MASTERED':
+      return 'bg-green-500 border-green-600';
+    case 'PROFICIENT':
+      return 'bg-blue-500 border-blue-600';
+    case 'DEVELOPING':
+      return 'bg-yellow-500 border-yellow-600';
+    case 'INTRODUCED':
+      return 'bg-orange-500 border-orange-600';
+    case 'NOT_STARTED':
+      return 'bg-gray-400 border-gray-500';
+    default:
+      return 'bg-gray-400 border-gray-500';
+  }
 };
 
 /**
@@ -107,19 +121,24 @@ const ConceptNode = memo(({ data, selected }: NodeProps<ConceptNodeData>) => {
         style={{ top: shouldExpand ? -8 : -4 }}
       />
 
-      {/* Dot mode (default) */}
+      {/* Dot mode with percentage label (default) */}
       {!shouldExpand && (
-        <div
-          className={`
-            w-3 h-3 rounded-full border-2 shadow-lg
-            transition-all duration-200 cursor-pointer
-            ${dotColorClasses}
-            hover:scale-150
-          `}
-          style={{
-            boxShadow: selected ? '0 0 0 4px rgba(59, 130, 246, 0.5)' : '0 2px 8px rgba(0,0,0,0.3)',
-          }}
-        />
+        <div className="flex flex-col items-center gap-0.5">
+          <div
+            className={`
+              w-3 h-3 rounded-full border-2 shadow-lg
+              transition-all duration-200 cursor-pointer
+              ${dotColorClasses}
+              hover:scale-150
+            `}
+            style={{
+              boxShadow: selected ? '0 0 0 4px rgba(59, 130, 246, 0.5)' : '0 2px 8px rgba(0,0,0,0.3)',
+            }}
+          />
+          <span className="text-[10px] font-semibold text-gray-700 whitespace-nowrap pointer-events-none">
+            {Math.round(data.mastery)}%
+          </span>
+        </div>
       )}
 
       {/* Expanded card mode (on hover or selected) */}
