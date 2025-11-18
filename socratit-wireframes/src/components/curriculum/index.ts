@@ -17,7 +17,7 @@ export { Timeline } from './Timeline';
 export { AIChatAssistant } from './AIChatAssistant';
 
 // Dashboard Components
-export { StudentProgressDashboard } from './StudentProgressDashboard';
+export { StudentProgressDashboard } from '../progress/StudentProgressDashboard';
 export { TeacherDashboard } from './TeacherDashboard';
 
 // Wizard
