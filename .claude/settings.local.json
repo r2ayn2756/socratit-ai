@@ -6,7 +6,19 @@
       "Bash(git fetch:*)",
       "Bash(.vercel-deploy)",
       "Bash(\"C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, title, description, topics, \"\"learningObjectives\"\", concepts FROM \"\"CurriculumUnit\"\" WHERE \"\"scheduleId\"\" IN (SELECT id FROM \"\"CurriculumSchedule\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 1) ORDER BY \"\"unitNumber\"\" LIMIT 3;\")",
-      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, title, LEFT(CAST(topics AS TEXT), 100) as topics_preview FROM \"\"CurriculumUnit\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 3;\")"
+      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql.exe\" -U postgres -d socratit_dev -c \"SELECT id, title, LEFT(CAST(topics AS TEXT), 100) as topics_preview FROM \"\"CurriculumUnit\"\" ORDER BY \"\"createdAt\"\" DESC LIMIT 3;\")",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Rebrand landing page with PDF-to-quiz workflow focus\n\nMajor rebranding from time-saving for teachers to dual-audience \n(employers + teachers) with clear PDF → Quiz pipeline messaging.\n\n**New Sections:**\n- 4-step workflow: Upload PDF → AI breakdown → Quiz generation → Track outcomes\n- Split problem statement targeting employers AND teachers\n- Use cases section with 6 real-world scenarios\n- Split benefits with interactive tabs (employers vs teachers)\n- Testimonials from training managers, teachers, and compliance officers\n- FAQ section with witty, conversational Q&A\n- Updated final CTA with trust badges\n\n**Copy Changes:**\n- Hero: \"Turn Any PDF Into a Smart Assessment System\"\n- Witty microcopy throughout (\"Death by PDF\", \"Quiz Creation Hell\", etc.)\n- Footer tagline: \"Making PDFs useful since 2024\"\n- Clear value prop: Upload curriculum, break into units, one-click quizzes\n\n**UX Improvements:**\n- Interactive tab selector for employer/teacher benefits\n- Animated workflow cards with gradient backgrounds\n- Enhanced visual hierarchy with color-coded sections\n- Trust signals and social proof in final CTA\n\nGenerated with Claude Code\nhttps://claude.com/claude-code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(timeout 10 git push:*)",
+      "Bash(npm start)",
+      "Bash(PORT=3001 npm start:*)",
+      "Bash(PORT=3002 npm start:*)",
+      "Bash(PORT=3003 npm start:*)",
+      "Bash(PORT=3004 npm start:*)"
     ],
     "deny": [],
     "ask": []
