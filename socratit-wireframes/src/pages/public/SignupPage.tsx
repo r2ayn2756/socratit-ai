@@ -258,25 +258,6 @@ export const SignupPage: React.FC = () => {
               />
             )}
 
-            {/* Terms Acceptance */}
-            <label className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                className="w-4 h-4 mt-0.5 text-brand-blue border-slate-300 rounded focus:ring-brand-blue"
-                required
-              />
-              <span className="text-sm text-slate-600">
-                I agree to the{' '}
-                <a href="#" className="text-brand-blue hover:text-blue-600 font-medium">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-brand-blue hover:text-blue-600 font-medium">
-                  Privacy Policy
-                </a>
-              </span>
-            </label>
-
             {/* Submit Button */}
             <Button
               type="submit"
