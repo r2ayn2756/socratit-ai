@@ -81,15 +81,16 @@ export const register = async (
         throw new AppError('Invalid school code', 400);
       }
     } else {
-      // If no school code provided (e.g., for teachers signing up), assign default school
-      // Try to find a default/demo school, or just use the first available school
-      school = await prisma.school.findFirst({
-        orderBy: { createdAt: 'asc' },
-      });
+      // If no school code provided (e.g., for teachers signing up without organization),
+      // create a new personal/individual school for this teacher to ensure data isolation
+      const schoolCode = `TEACH${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
-      if (!school) {
-        throw new AppError('No schools available in the system. Please contact support.', 500);
-      }
+      school = await prisma.school.create({
+        data: {
+          name: `${body.firstName} ${body.lastName}'s School`,
+          schoolCode: schoolCode,
+        },
+      });
     }
 
     // Hash password
