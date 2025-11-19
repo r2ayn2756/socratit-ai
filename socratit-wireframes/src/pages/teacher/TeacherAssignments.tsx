@@ -17,6 +17,7 @@ import {
   Trash2,
   Calendar,
   Eye,
+  Play,
 } from 'lucide-react';
 import { assignmentService, Assignment } from '../../services/assignment.service';
 
@@ -203,14 +204,27 @@ export const TeacherAssignments: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 {assignment.status === 'ACTIVE' && (
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => navigate(`/teacher/assignments/${assignment.id}/submissions`)}
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View Submissions
-                  </Button>
+                  <>
+                    {assignment.type === 'PRACTICE' && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => navigate(`/student/assignments/${assignment.id}/take`)}
+                        title="Take this practice assignment yourself"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Take Practice
+                      </Button>
+                    )}
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => navigate(`/teacher/assignments/${assignment.id}/submissions`)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Submissions
+                    </Button>
+                  </>
                 )}
                 {assignment.status === 'DRAFT' && (
                   <>

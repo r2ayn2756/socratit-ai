@@ -45,19 +45,44 @@ export async function startAssignment(req: AuthenticatedRequest, res: Response):
       return;
     }
 
-    // Verify student is enrolled in the class
-    const enrollment = await prisma.classEnrollment.findFirst({
-      where: {
-        classId: assignment.classId,
-        studentId: user.id,
-        status: 'APPROVED',
-      },
-    });
+    // Verify user has access to this assignment
+    // Students must be enrolled, teachers must be teaching the class
+    let hasAccess = false;
 
-    if (!enrollment) {
+    if (user.role === 'STUDENT') {
+      const enrollment = await prisma.classEnrollment.findFirst({
+        where: {
+          classId: assignment.classId,
+          studentId: user.id,
+          status: 'APPROVED',
+        },
+      });
+      hasAccess = !!enrollment;
+    } else if (user.role === 'TEACHER') {
+      // Teachers can only take PRACTICE assignments (not ESSAY)
+      if (assignment.type !== 'PRACTICE') {
+        res.status(403).json({
+          success: false,
+          message: 'Teachers can only take practice assignments',
+        });
+        return;
+      }
+
+      const classTeacher = await prisma.classTeacher.findFirst({
+        where: {
+          classId: assignment.classId,
+          teacherId: user.id,
+        },
+      });
+      hasAccess = !!classTeacher;
+    }
+
+    if (!hasAccess) {
       res.status(403).json({
         success: false,
-        message: 'You are not enrolled in this class',
+        message: user.role === 'STUDENT'
+          ? 'You are not enrolled in this class'
+          : 'You are not teaching this class',
       });
       return;
     }
