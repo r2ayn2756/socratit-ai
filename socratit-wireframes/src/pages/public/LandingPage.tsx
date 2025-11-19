@@ -124,14 +124,6 @@ export const LandingPage: React.FC = () => {
                 >
                   Try Digitizing Your Curriculum →
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => window.open('https://calendly.com/cc283-rice/30min?month=2025-10', '_blank')}
-                  className="glass border-2 border-white/20 text-white hover:bg-white/10"
-                >
-                  Book a Demo
-                </Button>
               </motion.div>
 
             </motion.div>
@@ -437,14 +429,6 @@ export const LandingPage: React.FC = () => {
               >
                 Try Digitizing Your Curriculum
               </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => window.open('https://calendly.com/cc283-rice/30min?month=2025-10', '_blank')}
-                className="border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-xl bg-slate-900/40"
-              >
-                Book a Demo
-              </Button>
             </div>
           </motion.div>
         </div>
@@ -464,7 +448,6 @@ export const LandingPage: React.FC = () => {
               <h3 className="font-semibold mb-4 text-white">{t('footer.product')}</h3>
               <ul className="space-y-2 text-sm text-white/60">
                 <li><button onClick={() => navigate('/signup')} className="hover:text-white transition-colors">{t('footer.features')}</button></li>
-                <li><button onClick={() => window.open('https://calendly.com/cc283-rice/30min?month=2025-10', '_blank')} className="hover:text-white transition-colors">{t('footer.demo')}</button></li>
               </ul>
             </div>
             <div>
