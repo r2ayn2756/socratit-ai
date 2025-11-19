@@ -17,26 +17,15 @@ import {
   BookOpen,
   CheckCircle,
   AlertCircle,
-  Brain,
   Target,
-  HelpCircle,
-  Lightbulb,
-  Calculator,
-  BookMarked,
-  GraduationCap,
-  Zap,
   Play,
-  Send,
-  Sparkles,
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
-import { aiTAService } from '../../services/aiTA.service';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 export const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [chatMessage, setChatMessage] = useState('');
 
   // Fetch assignments from backend
   const { data: assignmentsData } = useQuery({
@@ -84,49 +73,7 @@ export const StudentDashboard: React.FC = () => {
       )
     : 0;
 
-  // Teaching Assistant quick actions
-  const taQuickActions = [
-    {
-      text: 'Help me prepare for my test',
-      icon: <GraduationCap className="w-4 h-4" />,
-      color: 'blue',
-    },
-    {
-      text: "I don't know how to do my homework",
-      icon: <HelpCircle className="w-4 h-4" />,
-      color: 'purple',
-    },
-    {
-      text: 'I forgot the quadratic formula',
-      icon: <Calculator className="w-4 h-4" />,
-      color: 'orange',
-    },
-    {
-      text: 'Explain this concept simply',
-      icon: <Lightbulb className="w-4 h-4" />,
-      color: 'green',
-    },
-    {
-      text: 'Walk me through this problem',
-      icon: <BookMarked className="w-4 h-4" />,
-      color: 'cyan',
-    },
-    {
-      text: 'What should I study next?',
-      icon: <Target className="w-4 h-4" />,
-      color: 'pink',
-    },
-    {
-      text: 'Quiz me on this topic',
-      icon: <Zap className="w-4 h-4" />,
-      color: 'purple',
-    },
-    {
-      text: 'Teach me something new',
-      icon: <Brain className="w-4 h-4" />,
-      color: 'blue',
-    },
-  ];
+  // Teaching Assistant removed - no longer needed
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -183,41 +130,7 @@ export const StudentDashboard: React.FC = () => {
     });
   };
 
-  // Handle starting a conversation
-  const handleStartConversation = async (initialMessage: string) => {
-    if (!initialMessage.trim()) return;
-
-    try {
-      const conversation = await aiTAService.createConversation({
-        conversationType: 'GENERAL_HELP',
-        title: initialMessage.substring(0, 50) + (initialMessage.length > 50 ? '...' : ''),
-      });
-
-      // Navigate to chat page with the conversation ID and initial message
-      navigate('/student/ai-tutor', {
-        state: {
-          conversationId: conversation.id,
-          autoOpen: true,
-          initialMessage: initialMessage
-        }
-      });
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      alert('Failed to start conversation. Please try again.');
-    }
-  };
-
-  const handleQuickAction = (text: string) => {
-    handleStartConversation(text);
-  };
-
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (chatMessage.trim()) {
-      handleStartConversation(chatMessage);
-      setChatMessage('');
-    }
-  };
+  // Teaching Assistant handlers removed - no longer needed
 
   return (
     <DashboardLayout userRole="student">
@@ -483,83 +396,9 @@ export const StudentDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Right Column - Teaching Assistant */}
+          {/* Right Column - Grades and Stats */}
           <motion.div variants={fadeInUp} className="space-y-6">
-            {/* TA Card - Redesigned with transparent purple and neomorphism */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="relative overflow-hidden rounded-2xl"
-            >
-              {/* Neomorphic card */}
-              <div className="relative backdrop-blur-md bg-white/40 border border-white/50 shadow-2xl rounded-2xl p-6">
-                {/* Apple-style neomorphic inner shadow */}
-                <div className="absolute inset-0 rounded-2xl shadow-inner opacity-30 pointer-events-none"></div>
-
-                {/* Header with icon */}
-                <div className="relative flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
-                    <img src="/logo512.png" alt="SocratIt" className="w-full h-full object-contain" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-xl text-slate-800">{t('student.dashboard.aiTutor.title')}</h3>
-                      <Sparkles className="w-4 h-4 text-purple-600" />
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-slate-700 mb-4 leading-relaxed">
-                  {t('student.dashboard.aiTutor.description')}
-                </p>
-
-                {/* Text input form - neomorphic style */}
-                <form onSubmit={handleSendMessage} className="mb-4">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      placeholder={t('student.dashboard.aiTutor.placeholder')}
-                      className="w-full pl-4 pr-12 py-3 rounded-xl bg-white/60 backdrop-blur-sm border border-purple-200/50
-                               shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400
-                               text-slate-800 placeholder-slate-500 transition-all"
-                    />
-                    <button
-                      type="submit"
-                      disabled={!chatMessage.trim()}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700
-                               rounded-lg flex items-center justify-center hover:shadow-lg hover:shadow-purple-500/50
-                               transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
-                    >
-                      <Send className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
-                </form>
-
-                {/* Quick Actions */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-purple-700/80">
-                    {t('student.dashboard.quickActions')}
-                  </p>
-                  {taQuickActions.slice(0, 4).map((action, index) => (
-                    <motion.button
-                      key={index}
-                      whileHover={{ scale: 1.02, x: 4 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleQuickAction(action.text)}
-                      className="w-full text-left px-4 py-2.5 rounded-xl bg-white/50 backdrop-blur-sm border border-white/60
-                               hover:bg-white/70 hover:shadow-md hover:shadow-purple-200/50 transition-all text-sm
-                               flex items-center gap-3 text-slate-700 font-medium"
-                    >
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center text-white shadow-sm">
-                        {action.icon}
-                      </div>
-                      <span>{action.text}</span>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
+            {/* Teaching Assistant removed */}
 
             {/* Recent Grades */}
             {gradedAssignments.length > 0 && (
