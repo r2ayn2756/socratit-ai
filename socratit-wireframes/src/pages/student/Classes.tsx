@@ -362,54 +362,7 @@ export const Classes: React.FC = () => {
             )}
           </div>
 
-          {/* Teaching Assistant - Takes up 1/3 */}
-          <motion.div variants={fadeInUp}>
-            <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
-              <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                    <Brain className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg">AI Teaching Assistant</h3>
-                    <p className="text-sm opacity-90">24/7 Support</p>
-                  </div>
-                </div>
-                <Button
-                  variant="glass"
-                  size="sm"
-                  glow={false}
-                  className="w-full bg-white text-purple-700 hover:bg-white/90"
-                >
-                  Ask a Question
-                </Button>
-
-                <div className="mt-6 pt-6 border-t border-white/20">
-                  <p className="text-sm opacity-90 mb-4">
-                    Need help with any of your classes? I can assist with:
-                  </p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span className="opacity-70">•</span>
-                      <span>Understanding concepts</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="opacity-70">•</span>
-                      <span>Homework help</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="opacity-70">•</span>
-                      <span>Test preparation</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="opacity-70">•</span>
-                      <span>Study planning</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
+          {/* AI Teaching Assistant removed */}
         </div>
       </motion.div>
 
