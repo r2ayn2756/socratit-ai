@@ -68,10 +68,10 @@ export const registerSchema = Joi.object({
     .trim()
     .uppercase()
     .length(8)
-    .required()
+    .optional()
+    .allow('')
     .messages({
       'string.length': 'School code must be exactly 8 characters',
-      'any.required': 'School code is required',
     }),
 
   gradeLevel: Joi.string()

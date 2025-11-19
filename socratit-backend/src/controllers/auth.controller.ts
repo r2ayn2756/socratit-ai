@@ -68,13 +68,28 @@ export const register = async (
       throw new AppError('Password is too common, please choose a stronger password', 400);
     }
 
-    // Validate school code
-    const school = await prisma.school.findUnique({
-      where: { schoolCode: body.schoolCode },
-    });
+    // Validate or assign school
+    let school;
 
-    if (!school) {
-      throw new AppError('Invalid school code', 400);
+    if (body.schoolCode) {
+      // If school code provided, validate it
+      school = await prisma.school.findUnique({
+        where: { schoolCode: body.schoolCode },
+      });
+
+      if (!school) {
+        throw new AppError('Invalid school code', 400);
+      }
+    } else {
+      // If no school code provided (e.g., for teachers signing up), assign default school
+      // Try to find a default/demo school, or just use the first available school
+      school = await prisma.school.findFirst({
+        orderBy: { createdAt: 'asc' },
+      });
+
+      if (!school) {
+        throw new AppError('No schools available in the system. Please contact support.', 500);
+      }
     }
 
     // Hash password
