@@ -90,7 +90,9 @@ export const LandingPage: React.FC = () => {
                 variants={fadeInUp}
                 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight"
               >
-                Classroom Management Tool
+                A Tool for Teachers
+                <br />
+                <span className="text-3xl md:text-4xl font-normal text-white/80">In Partnership with Teachers</span>
               </motion.h1>
 
               <motion.p
