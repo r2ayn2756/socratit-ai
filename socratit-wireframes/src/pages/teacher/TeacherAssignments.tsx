@@ -16,9 +16,6 @@ import {
   Edit3,
   Trash2,
   Calendar,
-  Brain,
-  Target,
-  TrendingUp,
   Eye,
 } from 'lucide-react';
 import { assignmentService, Assignment } from '../../services/assignment.service';
@@ -337,9 +334,7 @@ export const TeacherAssignments: React.FC = () => {
         </motion.div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Assignments */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
             {/* Active Assignments */}
             <motion.div variants={fadeInUp}>
               <div className="flex items-center gap-3 mb-4">
@@ -374,88 +369,9 @@ export const TeacherAssignments: React.FC = () => {
                 {scheduledAssignments.map(assignment => renderAssignment(assignment))}
               </div>
             </motion.div>
-          </div>
-
-          {/* Right Column - AI Teaching Assistant */}
-          <div className="space-y-6">
-            <motion.div variants={fadeInUp}>
-              <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
-                <div className="p-6 bg-gradient-to-br from-brand-purple to-purple-600 text-white">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                      <Brain className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">AI Assistant</h3>
-                      <p className="text-sm opacity-90">Assignment insights</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                      <p className="text-sm opacity-90 mb-1">Active Assignments</p>
-                      <p className="text-2xl font-bold">{activeAssignments.length}</p>
-                    </div>
-
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                      <p className="text-sm opacity-90 mb-1">Total Submissions</p>
-                      <p className="text-2xl font-bold">
-                        {activeAssignments.reduce((sum, a) => sum + (a._count?.submissions || 0), 0)}
-                      </p>
-                    </div>
-
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                      <p className="text-sm opacity-90 mb-1">Total Questions</p>
-                      <p className="text-2xl font-bold">
-                        {activeAssignments.reduce((sum, a) => sum + (a._count?.questions || 0), 0)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full bg-white text-brand-purple hover:bg-white/90 mb-4"
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    Generate with AI
-                  </Button>
-
-                  <div className="pt-6 border-t border-white/20">
-                    <h4 className="font-semibold mb-3 text-sm">Quick Actions</h4>
-                    <div className="space-y-2">
-                      <button className="w-full text-left px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-sm">
-                        Create practice quiz
-                      </button>
-                      <button className="w-full text-left px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-sm">
-                        Generate homework
-                      </button>
-                      <button className="w-full text-left px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-sm">
-                        Create assessment
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <h4 className="font-semibold mb-3 text-sm">AI Insights</h4>
-                    <div className="space-y-2">
-                      <div className="text-sm bg-white/10 rounded-lg p-3">
-                        <p className="opacity-90">
-                          Triangle Properties assignment has high engagement - consider similar format
-                        </p>
-                      </div>
-                      <div className="text-sm bg-white/10 rounded-lg p-3">
-                        <p className="opacity-90">
-                          7 students haven't started Quadratic Functions - send reminder?
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
         </div>
+
+        {/* AI Assistant removed */}
       </motion.div>
     </DashboardLayout>
   );
