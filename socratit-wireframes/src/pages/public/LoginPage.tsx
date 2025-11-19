@@ -81,7 +81,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center p-6">
 
       <div className="w-full max-w-md">
 
@@ -90,16 +90,16 @@ export const LoginPage: React.FC = () => {
           <Link to="/">
             <img src="/logo.svg" alt="Socratit.ai" className="h-16 w-auto mx-auto mb-4" />
           </Link>
-          <h1 className="text-2xl font-bold text-white mb-2">Login</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Login</h1>
         </div>
 
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/30 rounded-2xl p-8">
+        <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
             {/* Error Alert */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
 
@@ -152,10 +152,10 @@ export const LoginPage: React.FC = () => {
             </Button>
 
             {/* Sign Up Link */}
-            <div className="text-center pt-4 border-t border-white/10">
-              <p className="text-white/60 text-sm">
+            <div className="text-center pt-4 border-t border-slate-200">
+              <p className="text-slate-600 text-sm">
                 {t('login.noAccount')}{' '}
-                <Link to="/signup" className="text-blue-400 hover:text-blue-300">
+                <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
                   {t('login.signUpFree')}
                 </Link>
               </p>
@@ -166,7 +166,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Back to Home */}
         <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-white/60 hover:text-white transition-colors">
+          <Link to="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
             ← Back to Home
           </Link>
         </div>

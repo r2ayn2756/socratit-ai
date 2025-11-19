@@ -103,10 +103,9 @@ export const SignupPage: React.FC = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/">
-            <img src="/logo.svg" alt="Socratit.ai" className="h-12 w-auto mx-auto mb-4" />
+            <img src="/logo.svg" alt="Socratit.ai" className="h-16 w-auto mx-auto mb-4" />
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('signup.title')}</h1>
-          <p className="text-slate-600">{t('signup.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Sign Up</h1>
         </div>
 
         <Card variant="elevated" padding="lg">
