@@ -19,7 +19,6 @@ import {
   Save,
 } from 'lucide-react';
 import { assignmentService } from '../../services/assignment.service';
-import { AlwaysVisibleAIChat } from '../../components/ai/AlwaysVisibleAIChat';
 import { TestLockdown, LockdownInfoBanner, LockdownViolation } from '../../components/student/TestLockdown';
 import { EssayEditor } from '../../components/student/EssayEditor';
 
@@ -291,18 +290,9 @@ export const TakeAssignment: React.FC = () => {
         onViolation={handleLockdownViolation}
         onMaxViolationsReached={handleMaxViolationsReached}
       >
-        {/* Always-visible AI Chat (right sidebar) - Hidden for tests */}
-        {!isTestAssignment && !isEssayAssignment && (
-          <AlwaysVisibleAIChat
-            assignmentId={assignmentId!}
-            assignmentTitle={assignment.title}
-            currentQuestionId={currentQuestion?.id}
-            currentQuestionText={currentQuestion?.questionText}
-          />
-        )}
 
-      {/* Main content area (with margin for chat only if not a test) */}
-      <div className={`max-w-4xl mx-auto space-y-6 ${!isTestAssignment ? 'mr-96 pr-6' : ''}`}>
+      {/* Main content area */}
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

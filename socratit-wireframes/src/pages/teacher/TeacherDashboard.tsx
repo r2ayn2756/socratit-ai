@@ -330,20 +330,6 @@ export const TeacherDashboard: React.FC = () => {
                 variant="glass"
                 glow={false}
                 className="p-6 h-auto justify-start hover:scale-105"
-                onClick={() => navigate('/teacher/analytics')}
-              >
-                <div className="text-left">
-                  <div className="font-semibold mb-1">{t('sidebar.analytics')}</div>
-                  <div className="text-sm text-slate-600">
-                    {t('teacher.dashboard.trackPerformance')}
-                  </div>
-                </div>
-              </Button>
-
-              <Button
-                variant="glass"
-                glow={false}
-                className="p-6 h-auto justify-start hover:scale-105"
                 onClick={() => navigate('/teacher/curriculum')}
               >
                 <div className="text-left">
