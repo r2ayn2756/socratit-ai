@@ -184,7 +184,7 @@ export const TeacherDashboard: React.FC = () => {
                     size="sm"
                     icon={<Plus className="w-4 h-4" />}
                     iconPosition="right"
-                    onClick={() => navigate('/teacher/classes/new')}
+                    onClick={() => navigate('/teacher/classes')}
                   >
                     {t('teacher.dashboard.addClass')}
                   </Button>
@@ -195,7 +195,7 @@ export const TeacherDashboard: React.FC = () => {
                 {upcomingClasses.length === 0 ? (
                   <div className="text-center py-12">
                     <p className="text-neutral-500 mb-4">{t('teacher.dashboard.noClasses')}</p>
-                    <Button onClick={() => navigate('/teacher/classes/new')}>
+                    <Button onClick={() => navigate('/teacher/classes')}>
                       {t('teacher.dashboard.createFirstClass')}
                     </Button>
                   </div>
