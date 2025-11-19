@@ -6,12 +6,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { Button, Input, Card } from '../../components/common';
+import { Button, Input } from '../../components/common';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { LoginFormData } from '../../types';
-import { Mail, Lock, AlertCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -83,96 +81,63 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-6">
 
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-brand-blue/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-brand-purple/10 rounded-full blur-3xl"></div>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
+      <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/">
-            <img src="/logo.svg" alt="Socratit.ai" className="h-24 w-auto mx-auto mb-4" />
+            <img src="/logo.svg" alt="Socratit.ai" className="h-16 w-auto mx-auto mb-4" />
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">{t('login.title')}</h1>
-          <p className="text-slate-600">{t('login.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-white mb-2">Login</h1>
         </div>
 
-        <Card variant="elevated" padding="lg">
+        <div className="bg-slate-900/80 backdrop-blur-xl border border-white/30 rounded-2xl p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
             {/* Error Alert */}
             {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-error/10 border border-error/20 rounded-lg p-4 flex items-start gap-3"
-              >
-                <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-error">{error}</p>
-                  {error.includes('Too many') && (
-                    <p className="text-xs text-error/80 mt-1">
-                      {t('login.error.securityMessage')}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
             )}
 
             {/* Email Field */}
-            <Input
-              label={t('login.emailLabel')}
-              type="email"
-              placeholder={t('login.emailPlaceholder')}
-              leftIcon={<Mail className="w-5 h-5" />}
-              error={errors.email?.message}
-              value={emailValue || ''}
-              {...register('email', {
-                required: t('login.validation.emailRequired'),
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: t('login.validation.invalidEmail'),
-                },
-              })}
-            />
+            <div>
+              <Input
+                label={t('login.emailLabel')}
+                type="email"
+                placeholder={t('login.emailPlaceholder')}
+                error={errors.email?.message}
+                value={emailValue || ''}
+                {...register('email', {
+                  required: t('login.validation.emailRequired'),
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: t('login.validation.invalidEmail'),
+                  },
+                })}
+              />
+            </div>
 
             {/* Password Field */}
-            <Input
-              label={t('login.passwordLabel')}
-              type="password"
-              placeholder={t('login.passwordPlaceholder')}
-              leftIcon={<Lock className="w-5 h-5" />}
-              showPasswordToggle={true}
-              error={errors.password?.message}
-              value={passwordValue || ''}
-              {...register('password', {
-                required: t('login.validation.passwordRequired'),
-                minLength: {
-                  value: 6,
-                  message: t('login.validation.passwordLength'),
-                },
-              })}
-            />
-
-            {/* Forgot Password Link */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="w-4 h-4 text-brand-blue border-slate-300 rounded focus:ring-brand-blue" />
-                <span className="text-sm text-slate-600">{t('login.rememberMe')}</span>
-              </label>
-              <Link to="/forgot-password" className="text-sm text-brand-blue hover:text-blue-600 font-medium">
-                {t('login.forgotPassword')}
-              </Link>
+            <div>
+              <Input
+                label={t('login.passwordLabel')}
+                type="password"
+                placeholder={t('login.passwordPlaceholder')}
+                showPasswordToggle={true}
+                error={errors.password?.message}
+                value={passwordValue || ''}
+                {...register('password', {
+                  required: t('login.validation.passwordRequired'),
+                  minLength: {
+                    value: 6,
+                    message: t('login.validation.passwordLength'),
+                  },
+                })}
+              />
             </div>
 
             {/* Submit Button */}
@@ -187,26 +152,26 @@ export const LoginPage: React.FC = () => {
             </Button>
 
             {/* Sign Up Link */}
-            <div className="text-center pt-4 border-t border-slate-200">
-              <p className="text-slate-600">
+            <div className="text-center pt-4 border-t border-white/10">
+              <p className="text-white/60 text-sm">
                 {t('login.noAccount')}{' '}
-                <Link to="/signup" className="text-brand-blue hover:text-blue-600 font-semibold">
+                <Link to="/signup" className="text-blue-400 hover:text-blue-300">
                   {t('login.signUpFree')}
                 </Link>
               </p>
             </div>
 
           </form>
-        </Card>
+        </div>
 
         {/* Back to Home */}
         <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-            ← {t('nav.backToHome')}
+          <Link to="/" className="text-sm text-white/60 hover:text-white transition-colors">
+            ← Back to Home
           </Link>
         </div>
 
-      </motion.div>
+      </div>
     </div>
   );
 };
