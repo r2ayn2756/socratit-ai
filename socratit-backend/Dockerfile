@@ -52,7 +52,7 @@ COPY prisma ./prisma/
 # Railway will provide the real DATABASE_URL at runtime
 ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
 ENV DATABASE_URL=$DATABASE_URL
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 # Copy source code
 COPY . .
@@ -108,4 +108,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
   CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Run migrations and start server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/index.js"]
