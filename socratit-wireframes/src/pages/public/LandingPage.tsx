@@ -38,11 +38,11 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
 
       {/* HEADER / NAVIGATION */}
       <motion.header
-        className="sticky top-0 z-50 glass border-b border-white/20"
+        className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -59,7 +59,7 @@ export const LandingPage: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/login')}
-                className="text-white hover:bg-white/10"
+                className="text-slate-700 hover:bg-slate-100"
               >
                 {t('nav.login')}
               </Button>
@@ -88,16 +88,16 @@ export const LandingPage: React.FC = () => {
             >
               <motion.h1
                 variants={fadeInUp}
-                className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight"
+                className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight"
               >
                 A Tool for Teachers
                 <br />
-                <span className="text-3xl md:text-4xl font-normal text-white/80">In Partnership with Teachers</span>
+                <span className="text-3xl md:text-4xl font-normal text-slate-700">In Partnership with Teachers</span>
               </motion.h1>
 
               <motion.p
                 variants={fadeInUp}
-                className="text-xl text-white/80 mb-8 leading-relaxed"
+                className="text-xl text-slate-600 mb-8 leading-relaxed"
               >
                 Upload curriculum, organize into units, create assessments, and track student progress.
               </motion.p>
@@ -125,9 +125,9 @@ export const LandingPage: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative rounded-3xl p-8 shadow-2xl border border-white/30 bg-slate-900/90 backdrop-blur-xl">
+              <div className="relative rounded-3xl p-8 shadow-2xl border border-slate-200 bg-white/90 backdrop-blur-xl">
                 <div className="mb-6 text-center">
-                  <h3 className="text-lg font-bold text-white">
+                  <h3 className="text-lg font-bold text-slate-900">
                     How It Works
                   </h3>
                 </div>
@@ -148,14 +148,14 @@ export const LandingPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="rounded-lg p-4 border border-blue-400/40 bg-blue-950/80 backdrop-blur-sm">
+                        <div className="rounded-lg p-4 border border-blue-300 bg-blue-50 backdrop-blur-sm">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-bold text-white">World_History_Textbook.pdf</span>
+                            <span className="text-sm font-bold text-slate-900">World_History_Textbook.pdf</span>
                             <Badge variant="info" size="sm">284 pages</Badge>
                           </div>
-                          <div className="w-full bg-blue-900/60 rounded-full h-2">
+                          <div className="w-full bg-blue-200 rounded-full h-2">
                             <motion.div
-                              className="bg-gradient-to-r from-blue-400 to-blue-500 h-2 rounded-full shadow-lg shadow-blue-500/50"
+                              className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full shadow-lg shadow-blue-500/50"
                               initial={{ width: 0 }}
                               animate={{ width: '100%' }}
                               transition={{ delay: 0.5, duration: 1.5 }}
@@ -166,7 +166,7 @@ export const LandingPage: React.FC = () => {
                     </div>
                     {/* Arrow */}
                     <div className="flex justify-center my-2">
-                      <ChevronRight className="w-6 h-6 text-blue-400 transform rotate-90" />
+                      <ChevronRight className="w-6 h-6 text-blue-500 transform rotate-90" />
                     </div>
                   </motion.div>
 
@@ -184,19 +184,19 @@ export const LandingPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="rounded-lg p-4 border border-purple-400/40 bg-purple-950/80 backdrop-blur-sm">
+                        <div className="rounded-lg p-4 border border-purple-300 bg-purple-50 backdrop-blur-sm">
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-200">Unit 1: Ancient Civilizations</span>
-                              <CheckCircle className="w-4 h-4 text-purple-300" />
+                              <span className="text-xs font-semibold text-slate-700">Unit 1: Ancient Civilizations</span>
+                              <CheckCircle className="w-4 h-4 text-purple-600" />
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-200">Unit 2: Medieval Europe</span>
-                              <CheckCircle className="w-4 h-4 text-purple-300" />
+                              <span className="text-xs font-semibold text-slate-700">Unit 2: Medieval Europe</span>
+                              <CheckCircle className="w-4 h-4 text-purple-600" />
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-purple-200">Unit 3: Age of Exploration</span>
-                              <CheckCircle className="w-4 h-4 text-purple-300" />
+                              <span className="text-xs font-semibold text-slate-700">Unit 3: Age of Exploration</span>
+                              <CheckCircle className="w-4 h-4 text-purple-600" />
                             </div>
                           </div>
                         </div>
@@ -204,7 +204,7 @@ export const LandingPage: React.FC = () => {
                     </div>
                     {/* Arrow */}
                     <div className="flex justify-center my-2">
-                      <ChevronRight className="w-6 h-6 text-purple-400 transform rotate-90" />
+                      <ChevronRight className="w-6 h-6 text-purple-500 transform rotate-90" />
                     </div>
                   </motion.div>
 
@@ -222,19 +222,19 @@ export const LandingPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="rounded-lg p-4 border border-pink-400/40 bg-pink-950/80 backdrop-blur-sm">
+                        <div className="rounded-lg p-4 border border-pink-300 bg-pink-50 backdrop-blur-sm">
                           <div className="grid grid-cols-3 gap-2">
-                            <div className="rounded p-2 text-center border border-pink-400/40 bg-pink-900/60">
-                              <div className="text-xl font-bold text-pink-300">15</div>
-                              <div className="text-[10px] text-white/80">Multiple Choice</div>
+                            <div className="rounded p-2 text-center border border-pink-300 bg-white">
+                              <div className="text-xl font-bold text-pink-600">15</div>
+                              <div className="text-[10px] text-slate-700">Multiple Choice</div>
                             </div>
-                            <div className="rounded p-2 text-center border border-pink-400/40 bg-pink-900/60">
-                              <div className="text-xl font-bold text-pink-300">8</div>
-                              <div className="text-[10px] text-white/80">Short Answer</div>
+                            <div className="rounded p-2 text-center border border-pink-300 bg-white">
+                              <div className="text-xl font-bold text-pink-600">8</div>
+                              <div className="text-[10px] text-slate-700">Short Answer</div>
                             </div>
-                            <div className="rounded p-2 text-center border border-pink-400/40 bg-pink-900/60">
-                              <div className="text-xl font-bold text-pink-300">3</div>
-                              <div className="text-[10px] text-white/80">Scenarios</div>
+                            <div className="rounded p-2 text-center border border-pink-300 bg-white">
+                              <div className="text-xl font-bold text-pink-600">3</div>
+                              <div className="text-[10px] text-slate-700">Scenarios</div>
                             </div>
                           </div>
                         </div>
@@ -242,7 +242,7 @@ export const LandingPage: React.FC = () => {
                     </div>
                     {/* Arrow */}
                     <div className="flex justify-center my-2">
-                      <ChevronRight className="w-6 h-6 text-pink-400 transform rotate-90" />
+                      <ChevronRight className="w-6 h-6 text-pink-500 transform rotate-90" />
                     </div>
                   </motion.div>
 
@@ -259,23 +259,23 @@ export const LandingPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <div className="rounded-lg p-4 border border-orange-400/40 bg-orange-950/80 backdrop-blur-sm">
+                        <div className="rounded-lg p-4 border border-orange-300 bg-orange-50 backdrop-blur-sm">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-bold text-white">Class Performance</span>
+                            <span className="text-xs font-bold text-slate-900">Class Performance</span>
                             <Badge variant="warning" size="sm">Live</Badge>
                           </div>
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-white/90">Class Average:</span>
-                              <span className="font-bold text-orange-300">87%</span>
+                              <span className="text-slate-700">Class Average:</span>
+                              <span className="font-bold text-orange-600">87%</span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-white/90">Completion:</span>
-                              <span className="font-bold text-orange-300">23/28 students</span>
+                              <span className="text-slate-700">Completion:</span>
+                              <span className="font-bold text-orange-600">23/28 students</span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-white/90">Need Help:</span>
-                              <span className="font-bold text-red-300">Unit 2.3</span>
+                              <span className="text-slate-700">Need Help:</span>
+                              <span className="font-bold text-red-600">Unit 2.3</span>
                             </div>
                           </div>
                         </div>
@@ -289,26 +289,26 @@ export const LandingPage: React.FC = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 2.3 }}
-                  className="mt-6 pt-6 border-t border-white/10"
+                  className="mt-6 pt-6 border-t border-slate-200"
                 >
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-blue-300">
+                      <div className="text-2xl font-bold text-blue-600">
                         3min
                       </div>
-                      <div className="text-xs text-white/80">Setup Time</div>
+                      <div className="text-xs text-slate-600">Setup Time</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-purple-300">
+                      <div className="text-2xl font-bold text-purple-600">
                         1 click
                       </div>
-                      <div className="text-xs text-white/80">To Generate</div>
+                      <div className="text-xs text-slate-600">To Generate</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-pink-300">
+                      <div className="text-2xl font-bold text-pink-600">
                         100%
                       </div>
-                      <div className="text-xs text-white/80">Visibility</div>
+                      <div className="text-xs text-slate-600">Visibility</div>
                     </div>
                   </div>
                 </motion.div>
@@ -320,7 +320,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* VALUE PROPOSITION SECTION */}
-      <section className="py-20 border-t border-white/10">
+      <section className="py-20 border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -329,10 +329,10 @@ export const LandingPage: React.FC = () => {
             variants={staggerContainer}
             className="text-center mb-16"
           >
-            <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-white mb-4">
+            <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-slate-900 mb-4">
               Simple Workflow
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-white/70 max-w-3xl mx-auto">
+            <motion.p variants={fadeInUp} className="text-xl text-slate-600 max-w-3xl mx-auto">
               Upload materials, create units, generate assessments, and track results.
             </motion.p>
           </motion.div>
@@ -346,13 +346,13 @@ export const LandingPage: React.FC = () => {
           >
             {/* Step 1 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-blue-400/60 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/60 group-hover:scale-110 transition-all duration-300">
+              <div className="rounded-2xl p-6 h-full border border-slate-200 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 bg-white backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 group-hover:scale-110 transition-all duration-300">
                   <Upload className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-sm font-semibold text-blue-300 mb-2">STEP 1</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Upload Materials</h3>
-                <p className="text-white/80 text-sm">
+                <div className="text-sm font-semibold text-blue-600 mb-2">STEP 1</div>
+                <h3 className="text-xl font-bold mb-3 text-slate-900">Upload Materials</h3>
+                <p className="text-slate-600 text-sm">
                   Upload textbooks, curriculum guides, or lesson plans as PDFs.
                 </p>
               </div>
@@ -360,13 +360,13 @@ export const LandingPage: React.FC = () => {
 
             {/* Step 2 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/60 group-hover:scale-110 transition-all duration-300">
+              <div className="rounded-2xl p-6 h-full border border-slate-200 hover:border-purple-400 hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 bg-white backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 group-hover:scale-110 transition-all duration-300">
                   <Layers className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-sm font-semibold text-purple-300 mb-2">STEP 2</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Organize Into Units</h3>
-                <p className="text-white/80 text-sm">
+                <div className="text-sm font-semibold text-purple-600 mb-2">STEP 2</div>
+                <h3 className="text-xl font-bold mb-3 text-slate-900">Organize Into Units</h3>
+                <p className="text-slate-600 text-sm">
                   Content is automatically organized into units and lessons that you can review and edit.
                 </p>
               </div>
@@ -374,13 +374,13 @@ export const LandingPage: React.FC = () => {
 
             {/* Step 3 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-pink-400/60 hover:shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-pink-500/30 group-hover:shadow-pink-500/60 group-hover:scale-110 transition-all duration-300">
+              <div className="rounded-2xl p-6 h-full border border-slate-200 hover:border-pink-400 hover:shadow-2xl hover:shadow-pink-500/30 transition-all duration-300 bg-white backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-pink-500/20 group-hover:shadow-pink-500/40 group-hover:scale-110 transition-all duration-300">
                   <FileText className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-sm font-semibold text-pink-300 mb-2">STEP 3</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Generate Quizzes</h3>
-                <p className="text-white/80 text-sm">
+                <div className="text-sm font-semibold text-pink-600 mb-2">STEP 3</div>
+                <h3 className="text-xl font-bold mb-3 text-slate-900">Generate Quizzes</h3>
+                <p className="text-slate-600 text-sm">
                   Create quizzes and assessments aligned to your curriculum content.
                 </p>
               </div>
@@ -388,13 +388,13 @@ export const LandingPage: React.FC = () => {
 
             {/* Step 4 */}
             <motion.div variants={fadeInUp}>
-              <div className="rounded-2xl p-6 h-full border border-white/30 hover:border-orange-400/60 hover:shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 bg-slate-900/80 backdrop-blur-xl group">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/30 group-hover:shadow-orange-500/60 group-hover:scale-110 transition-all duration-300">
+              <div className="rounded-2xl p-6 h-full border border-slate-200 hover:border-orange-400 hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 bg-white backdrop-blur-xl group">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 group-hover:scale-110 transition-all duration-300">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-sm font-semibold text-orange-300 mb-2">STEP 4</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Track Progress</h3>
-                <p className="text-white/80 text-sm">
+                <div className="text-sm font-semibold text-orange-600 mb-2">STEP 4</div>
+                <h3 className="text-xl font-bold mb-3 text-slate-900">Track Progress</h3>
+                <p className="text-slate-600 text-sm">
                   View class performance and individual student results.
                 </p>
               </div>
