@@ -127,30 +127,6 @@ export const ConceptMapper: React.FC<ConceptMapperProps> = ({
         </div>
       )}
 
-      {/* Concept Coverage Indicators */}
-      {showCoverage && availableConcepts.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-            <BookOpen className="w-4 h-4" />
-            Available Concepts
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {availableConcepts.map(concept => (
-              <Badge
-                key={concept.id}
-                variant={mappedConcepts.has(concept.id) ? 'success' : 'neutral'}
-                size="sm"
-              >
-                {mappedConcepts.has(concept.id) && (
-                  <Check className="w-3 h-3 mr-1" />
-                )}
-                {concept.name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Question Mapping Interface */}
       <div className="space-y-4">
         <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
@@ -218,23 +194,6 @@ export const ConceptMapper: React.FC<ConceptMapperProps> = ({
                       ))}
                     </select>
                   </div>
-
-                  {/* Selected Concept Info */}
-                  {mapping && mapping.conceptId && (
-                    <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-2">
-                      <div className="flex items-start gap-2">
-                        <Target className="w-3.5 h-3.5 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-xs font-medium text-blue-900">
-                            {mapping.conceptName}
-                          </p>
-                          <p className="text-xs text-blue-700">
-                            {mapping.subtopicName}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </motion.div>
