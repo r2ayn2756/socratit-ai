@@ -14,8 +14,7 @@ import {
   Upload,
   FileText,
   ChevronRight,
-  Layers,
-  Zap
+  Layers
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
@@ -87,29 +86,18 @@ export const LandingPage: React.FC = () => {
               animate="visible"
               variants={staggerContainer}
             >
-              <motion.div variants={fadeInUp}>
-                <Badge variant="purple" size="md" className="mb-4 glass">
-                  <Zap className="w-3 h-3 mr-1" />
-                  Your PDF → Quiz Pipeline
-                </Badge>
-              </motion.div>
-
               <motion.h1
                 variants={fadeInUp}
                 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight"
               >
-                Any Curriculum into{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                  easy measurable assessments
-                </span>
+                Classroom Management Tool
               </motion.h1>
 
               <motion.p
                 variants={fadeInUp}
                 className="text-xl text-white/80 mb-8 leading-relaxed"
               >
-                Upload your curriculum. AI breaks it into units. Generate quizzes with one click.
-                Track every student's progress. Built for teachers who want to focus on teaching.
+                Upload curriculum, organize into units, create assessments, and track student progress.
               </motion.p>
 
               <motion.div
@@ -122,7 +110,7 @@ export const LandingPage: React.FC = () => {
                   onClick={() => navigate('/signup')}
                   className="shadow-2xl shadow-blue-500/50"
                 >
-                  Try Digitizing Your Curriculum →
+                  Get Started
                 </Button>
               </motion.div>
 
@@ -138,9 +126,8 @@ export const LandingPage: React.FC = () => {
               <div className="relative rounded-3xl p-8 shadow-2xl border border-white/30 bg-slate-900/90 backdrop-blur-xl">
                 <div className="mb-6 text-center">
                   <h3 className="text-lg font-bold text-white">
-                    The Complete Workflow
+                    How It Works
                   </h3>
-                  <p className="text-sm text-white/80">PDF Upload to Results Tracking</p>
                 </div>
 
                 {/* Workflow Steps */}
@@ -341,10 +328,10 @@ export const LandingPage: React.FC = () => {
             className="text-center mb-16"
           >
             <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-white mb-4">
-              Four Steps. Zero Quiz-Writing. Full Visibility.
+              Simple Workflow
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-xl text-white/70 max-w-3xl mx-auto">
-              Whether you're training employees or teaching students, prove they actually learned something.
+              Upload materials, create units, generate assessments, and track results.
             </motion.p>
           </motion.div>
 
@@ -362,9 +349,9 @@ export const LandingPage: React.FC = () => {
                   <Upload className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-blue-300 mb-2">STEP 1</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Upload Your Materials</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Upload Materials</h3>
                 <p className="text-white/80 text-sm">
-                  Textbook chapters, curriculum guides, lesson plans—any PDF works. Your content, digitized.
+                  Upload textbooks, curriculum guides, or lesson plans as PDFs.
                 </p>
               </div>
             </motion.div>
@@ -376,9 +363,9 @@ export const LandingPage: React.FC = () => {
                   <Layers className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-purple-300 mb-2">STEP 2</div>
-                <h3 className="text-xl font-bold mb-3 text-white">AI Organizes Into Units</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Organize Into Units</h3>
                 <p className="text-white/80 text-sm">
-                  Automatically breaks content into teaching units and lessons. Review, customize, perfect.
+                  Content is automatically organized into units and lessons that you can review and edit.
                 </p>
               </div>
             </motion.div>
@@ -390,9 +377,9 @@ export const LandingPage: React.FC = () => {
                   <FileText className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-pink-300 mb-2">STEP 3</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Create Assessments</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Generate Quizzes</h3>
                 <p className="text-white/80 text-sm">
-                  One click generates quizzes. Multiple choice, short answer, essay prompts—all aligned to your content.
+                  Create quizzes and assessments aligned to your curriculum content.
                 </p>
               </div>
             </motion.div>
@@ -404,9 +391,9 @@ export const LandingPage: React.FC = () => {
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-sm font-semibold text-orange-300 mb-2">STEP 4</div>
-                <h3 className="text-xl font-bold mb-3 text-white">Track Student Progress</h3>
+                <h3 className="text-xl font-bold mb-3 text-white">Track Progress</h3>
                 <p className="text-white/80 text-sm">
-                  Live dashboards show class performance, identify struggling students, and reveal knowledge gaps by topic.
+                  View class performance and individual student results.
                 </p>
               </div>
             </motion.div>
@@ -427,7 +414,7 @@ export const LandingPage: React.FC = () => {
                 onClick={() => navigate('/signup')}
                 className="shadow-2xl shadow-blue-500/50"
               >
-                Try Digitizing Your Curriculum
+                Get Started
               </Button>
             </div>
           </motion.div>
@@ -441,7 +428,7 @@ export const LandingPage: React.FC = () => {
             <div>
               <img src="/logo.svg" alt="Socratit.ai" className="h-8 w-auto mb-4 brightness-0 invert" />
               <p className="text-white/60 text-sm">
-                Making PDFs useful since 2024
+                Classroom management tool
               </p>
             </div>
             <div>
