@@ -51,6 +51,8 @@ const allowedOrigins = [
   'https://www.socratit.com',          // www subdomain
   'https://socratit-ai.vercel.app',    // Original Vercel domain
   'https://socratit-ai-git-main-r2ayn2756s-projects.vercel.app',
+  'http://localhost:3000',             // Local development
+  'http://localhost:5173',             // Vite dev server
 ];
 
 // Also allow any Vercel preview URLs for testing
@@ -59,7 +61,20 @@ const isVercelPreview = (origin: string) => {
 };
 
 app.use(cors({
-  origin: true, // TEMPORARY: Allow all origins to debug CORS issue
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, Postman, or same-origin)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if origin is in allowed list or is a Vercel preview URL
+    if (allowedOrigins.includes(origin) || isVercelPreview(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
