@@ -407,7 +407,7 @@ export const LandingPage: React.FC = () => {
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeInUp}
-            className="text-center"
+            className="text-center pb-16"
           >
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -422,43 +422,6 @@ export const LandingPage: React.FC = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <img src="/logo.svg" alt="Socratit.ai" className="h-8 w-auto mb-4 brightness-0 invert" />
-              <p className="text-white/60 text-sm">
-                Classroom management tool
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footer.product')}</h3>
-              <ul className="space-y-2 text-sm text-white/60">
-                <li><button onClick={() => navigate('/signup')} className="hover:text-white transition-colors">{t('footer.features')}</button></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footer.company')}</h3>
-              <ul className="space-y-2 text-sm text-white/60">
-                <li><button onClick={() => navigate('/signup')} className="hover:text-white transition-colors">{t('footer.about')}</button></li>
-                <li><button onClick={() => navigate('/signup')} className="hover:text-white transition-colors">{t('footer.contact')}</button></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4 text-white">{t('footer.legal')}</h3>
-              <ul className="space-y-2 text-sm text-white/60">
-                <li><button onClick={() => navigate('/signup')} className="hover:text-white transition-colors">{t('footer.privacy')}</button></li>
-                <li><button onClick={() => navigate('/signup')} className="hover:text-white transition-colors">{t('footer.terms')}</button></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-white/60">
-            {t('footer.copyright')}
-          </div>
-        </div>
-      </footer>
 
     </div>
   );
