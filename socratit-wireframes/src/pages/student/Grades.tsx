@@ -83,10 +83,8 @@ export const Grades: React.FC<GradesProps> = () => {
   // Helper function to map assignment type to display name
   const formatAssignmentType = (type: string): string => {
     const typeMap: Record<string, string> = {
-      'TEST': 'Test',
       'PRACTICE': 'Practice',
       'ESSAY': 'Essay',
-      'INTERACTIVE_MATH': 'Interactive Math',
     };
     return typeMap[type] || type;
   };

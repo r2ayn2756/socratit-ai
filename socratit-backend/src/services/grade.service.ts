@@ -104,10 +104,8 @@ export async function calculateStudentGrade(
 
   // Map assignment types to category names
   const typeToCategory: Record<string, string> = {
-    TEST: 'Tests',
     PRACTICE: 'Practice',
     ESSAY: 'Essays',
-    INTERACTIVE_MATH: 'Math',
   };
 
   // Group submissions by category
@@ -317,10 +315,8 @@ export async function saveAssignmentGrade(
 
   // Map assignment type to category name
   const typeToCategory: Record<string, string> = {
-    TEST: 'Tests',
     PRACTICE: 'Practice',
     ESSAY: 'Essays',
-    INTERACTIVE_MATH: 'Math',
   };
 
   const categoryName =

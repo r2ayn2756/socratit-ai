@@ -424,8 +424,6 @@ export const CreateAssignment: React.FC = () => {
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { value: 'PRACTICE', label: 'Practice', activeClass: 'border-blue-500 bg-blue-50 text-blue-700' },
-                    { value: 'TEST', label: 'Test', activeClass: 'border-red-500 bg-red-50 text-red-700' },
-                    { value: 'INTERACTIVE_MATH', label: 'Interactive Math', activeClass: 'border-indigo-500 bg-indigo-50 text-indigo-700' },
                     { value: 'ESSAY', label: 'Essay', activeClass: 'border-pink-500 bg-pink-50 text-pink-700' },
                   ].map((type) => (
                     <motion.button
@@ -541,53 +539,7 @@ export const CreateAssignment: React.FC = () => {
                 </div>
               </div>
 
-              {/* Interactive Math Settings - Only show when type is INTERACTIVE_MATH */}
-              {formData.type === 'INTERACTIVE_MATH' && (
-                <div className="pt-4 border-t border-slate-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Calculator className="w-4 h-4 text-indigo-600" />
-                    <label className="text-sm font-medium text-indigo-700">Interactive Math Settings</label>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={mathSettings.enableGraphingCalculator}
-                        onChange={(e) => setMathSettings({ ...mathSettings, enableGraphingCalculator: e.target.checked })}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500"
-                      />
-                      <div className="flex-1">
-                        <span className="text-sm text-slate-900 font-medium">Enable Desmos Graphing Calculator</span>
-                        <p className="text-xs text-slate-600 mt-0.5">Allow students to use an interactive graphing calculator</p>
-                      </div>
-                    </label>
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={mathSettings.enableBasicCalculator}
-                        onChange={(e) => setMathSettings({ ...mathSettings, enableBasicCalculator: e.target.checked })}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500"
-                      />
-                      <div className="flex-1">
-                        <span className="text-sm text-slate-900 font-medium">Enable Basic Calculator</span>
-                        <p className="text-xs text-slate-600 mt-0.5">Provide a simple calculator for arithmetic operations</p>
-                      </div>
-                    </label>
-                    <label className="flex items-center gap-3 p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={mathSettings.enableStepByStepHints}
-                        onChange={(e) => setMathSettings({ ...mathSettings, enableStepByStepHints: e.target.checked })}
-                        className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500"
-                      />
-                      <div className="flex-1">
-                        <span className="text-sm text-slate-900 font-medium">Enable Step-by-Step Hints</span>
-                        <p className="text-xs text-slate-600 mt-0.5">Progressive hints that guide without giving the answer</p>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              )}
+              {/* Interactive Math removed - only PRACTICE and ESSAY types supported */}
 
               {/* Essay Settings - Only show when type is ESSAY */}
               {formData.type === 'ESSAY' && (

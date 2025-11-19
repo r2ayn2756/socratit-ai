@@ -62,20 +62,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ userRole, isCollapsed, onToggl
       { label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/teacher/dashboard' },
       { label: t('sidebar.classes'), icon: BookOpen, path: '/teacher/classes' },
       { label: t('sidebar.assignments'), icon: FileText, path: '/teacher/assignments' },
-      { label: t('sidebar.aiTutor'), icon: Brain, path: '/teacher/ai-tutor' },
       { label: t('sidebar.messages'), icon: MessageSquare, path: '/teacher/messages', badge: unreadCount },
       // REMOVED: Analytics and AI Insights - now part of class pages
       // Analytics features: Performance tracking, concept mastery, engagement metrics
       // AI Insights features: Student AI usage monitoring, common questions, struggling concepts
+      // REMOVED: AI Tutor - not needed for teachers
     ],
     student: [
       { label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/student/dashboard' },
       { label: t('sidebar.myClasses'), icon: BookOpen, path: '/student/classes' },
       { label: t('sidebar.assignments'), icon: FileText, path: '/student/assignments' },
       { label: t('sidebar.grades'), icon: BarChart3, path: '/student/grades' },
-      { label: 'Atlas', icon: Map, path: '/student/atlas' },
       { label: t('sidebar.aiTutor'), icon: Brain, path: '/student/ai-tutor' },
       { label: t('sidebar.messages'), icon: MessageSquare, path: '/student/messages', badge: unreadCount },
+      // REMOVED: Atlas (Socratit) - not needed
     ],
     admin: [
       { label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/admin/dashboard' },

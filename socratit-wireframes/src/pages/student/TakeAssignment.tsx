@@ -241,9 +241,8 @@ export const TakeAssignment: React.FC = () => {
   const answeredCount = isEssayAssignment ? (essayContent.length > 0 ? 1 : 0) : Object.keys(answers).length;
   const progress = isEssayAssignment ? (essayContent.length > 0 ? 100 : 0) : Math.round((answeredCount / totalQuestions) * 100);
 
-  // Determine if this is a test and needs lockdown
-  const isTestAssignment = assignment.type === 'TEST';
-  const lockdownEnabled = isTestAssignment && !lockdownAccepted;
+  // Lockdown mode is no longer used since we removed TEST type
+  const lockdownEnabled = false;
 
   // Lockdown settings (these could come from assignment settings in the future)
   const lockdownSettings = {
@@ -267,29 +266,9 @@ export const TakeAssignment: React.FC = () => {
     handleSubmitAssignment();
   };
 
-  // Show lockdown info banner for tests
-  if (isTestAssignment && !lockdownAccepted) {
-    return (
-      <DashboardLayout userRole="student">
-        <div className="max-w-2xl mx-auto mt-8">
-          <LockdownInfoBanner
-            settings={lockdownSettings}
-            onAccept={() => setLockdownAccepted(true)}
-          />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
+  // Lockdown mode removed with TEST type
   return (
     <DashboardLayout userRole="student">
-      <TestLockdown
-        enabled={isTestAssignment && lockdownAccepted}
-        settings={lockdownSettings}
-        assignmentId={assignmentId!}
-        onViolation={handleLockdownViolation}
-        onMaxViolationsReached={handleMaxViolationsReached}
-      >
 
       {/* Main content area */}
       <div className="max-w-4xl mx-auto space-y-6">
@@ -520,7 +499,6 @@ export const TakeAssignment: React.FC = () => {
           </Card>
         )}
       </div>
-      </TestLockdown>
     </DashboardLayout>
   );
 };

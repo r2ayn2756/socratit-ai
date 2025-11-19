@@ -371,7 +371,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens: numbe
 export async function generateQuizFromCurriculum(
   curriculumText: string,
   options: {
-    assignmentType?: 'PRACTICE' | 'TEST';
+    assignmentType?: 'PRACTICE' | 'ESSAY';
     numQuestions?: number;
     questionTypes?: Array<'MULTIPLE_CHOICE' | 'FREE_RESPONSE'>;
     difficulty?: 'easy' | 'medium' | 'hard' | 'mixed';

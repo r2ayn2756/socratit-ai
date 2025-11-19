@@ -50,7 +50,6 @@ export const TeacherClasses: React.FC = () => {
   const [showWizard, setShowWizard] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [classToDelete, setClassToDelete] = useState<ClassWithStats | null>(null);
-  const [socratitMessage, setSocratitMessage] = useState('');
 
   // Fetch classes from backend
   const { data: classes, isLoading, error } = useQuery({
@@ -88,13 +87,6 @@ export const TeacherClasses: React.FC = () => {
   const handleDeleteConfirm = () => {
     if (classToDelete) {
       deleteClassMutation.mutate(classToDelete.id);
-    }
-  };
-
-  const handleSocratitSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (socratitMessage.trim()) {
-      navigate(`/teacher/ai-tutor?message=${encodeURIComponent(socratitMessage)}`);
     }
   };
 
@@ -360,101 +352,7 @@ export const TeacherClasses: React.FC = () => {
             )}
           </div>
 
-          {/* Right Column - SocratIt */}
-          <div className="space-y-6">
-            <motion.div variants={fadeInUp}>
-              <Card variant="glassElevated" padding="none" className="overflow-hidden sticky top-6">
-                <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                      <Brain className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">SocratIt</h3>
-                      <p className="text-sm opacity-90">AI-powered teaching assistant</p>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <form onSubmit={handleSocratitSubmit}>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={socratitMessage}
-                          onChange={(e) => setSocratitMessage(e.target.value)}
-                          placeholder="Hi! I can help you create assignments, generate quizzes, plan lessons, and more. What would you like to work on today?"
-                          className="w-full bg-white/90 backdrop-blur-md border border-white/30 rounded-xl p-4 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                        />
-                        {socratitMessage && (
-                          <button
-                            type="submit"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-600 hover:text-purple-700"
-                          >
-                            <Brain className="w-5 h-5" />
-                          </button>
-                        )}
-                      </div>
-                    </form>
-                  </div>
-
-                  <div className="space-y-2 mb-6 pt-6 border-t border-white/20">
-                    <h4 className="font-semibold text-sm mb-3 opacity-90">Quick Actions</h4>
-
-                    {classes && classes.length > 0 && (
-                      <div className="space-y-2">
-                        {classes.slice(0, 3).map((classItem) => (
-                          <button
-                            key={classItem.id}
-                            onClick={() => {
-                              // TODO: Open SocratIt chat modal with assignment creation context
-                              navigate(`/teacher/ai-assistant?action=create-assignment&classId=${classItem.id}`);
-                            }}
-                            className="w-full text-left bg-white/90 backdrop-blur-md border border-white/30 hover:border-white hover:bg-white rounded-xl p-3 transition-all group"
-                          >
-                            <div className="flex items-center gap-2">
-                              <FileText className="w-4 h-4 text-purple-600" />
-                              <span className="text-sm font-medium text-slate-900 group-hover:text-purple-600">
-                                Create assignment for {classItem.name}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        // TODO: Open SocratIt chat modal
-                        navigate('/teacher/ai-assistant');
-                      }}
-                      className="w-full text-left bg-white/90 backdrop-blur-md border border-white/30 hover:border-white hover:bg-white rounded-xl p-3 transition-all group"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Brain className="w-4 h-4 text-purple-600" />
-                        <span className="text-sm font-medium text-slate-900 group-hover:text-purple-600">
-                          Open SocratIt Chat
-                        </span>
-                      </div>
-                    </button>
-                  </div>
-
-                  {classes && classes.some(c => c.enrollmentCounts.pending > 0) && (
-                    <div className="pt-6 border-t border-white/20">
-                      <div className="bg-orange-50/70 backdrop-blur-md border border-orange-300/50 rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <AlertCircle className="w-4 h-4 text-orange-600" />
-                          <p className="text-sm font-semibold text-orange-900">Needs Attention</p>
-                        </div>
-                        <p className="text-sm text-orange-700">
-                          {classes.reduce((sum, c) => sum + c.enrollmentCounts.pending, 0)} pending enrollment request{classes.reduce((sum, c) => sum + c.enrollmentCounts.pending, 0) !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            </motion.div>
-          </div>
+          {/* Right Column - REMOVED: SocratIt AI assistant */}
         </div>
       </motion.div>
     </DashboardLayout>
