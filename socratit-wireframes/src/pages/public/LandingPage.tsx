@@ -50,7 +50,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 py-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="Socratit.ai" className="h-24 w-auto" />
+              <img src="/logo.svg" alt="Socratit.ai" className="h-32 w-auto" />
             </div>
 
             <nav className="hidden md:flex items-center gap-4">

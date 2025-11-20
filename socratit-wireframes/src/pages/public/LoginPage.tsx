@@ -86,9 +86,9 @@ export const LoginPage: React.FC = () => {
       <div className="w-full max-w-md">
 
         {/* Logo */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
           <Link to="/">
-            <img src="/logo.svg" alt="Socratit.ai" className="h-24 w-auto mx-auto mb-2" />
+            <img src="/logo.svg" alt="Socratit.ai" className="h-32 w-auto mx-auto mb-1" />
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Login</h1>
         </div>
