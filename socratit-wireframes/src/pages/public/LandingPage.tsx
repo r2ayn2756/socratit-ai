@@ -47,10 +47,10 @@ export const LandingPage: React.FC = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-3">
+        <div className="max-w-7xl mx-auto px-6 py-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="Socratit.ai" className="h-20 w-auto" />
+              <img src="/logo.svg" alt="Socratit.ai" className="h-24 w-auto" />
             </div>
 
             <nav className="hidden md:flex items-center gap-4">
