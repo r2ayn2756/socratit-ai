@@ -47,9 +47,9 @@ export const LandingPage: React.FC = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-1">
+        <div className="max-w-7xl mx-auto px-6 py-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 -my-4">
               <img src="/logo.svg" alt="Socratit.ai" className="h-32 w-auto" />
             </div>
 
