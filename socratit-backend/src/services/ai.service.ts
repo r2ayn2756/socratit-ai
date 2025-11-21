@@ -380,7 +380,7 @@ export async function generateQuizFromCurriculum(
   } = {}
 ): Promise<AIQuizGenerationResult> {
   const {
-    assignmentType = 'QUIZ',
+    assignmentType = 'PRACTICE',
     numQuestions = 10,
     questionTypes = ['MULTIPLE_CHOICE', 'FREE_RESPONSE'],
     difficulty = 'mixed',
