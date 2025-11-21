@@ -14,10 +14,7 @@ import { assignmentService, CreateAssignmentDTO, Question, EssayConfig, RubricCr
 import { classService } from '../../services/class.service';
 import { AIAssignmentModal } from '../../components/teacher/AIAssignmentModal';
 import { MathQuestionEditor } from '../../components/teacher/MathQuestionEditor';
-import { ConceptMapper, ConceptMapping, CurriculumConcept } from '../../components/teacher/ConceptMapper';
 import { RubricBuilder } from '../../components/teacher/RubricBuilder';
-import { classCurriculumService } from '../../services/classCurriculum.service';
-import type { CurriculumSchedule, CurriculumUnit, CurriculumSubUnit } from '../../types/curriculum.types';
 
 export const CreateAssignment: React.FC = () => {
   const navigate = useNavigate();
@@ -64,9 +61,6 @@ export const CreateAssignment: React.FC = () => {
     enableBasicCalculator: true,
   });
 
-  // Concept mapping state (for PRACTICE assignments)
-  const [conceptMappings, setConceptMappings] = useState<ConceptMapping[]>([]);
-  const [availableConcepts, setAvailableConcepts] = useState<CurriculumConcept[]>([]);
 
   // Essay-specific settings
   const [essayConfig, setEssayConfig] = useState<EssayConfig>({
@@ -83,12 +77,6 @@ export const CreateAssignment: React.FC = () => {
     queryFn: () => classService.getTeacherClasses(),
   });
 
-  // Fetch curriculum schedule for selected class (to get available concepts)
-  const { data: curriculumSchedule } = useQuery({
-    queryKey: ['class-curriculum', formData.classId],
-    queryFn: () => classCurriculumService.getClassSchedule(formData.classId),
-    enabled: !!formData.classId && formData.type === 'PRACTICE',
-  });
 
   // Fetch existing assignment if in edit mode
   const { data: existingAssignment, isLoading: isLoadingAssignment } = useQuery({
@@ -97,44 +85,6 @@ export const CreateAssignment: React.FC = () => {
     enabled: isEditMode,
   });
 
-  // Parse available concepts from curriculum schedule
-  useEffect(() => {
-    if (curriculumSchedule && curriculumSchedule.units) {
-      const concepts: CurriculumConcept[] = [];
-
-      curriculumSchedule.units.forEach((unit: CurriculumUnit) => {
-        // Get concepts from unit's subunits
-        if (unit.subUnits) {
-          unit.subUnits.forEach((subUnit: CurriculumSubUnit) => {
-            subUnit.concepts.forEach((conceptName: string) => {
-              concepts.push({
-                id: `${subUnit.id}-${conceptName}`,
-                name: conceptName,
-                subtopicName: subUnit.name,
-                learningObjectives: subUnit.learningObjectives || [],
-                unitTitle: unit.title,
-              });
-            });
-          });
-        }
-
-        // Get concepts directly from unit if no subunits
-        if (!unit.subUnits || unit.subUnits.length === 0) {
-          unit.concepts?.forEach((conceptName: string) => {
-            concepts.push({
-              id: `${unit.id}-${conceptName}`,
-              name: conceptName,
-              subtopicName: unit.title,
-              learningObjectives: unit.learningObjectives || [],
-              unitTitle: unit.title,
-            });
-          });
-        }
-      });
-
-      setAvailableConcepts(concepts);
-    }
-  }, [curriculumSchedule]);
 
   // Populate form when assignment data loads OR when coming from curriculum
   useEffect(() => {
@@ -779,40 +729,6 @@ export const CreateAssignment: React.FC = () => {
             </Card>
           )}
 
-          {/* Concept Mapping (for PRACTICE assignments only) */}
-          {formData.type === 'PRACTICE' && formData.questions && formData.questions.length > 0 && (
-            <Card variant="glassElevated">
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="w-5 h-5 text-purple-600" />
-                  <h2 className="text-xl font-bold text-slate-900">Concept Mapping</h2>
-                </div>
-                <p className="text-sm text-slate-600">
-                  Map questions to curriculum concepts to track student mastery and provide personalized insights.
-                </p>
-              </div>
-
-              {availableConcepts.length > 0 ? (
-                <ConceptMapper
-                  questions={formData.questions.map((q, idx) => ({
-                    id: `temp-${idx}`,
-                    questionText: q.questionText,
-                    questionOrder: q.questionOrder || idx + 1,
-                  }))}
-                  availableConcepts={availableConcepts}
-                  initialMappings={conceptMappings}
-                  onChange={setConceptMappings}
-                  showCoverage={true}
-                />
-              ) : (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
-                    <strong>No curriculum concepts available.</strong> To enable concept mapping, ensure your class has a curriculum schedule with defined concepts and subtopics.
-                  </p>
-                </div>
-              )}
-            </Card>
-          )}
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3">
