@@ -49,6 +49,8 @@ const allowedOrigins = [
   env.FRONTEND_URL,
   'https://socratit.com',              // Custom domain (production)
   'https://www.socratit.com',          // www subdomain
+  'https://dydactyc.com',              // Alternative custom domain
+  'https://www.dydactyc.com',          // www subdomain
   'https://socratit-ai.vercel.app',    // Original Vercel domain
   'https://socratit-ai-git-main-r2ayn2756s-projects.vercel.app',
   'http://localhost:3000',             // Local development
