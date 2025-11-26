@@ -7,6 +7,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import passport from './config/passport';
 import { env } from './config/env';
 import { apiLimiter } from './middleware/rateLimiter';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -106,6 +107,9 @@ if (env.NODE_ENV === 'development') {
 
 // Rate limiting middleware (applied globally)
 app.use(apiLimiter);
+
+// Initialize Passport middleware for OAuth
+app.use(passport.initialize());
 
 // Request logging for debugging
 app.use((req, _res, next) => {

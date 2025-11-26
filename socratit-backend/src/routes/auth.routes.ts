@@ -12,6 +12,8 @@ import {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  googleCallback,
+  microsoftCallback,
 } from '../controllers/auth.controller';
 import { validate } from '../middleware/validate';
 import { requireAuth } from '../middleware/auth';
@@ -30,6 +32,7 @@ import {
   resetPasswordSchema,
   verifyEmailSchema,
 } from '../validators/auth.validator';
+import passport from '../config/passport';
 
 const router = Router();
 
@@ -106,6 +109,52 @@ router.post(
   passwordResetLimiter,
   validate(resetPasswordSchema),
   asyncHandler(resetPassword)
+);
+
+// ============================================================================
+// OAUTH ROUTES
+// ============================================================================
+
+/**
+ * @route   GET /api/v1/auth/google
+ * @desc    Initiate Google OAuth flow
+ * @access  Public
+ */
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+/**
+ * @route   GET /api/v1/auth/google/callback
+ * @desc    Google OAuth callback
+ * @access  Public
+ */
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+  asyncHandler(googleCallback)
+);
+
+/**
+ * @route   GET /api/v1/auth/microsoft
+ * @desc    Initiate Microsoft OAuth flow
+ * @access  Public
+ */
+router.get(
+  '/microsoft',
+  passport.authenticate('microsoft', { scope: ['user.read'] })
+);
+
+/**
+ * @route   GET /api/v1/auth/microsoft/callback
+ * @desc    Microsoft OAuth callback
+ * @access  Public
+ */
+router.get(
+  '/microsoft/callback',
+  passport.authenticate('microsoft', { session: false, failureRedirect: '/login' }),
+  asyncHandler(microsoftCallback)
 );
 
 // ============================================================================

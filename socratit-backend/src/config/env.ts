@@ -13,6 +13,7 @@ interface EnvConfig {
   NODE_ENV: string;
   PORT: number;
   API_VERSION: string;
+  BACKEND_URL: string;
 
   // Database
   DATABASE_URL: string;
@@ -38,6 +39,12 @@ interface EnvConfig {
 
   // Frontend
   FRONTEND_URL: string;
+
+  // OAuth
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  MICROSOFT_CLIENT_ID: string;
+  MICROSOFT_CLIENT_SECRET: string;
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: number;
@@ -95,6 +102,7 @@ export const env: EnvConfig = {
   NODE_ENV: getEnv('NODE_ENV', 'development'),
   PORT: getEnvNumber('PORT', 3001),
   API_VERSION: getEnv('API_VERSION', 'v1'),
+  BACKEND_URL: getEnv('BACKEND_URL', 'http://localhost:3001'),
 
   // Database
   DATABASE_URL: getEnv('DATABASE_URL'),
@@ -120,6 +128,12 @@ export const env: EnvConfig = {
 
   // Frontend
   FRONTEND_URL: getEnv('FRONTEND_URL', 'http://localhost:3000'),
+
+  // OAuth
+  GOOGLE_CLIENT_ID: getEnv('GOOGLE_CLIENT_ID', ''),
+  GOOGLE_CLIENT_SECRET: getEnv('GOOGLE_CLIENT_SECRET', ''),
+  MICROSOFT_CLIENT_ID: getEnv('MICROSOFT_CLIENT_ID', ''),
+  MICROSOFT_CLIENT_SECRET: getEnv('MICROSOFT_CLIENT_SECRET', ''),
 
   // Rate Limiting
   RATE_LIMIT_WINDOW_MS: getEnvNumber('RATE_LIMIT_WINDOW_MS', 900000),

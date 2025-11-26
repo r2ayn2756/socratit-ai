@@ -688,3 +688,143 @@ export const changePassword = async (
     throw new AppError(error.message || 'Failed to change password', error.statusCode || 500);
   }
 };
+
+// ============================================================================
+// OAUTH AUTHENTICATION
+// ============================================================================
+
+/**
+ * Google OAuth callback handler
+ * GET /api/v1/auth/google/callback
+ */
+export const googleCallback = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    // User is attached by passport middleware
+    if (!req.user) {
+      throw new AppError('OAuth authentication failed', 401);
+    }
+
+    const user = req.user as any;
+    const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.get('user-agent');
+
+    // Generate tokens
+    const sessionId = uuidv4();
+    const accessToken = generateAccessToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      schoolId: user.schoolId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user.id,
+      sessionId,
+    });
+
+    // Store session in database
+    const expiresAt = new Date(Date.now() + getTokenExpirySeconds('refresh') * 1000);
+    await prisma.session.create({
+      data: {
+        id: sessionId,
+        userId: user.id,
+        refreshToken,
+        accessTokenFamily: uuidv4(),
+        expiresAt,
+        userAgent,
+        ipAddress,
+      },
+    });
+
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    // Log login
+    await logLogin(user.id, user.schoolId, ipAddress, userAgent);
+
+    // Redirect to frontend with tokens and user data
+    const userData = encodeURIComponent(JSON.stringify(sanitizeUser(user)));
+    const redirectUrl = `${env.FRONTEND_URL}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}&user=${userData}`;
+
+    res.redirect(redirectUrl);
+  } catch (error: any) {
+    console.error('Google OAuth callback error:', error);
+    const errorMsg = encodeURIComponent(error.message || 'Authentication failed');
+    res.redirect(`${env.FRONTEND_URL}/auth/callback?error=${errorMsg}`);
+  }
+};
+
+/**
+ * Microsoft OAuth callback handler
+ * GET /api/v1/auth/microsoft/callback
+ */
+export const microsoftCallback = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    // User is attached by passport middleware
+    if (!req.user) {
+      throw new AppError('OAuth authentication failed', 401);
+    }
+
+    const user = req.user as any;
+    const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+    const userAgent = req.get('user-agent');
+
+    // Generate tokens
+    const sessionId = uuidv4();
+    const accessToken = generateAccessToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      schoolId: user.schoolId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user.id,
+      sessionId,
+    });
+
+    // Store session in database
+    const expiresAt = new Date(Date.now() + getTokenExpirySeconds('refresh') * 1000);
+    await prisma.session.create({
+      data: {
+        id: sessionId,
+        userId: user.id,
+        refreshToken,
+        accessTokenFamily: uuidv4(),
+        expiresAt,
+        userAgent,
+        ipAddress,
+      },
+    });
+
+    // Update last login
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    // Log login
+    await logLogin(user.id, user.schoolId, ipAddress, userAgent);
+
+    // Redirect to frontend with tokens and user data
+    const userData = encodeURIComponent(JSON.stringify(sanitizeUser(user)));
+    const redirectUrl = `${env.FRONTEND_URL}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}&user=${userData}`;
+
+    res.redirect(redirectUrl);
+  } catch (error: any) {
+    console.error('Microsoft OAuth callback error:', error);
+    const errorMsg = encodeURIComponent(error.message || 'Authentication failed');
+    res.redirect(`${env.FRONTEND_URL}/auth/callback?error=${errorMsg}`);
+  }
+};
