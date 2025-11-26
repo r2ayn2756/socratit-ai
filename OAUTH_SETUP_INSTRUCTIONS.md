@@ -50,11 +50,16 @@ npm install --save-dev @types/passport @types/passport-google-oauth20
 1. Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID"
 2. Application type: **Web application**
 3. Name: **Socratit.ai OAuth**
-4. Authorized redirect URIs:
+4. Authorized JavaScript origins:
+   - Development: `http://localhost:3000`
+   - Production Frontend: `https://socratit-ai.vercel.app`
+   - Production Custom Domain: `https://socratit.com` (if applicable)
+   - Production Custom Domain: `https://dydactyc.com` (if applicable)
+5. Authorized redirect URIs:
    - Development: `http://localhost:3001/api/v1/auth/google/callback`
    - Production: `https://socratit-ai-production.up.railway.app/api/v1/auth/google/callback`
-5. Click "Create"
-6. **Save the Client ID and Client Secret** - you'll need these for environment variables
+6. Click "Create"
+7. **Save the Client ID and Client Secret** - you'll need these for environment variables
 
 ---
 
@@ -73,11 +78,16 @@ npm install --save-dev @types/passport @types/passport-google-oauth20
    - Development: `http://localhost:3001/api/v1/auth/microsoft/callback`
 4. Click "Register"
 
-### 3.3 Add Production Redirect URI
+### 3.3 Configure Authentication Settings
 1. In your app registration, go to "Authentication"
-2. Under "Redirect URIs", click "Add URI"
-3. Add: `https://socratit-ai-production.up.railway.app/api/v1/auth/microsoft/callback`
-4. Save
+2. Under "Platform configurations", add web platform if not already added
+3. Under "Redirect URIs", add:
+   - Development: `http://localhost:3001/api/v1/auth/microsoft/callback`
+   - Production: `https://socratit-ai-production.up.railway.app/api/v1/auth/microsoft/callback`
+4. Under "Front-channel logout URL", leave empty
+5. Under "Implicit grant and hybrid flows", check:
+   - ✅ ID tokens (used for implicit and hybrid flows)
+6. Save
 
 ### 3.4 Create Client Secret
 1. Go to "Certificates & secrets"
@@ -115,14 +125,26 @@ MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret_here
 
 ### 4.2 Production Environment (Railway)
 
-In your Railway project settings, add these environment variables:
+In your Railway backend project settings, add these environment variables:
 
 ```
 BACKEND_URL=https://socratit-ai-production.up.railway.app
+FRONTEND_URL=https://socratit-ai.vercel.app
 GOOGLE_CLIENT_ID=<your_production_google_client_id>
 GOOGLE_CLIENT_SECRET=<your_production_google_client_secret>
 MICROSOFT_CLIENT_ID=<your_production_microsoft_client_id>
 MICROSOFT_CLIENT_SECRET=<your_production_microsoft_client_secret>
+```
+
+**IMPORTANT:** The `FRONTEND_URL` must match your Vercel deployment URL. After OAuth completes, users will be redirected to:
+`${FRONTEND_URL}/auth/callback?token=...&refreshToken=...&user=...`
+
+**For Custom Domains:**
+If you're using `socratit.com` or `dydactyc.com`, update `FRONTEND_URL` accordingly:
+```
+FRONTEND_URL=https://socratit.com
+# or
+FRONTEND_URL=https://dydactyc.com
 ```
 
 ---
@@ -159,13 +181,78 @@ npm start
 
 ---
 
+## 🌐 Production Deployment Configuration
+
+### Understanding the OAuth Flow URLs
+
+The OAuth flow involves THREE URLs that must all be configured correctly:
+
+1. **Frontend URL** (where user clicks the OAuth button):
+   - Development: `http://localhost:3000/login`
+   - Production: `https://socratit-ai.vercel.app/login` (or your custom domain)
+
+2. **Backend OAuth Initiation** (where the frontend redirects to start OAuth):
+   - Development: `http://localhost:3001/api/v1/auth/google` (or `/auth/microsoft`)
+   - Production: `https://socratit-ai-production.up.railway.app/api/v1/auth/google`
+
+3. **Backend OAuth Callback** (where Google/Microsoft sends the user after authentication):
+   - Development: `http://localhost:3001/api/v1/auth/google/callback`
+   - Production: `https://socratit-ai-production.up.railway.app/api/v1/auth/google/callback`
+
+4. **Frontend Callback** (where the backend redirects after processing OAuth):
+   - Development: `http://localhost:3000/auth/callback?token=...`
+   - Production: `https://socratit-ai.vercel.app/auth/callback?token=...`
+
+### Key Environment Variables by Service
+
+**Railway Backend:**
+```env
+BACKEND_URL=https://socratit-ai-production.up.railway.app
+FRONTEND_URL=https://socratit-ai.vercel.app  # CRITICAL: Must match your Vercel URL
+GOOGLE_CLIENT_ID=<your_client_id>
+GOOGLE_CLIENT_SECRET=<your_client_secret>
+MICROSOFT_CLIENT_ID=<your_client_id>
+MICROSOFT_CLIENT_SECRET=<your_client_secret>
+```
+
+**Vercel Frontend:**
+The frontend automatically uses the correct API URL from environment:
+```env
+REACT_APP_API_URL=https://socratit-ai-production.up.railway.app/api/v1
+```
+
+### Verifying Your Setup
+
+1. **Check Railway Environment Variables:**
+   - Go to Railway → Your Backend Project → Variables
+   - Ensure `BACKEND_URL` and `FRONTEND_URL` are set correctly
+
+2. **Check OAuth Provider Settings:**
+   - Google Cloud Console → Credentials → Your OAuth Client
+   - Verify redirect URI: `https://socratit-ai-production.up.railway.app/api/v1/auth/google/callback`
+   - Azure Portal → App registrations → Your App → Authentication
+   - Verify redirect URI: `https://socratit-ai-production.up.railway.app/api/v1/auth/microsoft/callback`
+
+3. **Test the Production Flow:**
+   - Go to `https://socratit-ai.vercel.app/login`
+   - Click Google or Microsoft button
+   - You should be redirected through OAuth and back to your dashboard
+
+---
+
 ## 🐛 Troubleshooting
 
 ### Issue: "redirect_uri_mismatch" Error
 
-**Solution:** Make sure the redirect URI in your OAuth provider console EXACTLY matches the callback URL in your code:
+**Solution:** Make sure the redirect URI in your OAuth provider console EXACTLY matches the callback URL:
+
+**Development:**
 - Google: `http://localhost:3001/api/v1/auth/google/callback`
 - Microsoft: `http://localhost:3001/api/v1/auth/microsoft/callback`
+
+**Production:**
+- Google: `https://socratit-ai-production.up.railway.app/api/v1/auth/google/callback`
+- Microsoft: `https://socratit-ai-production.up.railway.app/api/v1/auth/microsoft/callback`
 
 ### Issue: "Invalid client" Error
 
@@ -180,7 +267,41 @@ npm install --save-dev @types/passport @types/passport-google-oauth20
 
 ### Issue: CORS Errors
 
-**Solution:** The backend is already configured to accept requests from `http://localhost:3000`. If you're running the frontend on a different port, update the CORS configuration in `socratit-backend/src/app.ts`.
+**Solution:** The backend is already configured to accept requests from common origins. Verify these are in `socratit-backend/src/app.ts`:
+```javascript
+const allowedOrigins = [
+  'https://socratit-ai.vercel.app',    // Production
+  'https://socratit.com',              // Custom domain
+  'https://dydactyc.com',              // Custom domain
+  'http://localhost:3000',             // Development
+];
+```
+
+### Issue: User Gets Redirected to Wrong URL After OAuth
+
+**Symptoms:** After OAuth login, user is redirected to `http://localhost:3000/auth/callback` instead of production URL.
+
+**Solution:**
+1. Check Railway environment variable `FRONTEND_URL` - it should be `https://socratit-ai.vercel.app` (not localhost!)
+2. The backend uses this variable to redirect users after OAuth: `${env.FRONTEND_URL}/auth/callback`
+3. Update Railway variables and redeploy if needed
+
+### Issue: OAuth Works Locally but Not in Production
+
+**Checklist:**
+1. ✅ Verify Railway has all OAuth environment variables set
+2. ✅ Verify `BACKEND_URL` in Railway matches your Railway deployment URL
+3. ✅ Verify `FRONTEND_URL` in Railway matches your Vercel deployment URL
+4. ✅ Verify OAuth provider has production redirect URIs configured
+5. ✅ Test the production API directly: `https://socratit-ai-production.up.railway.app/api/v1/auth/google`
+6. ✅ Check Railway logs for error messages
+
+### Issue: "Cannot GET /auth/callback" Error
+
+**Solution:** This means the frontend route isn't configured. Verify:
+1. `socratit-wireframes/src/App.tsx` has the route: `<Route path="/auth/callback" element={<OAuthCallback />} />`
+2. The OAuthCallback component is imported correctly
+3. Redeploy the frontend to Vercel
 
 ---
 
