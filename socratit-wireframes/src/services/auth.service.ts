@@ -216,6 +216,32 @@ export const authService = {
   getToken: (): string | null => {
     return localStorage.getItem('authToken');
   },
+
+  /**
+   * Initiate Google OAuth flow
+   */
+  loginWithGoogle: () => {
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+    window.location.href = `${apiUrl}/auth/google`;
+  },
+
+  /**
+   * Initiate Microsoft OAuth flow
+   */
+  loginWithMicrosoft: () => {
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+    window.location.href = `${apiUrl}/auth/microsoft`;
+  },
+
+  /**
+   * Handle OAuth callback (called from OAuthCallback component)
+   */
+  handleOAuthCallback: async (accessToken: string, refreshToken: string, user: User) => {
+    // Store tokens and user data
+    localStorage.setItem('authToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+  },
 };
 
 export default authService;

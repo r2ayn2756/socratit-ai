@@ -12,9 +12,13 @@ import { queryClient } from './config/queryClient';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 
 // Public Pages
-import { LandingPage } from './pages/public/LandingPage';
+import LandingPage from './pages/public/LandingPage';
+import LandingPageSegmentation from './pages/public/LandingPageSegmentation';
+import LandingPageEducation from './pages/public/LandingPageEducation';
+import LandingPageEnterprise from './pages/public/LandingPageEnterprise';
 import { LoginPage } from './pages/public/LoginPage';
 import { SignupPage } from './pages/public/SignupPage';
+import { OAuthCallback } from './pages/public/OAuthCallback';
 
 // Teacher Pages
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard';
@@ -51,8 +55,12 @@ function App() {
 
             {/* PUBLIC ROUTES */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/education" element={<LandingPageEducation />} />
+            <Route path="/enterprise" element={<LandingPageEnterprise />} />
+            <Route path="/segmentation" element={<LandingPageSegmentation />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
 
             {/* TEACHER ROUTES */}
             <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
