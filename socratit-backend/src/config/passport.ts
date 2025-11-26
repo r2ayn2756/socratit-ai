@@ -14,14 +14,16 @@ import { v4 as uuidv4 } from 'uuid';
 // GOOGLE OAUTH STRATEGY
 // ============================================================================
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${env.BACKEND_URL}/api/v1/auth/google/callback`,
-      scope: ['profile', 'email'],
-    },
+// Only configure Google OAuth if credentials are provided
+if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${env.BACKEND_URL}/api/v1/auth/google/callback`,
+        scope: ['profile', 'email'],
+      },
     async (accessToken, refreshToken, profile, done) => {
       try {
         // Extract user info from Google profile
@@ -80,22 +82,27 @@ passport.use(
         return done(error as Error, undefined);
       }
     }
-  )
-);
+    )
+  );
+} else {
+  console.warn('Google OAuth not configured - GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET not set');
+}
 
 // ============================================================================
 // MICROSOFT OAUTH STRATEGY
 // ============================================================================
 
-passport.use(
-  new MicrosoftStrategy(
-    {
-      clientID: env.MICROSOFT_CLIENT_ID,
-      clientSecret: env.MICROSOFT_CLIENT_SECRET,
-      callbackURL: `${env.BACKEND_URL}/api/v1/auth/microsoft/callback`,
-      scope: ['user.read'],
-      tenant: 'common', // Allow both personal and work/school accounts
-    },
+// Only configure Microsoft OAuth if credentials are provided
+if (env.MICROSOFT_CLIENT_ID && env.MICROSOFT_CLIENT_SECRET) {
+  passport.use(
+    new MicrosoftStrategy(
+      {
+        clientID: env.MICROSOFT_CLIENT_ID,
+        clientSecret: env.MICROSOFT_CLIENT_SECRET,
+        callbackURL: `${env.BACKEND_URL}/api/v1/auth/microsoft/callback`,
+        scope: ['user.read'],
+        tenant: 'common', // Allow both personal and work/school accounts
+      },
     async (accessToken, refreshToken, profile, done) => {
       try {
         // Extract user info from Microsoft profile
@@ -153,8 +160,11 @@ passport.use(
         return done(error as Error, undefined);
       }
     }
-  )
-);
+    )
+  );
+} else {
+  console.warn('Microsoft OAuth not configured - MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET not set');
+}
 
 // Serialize user for session
 passport.serializeUser((user: any, done) => {
